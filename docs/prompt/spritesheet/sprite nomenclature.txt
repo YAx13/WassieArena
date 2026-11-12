@@ -1,0 +1,61 @@
+Bonjour Claude, on va faire évoluer notre jeu "Arène des Brutes" (Réseau Wass-E). Je veux implémenter visuellement la phase de combat (là où il y a actuellement les options x1, x2, x4, Skip) en utilisant des spritesheets en Pixel Art que je crée sur PixelLab.
+
+Tu vas devoir coder toute la logique de découpage des images et la machine d'état (State Machine) des animations. Voici mes contraintes et ma structure de fichiers :
+
+1. Contrainte de Grille : TOUTES mes spritesheets (personnages et familiers) utilisent une grille stricte de 4x4 (16 frames au total par planche : 4 lignes de 4 colonnes). Chaque case est un carré parfait.
+2. Logique des Armes (Layering) : Les spritesheets d'attaque ont les mains FERMÉES mais VIDES. Le code devra gérer un point d'ancrage (Pivot/Bone) sur la main pour superposer visuellement l'image de l'arme équipée selon l'animation.
+3. Système automatique : Le combat est asynchrone et géré par nos formules. Le script doit lire l'action choisie par l'algorithme et orchestrer le timing des animations.
+
+Voici la nomenclature exacte de mes fichiers 4x4 que tu dois gérer dans le code :
+
+---
+
+### PLANCHE 1 : BRUTE - ÉTATS DE BASE
+- Ligne 0 (4 frames) : Idle (Attente / Respiration en boucle)
+- Ligne 1 (4 frames) : Running Dash (Course d'élan vers l'avant)
+- Ligne 2 (4 frames) : 2 frames d'Esquive + 2 frames de Coup Reçu (Hurt flinch)
+- Ligne 3 (4 frames) : Chute et Mort K.O. au sol (Reste figé sur la dernière image)
+
+### PLANCHE 2 : BRUTE - ATTAQUES NORMALES
+- Ligne 0 (4 frames) : Basic Punch (Coup de poing de base)
+- Ligne 1 (4 frames) : Forward Thrust (Coup d'estoc vers l'avant pour lances/épées)
+- Ligne 2 (4 frames) : Jumping Overhead (Coup sauté pour armes lourdes)
+- Ligne 3 (4 frames) : Weapon Throwing (Jet d'arme à distance)
+
+### PLANCHE 3 : BRUTE - ATTAQUES CRITIQUES SPECTACULAIRES
+- Ligne 0 (4 frames) : Uppercut dévastateur (Critique mains nues)
+- Ligne 1 (4 frames) : Perforation éclair (Téléportation/Dash à travers l'ennemi)
+- Ligne 2 (4 frames) : Saut météore (Écrasement lourd au sol avec onde de choc)
+- Ligne 3 (4 frames) : Salto arrière et lancer de projectile en rafale
+
+### PLANCHE 4 : BRUTE - POSTURES DE DRESSEUR & SPÉCIALES
+- Ligne 0 (4 frames) : Ordre de commandement / Sifflement pour les familiers (Pointe le doigt)
+- Ligne 1 (4 frames) : Surprise / Flinch (Quand l'animal intercepte un coup à sa place)
+- Ligne 2 (4 frames) : Provocation / Taunt (Animation de moquerie)
+- Ligne 3 (4 frames) : Victory Celebration (Pose de victoire à la fin du duel)
+
+---
+
+### PLANCHES FAMILIERS (Chien, Loup, Ours - Même structure 4x4 pour les 3)
+- Ligne 0 (4 frames) : Idle (Animal au repos)
+- Ligne 1 (4 frames) : Running Loop (Course rapide vers l'ennemi)
+- Ligne 2 (4 frames) : Attack / Bite (Animation d'impact / Morsure)
+- Ligne 3 (4 frames) : Death / Knockout (Chute et K.O. au sol)
+
+---
+
+### LOGIQUE DE COMBAT ET TIMING "DRESSEUR" :
+Quand l'algorithme décide qu'un mutant utilise son animal :
+1. Joue la Ligne 0 de la Planche 4 de la Brute (Sifflement).
+2. Après un court délai, le familier passe en Ligne 1 (Course) et se déplace vers les coordonnées de la brute adverse.
+3. À l'impact, le familier joue sa Ligne 2 (Attaque). La brute adverse subit les dégâts et joue sa Ligne 2 de la Planche 1 (Coup reçu). Ajoute un micro "Freeze Frame" (0.1s) et un tremblement d'écran ("Screen Shake") pour donner de l'impact.
+4. Le familier revient en courant à sa position initiale et se remet en Idle.
+
+---
+
+### NOTE IMPORTANTE SUR LES ASSETS ACTUELS :
+J'ai déjà mes spritesheets fonctionnelles pour les états de base (Idle, course, dégâts, mort). En revanche, je n'ai pas encore dessiné sur PixelLab les planches d'attaques, de critiques et de dresseur. 
+
+Peux-tu coder TOUTE la logique du système de combat en utilisant mes vrais assets actuels pour les états, et en simulant temporairement les attaques manquantes (avec des poses figées ou en réutilisant mes frames d'états existantes) ? De cette façon, le moteur sera prêt et je n'aurai qu'à remplacer les fichiers PNG au fur et à mesure de mes dessins.
+
+Peux-tu m'adapter notre boucle de combat pour qu'elle intègre cette gestion d'animations ?

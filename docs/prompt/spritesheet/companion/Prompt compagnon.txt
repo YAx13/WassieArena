@@ -1,0 +1,13 @@
+Use the style of the character shared in the context 
+
+generate a pixel art post-apocalyptic wasteland companion Aw facing right, 2.5D beat-em-up perspective inspired by La Brute. Gritty battle-scarred stray hound, smaller than a human fighter, tattered ears, jagged scars, nalypatched leather spiked collar, lean muscular scavenger look, consistent scale and bottom-center ground alignment in every cell. Row 1: 4 tense growling idle animation loops. Row 2: 4 fast quadrupedal running loops. Row 3: 4 ferocious leaping biting attack loops. Row 4: 1 hurt flinching frame, 1 falling frame, and 2 dead knocked-out frames lying on the floor. Crisp 16-bit pixel art with dark outlines, no grid lines, no text. isolated on a solid flat chromakey green background, #00FF00
+
+
+Use the style of the character shared in the context 
+
+generate a pixel art post-apocalyptic wasteland companion cat sprite sheet, strict 4x4 grid of 16 equal square frames, 3/4 side view facing right, 2.5D beat-em-up perspective inspired by La Brute. Rugged feral survivor panther-cat, smaller and lower than a human fighter, notched ears, facial scar over one squinting eye, frayed rag bandana around neck, wiry street-fighter look, consistent scale and bottom-center ground alignment in every cell. Row 1: 4 low prowling breathing idle loops. Row 2: 4 bounding quadrupedal run loops. Row 3: 4 savage claw slashing pounce attack loops with motion lines. Row 4: 1 hurt recoil frame, 1 falling frame, and 2 dead knocked-out frames lying on the floor. Crisp 16-bit pixel art with dark outlines, no grid lines, no text. isolated on a solid flat chromakey green background, #00FF00
+
+
+Use the style of the character shared in the context 
+
+generate a pixel art post-apocalyptic giant companion bear sprite sheet, strict 4x4 grid of 16 equal square frames, 3/4 side view facing right, 2.5D beat-em-up perspective inspired by La Brute. Massive hulking bipedal grizzly bear standing upright on two legs like a heavy tank brawler, larger and broader than a human fighter, battle-worn scarred fur, torn ear, scrap metal shoulder strap and rusted chain collar, grim survivor look, consistent scale and bottom-center ground alignment in every cell. Row 1: 4 heavy upright breathing idle loops. Row 2: 4 lumbering charging run loops. Row 3: 4 brutal double paw ground slam attack loops with a small dust explosion. Row 4: 1 heavy stagger hurt frame, 1 falling backward frame, and 2 knocked-out frames lying flat on the floor. Crisp 16-bit pixel art with dark outlines, no grid lines, no text. isolated on a solid flat chromakey green background, #00FF00

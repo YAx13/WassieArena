@@ -1,0 +1,32 @@
+/* character-select.css — styles extraits de Arène_des_Brutes.html (écran de sélection / recrutement) */
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tab{flex:1 1 140px;padding:11px 10px;background:rgba(0,0,0,.7);border:1px solid var(--line);border-radius:2px;font-weight:700;font-size:.9rem;color:var(--dim)}
+.tab:hover{color:var(--txt);border-color:var(--neon)}
+.tab.active{color:var(--neon);border-color:var(--neon);background:rgba(232,168,48,.12);box-shadow:0 0 12px rgba(232,168,48,.45),inset 0 -3px 0 var(--neon)}
+
+/* recrutement : laboratoire de clonage */
+.stage{
+  display:flex;align-items:center;justify-content:center;aspect-ratio:1/1;max-height:420px;width:100%;
+  background:
+    radial-gradient(circle at 76% 17%,#fff0c8 0 5%,#ffc24d 6%,rgba(232,168,48,.25) 14%,transparent 28%),
+    repeating-linear-gradient(90deg,rgba(232,168,48,.07) 0 1px,transparent 1px 16px),
+    linear-gradient(180deg,#3b4149 0%,#3a342c 45%,#5b3d1c 100%);
+  border:1px solid var(--neon);border-radius:2px;box-shadow:inset 0 0 40px rgba(0,0,0,.7),0 0 14px rgba(232,168,48,.3);
+}
+.stage canvas{width:85%;height:85%;image-rendering:pixelated;filter:drop-shadow(0 0 6px rgba(232,168,48,.55))}
+
+/* Mes brutes : cuves */
+.socles{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:8px 0 18px}
+.socle{
+  position:relative;aspect-ratio:3/4;padding:8px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;text-align:center;cursor:pointer;
+  background:radial-gradient(ellipse at 50% 100%,rgba(232,168,48,.4),transparent 65%),linear-gradient(180deg,rgba(232,168,48,.07),rgba(0,0,0,.92));
+  border:1px solid var(--neon);border-radius:40px 40px 4px 4px;box-shadow:0 0 12px rgba(232,168,48,.35),inset 0 0 18px rgba(0,0,0,.8);
+}
+.socle.sel{border-color:var(--plasma-l);box-shadow:0 0 20px var(--plasma),inset 0 0 18px rgba(182,32,224,.25)}
+.socle canvas{width:80%;image-rendering:pixelated;margin-bottom:auto;margin-top:8px;filter:drop-shadow(0 0 4px rgba(232,168,48,.6))}
+.socle .nm{font-weight:700;font-size:.9rem;word-break:break-word;line-height:1.1;color:var(--txt)}
+.socle .lv{font-size:.8rem;color:var(--neon)}
+.socle.empty{cursor:default;border-style:dashed;border-color:var(--line);box-shadow:none;background:rgba(0,0,0,.6)}
+.socle.empty .q{font-size:4.5rem;color:#3b4a3b;margin:auto;font-weight:700}
+.socle .del{position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:2px;border:1px solid var(--plasma-l);background:#000;color:var(--plasma-l);font-size:.7rem;line-height:1}
+.socle .del:hover{background:var(--plasma);color:#fff}

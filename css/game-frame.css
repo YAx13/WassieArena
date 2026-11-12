@@ -1,0 +1,766 @@
+:root {
+  --frame-w: 1600px;
+  --frame-h: 900px;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+body {
+  padding: 0;
+}
+
+.game-frame.app {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: var(--frame-w);
+  height: var(--frame-h);
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #121315;
+  border: 1px solid var(--neon);
+  box-shadow: var(--glow);
+}
+
+.game-frame.app.is-scaled {
+  transform: scale(var(--game-frame-scale));
+  transform-origin: top left;
+}
+
+.game-frame-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1100px;
+  height: 618.75px;
+  transform: scale(var(--game-frame-content-scale, 1));
+  transform-origin: top left;
+}
+
+.game-frame-content > #screen-game,
+.game-frame-content > #screen-select-root {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.game-frame-content > #screen-game:not(.hidden) {
+  display: block;
+}
+
+.game-frame-content #home,
+.game-frame-content .home-grid {
+  width: 100%;
+  height: 100%;
+}
+
+.game-frame-content .afk-stage {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.game-frame-content .pane.ov.active {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  padding: 10px;
+}
+.game-frame-content #g-boss.active {
+  inset: 0;
+  margin: auto;
+  box-sizing: border-box;
+}
+.game-frame-content #g-fiche.active {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  padding: 0;
+}
+
+.game-frame-content #g-fiche .fx {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+}
+
+.game-frame > .toast {
+  max-width: 90%;
+  bottom: 20px;
+}
+
+.game-frame > .wtip {
+  width: 250px;
+  max-height: calc(var(--frame-h) - 12px);
+}
+
+.game-frame-content .tr-brutes {
+  display: grid;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  overflow: visible;
+}
+
+.game-frame-content .tr-b {
+  width: auto;
+}
+
+.game-frame-content .fx-right {
+  min-width: 0;
+}
+
+.game-frame-content #cs-train {
+  min-width: 0;
+  white-space: normal;
+}
+
+.game-frame-content #g-combat > .ov-bar,
+.game-frame-content #g-train > .ov-bar {
+  margin-bottom: 6px;
+}
+
+.game-frame-content #g-combat.active {
+  display: grid;
+  grid-template-columns: minmax(0, .72fr) minmax(0, 1.28fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  align-content: center;
+  gap: 8px;
+}
+
+.game-frame-content #g-combat > .ov-bar {
+  grid-column: 1 / -1;
+}
+
+.game-frame-content #g-combat #pvp-panel {
+  display: none;
+}
+
+.game-frame-content #g-combat #arena {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  align-self: center;
+}
+
+
+.game-frame-content #g-combat #arena {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0 auto;
+  padding: 10px;
+}
+
+.game-frame-content #g-combat #cv-arena {
+  height: auto;
+  max-height: 390px;
+}
+
+.game-frame-content #g-combat .log {
+  box-sizing: border-box;
+  height: 60px;
+  margin-top: 6px;
+}
+
+.game-frame-content #g-boss > #boss-stage {
+  box-sizing: border-box;
+  display: grid;
+  width: min(960px, 100%);
+  height: calc(100% - 62px);
+  grid-template-columns: minmax(0, .45fr) minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  align-content: center;
+  align-items: center;
+  gap: 8px 16px;
+  margin: 0 auto;
+}
+
+.game-frame-content #boss-stage > .boss-sprite {
+  grid-column: 1;
+  grid-row: 1 / 3;
+  width: min(300px, 100%);
+  justify-self: center;
+}
+
+.game-frame-content #boss-stage > .boss-name {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.game-frame-content #boss-stage > #rd-panel {
+  box-sizing: border-box;
+  grid-column: 2;
+  grid-row: 2;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 8px;
+}
+
+.game-frame-content #g-train > .plank.panel {
+  box-sizing: border-box;
+  display: grid;
+  width: min(960px, 100%);
+  height: calc(100% - 42px);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: auto auto auto auto minmax(0, 1fr) auto;
+  align-content: stretch;
+  gap: 4px 12px;
+  padding: 10px;
+}
+
+.game-frame-content #g-train > .plank.panel > .termbar {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 6px 8px;
+}
+
+.game-frame-content #g-train #tr-brutes {
+  grid-column: 1 / -1;
+  gap: 4px;
+  padding: 2px;
+}
+
+.game-frame-content #g-train .tr-b {
+  padding: 2px;
+  font-size: .58rem;
+  line-height: 1;
+}
+
+.game-frame-content #g-train .tr-b canvas {
+  width: 34px;
+  height: 34px;
+}
+
+.game-frame-content #g-train .arena-top {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.game-frame-content #g-train .arenawrap {
+  grid-column: 1;
+  grid-row: 4 / 6;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.game-frame-content #g-train #cv-train {
+  height: auto;
+  max-height: 100%;
+}
+
+.game-frame-content #g-train .tr-ctrl {
+  grid-column: 2;
+  grid-row: 4;
+  gap: 4px;
+  margin: 0;
+}
+
+.game-frame-content #g-train .tr-ctrl .btn,
+.game-frame-content #g-train #tr-wpn {
+  padding: 4px 6px;
+  font-size: .68rem;
+}
+
+.game-frame-content #g-train .tr-opt {
+  font-size: .68rem;
+}
+
+.game-frame-content #g-train #tr-select-decor {
+  max-width: 100px;
+}
+
+.game-frame-content #g-train #tr-anims {
+  grid-column: 2;
+  grid-row: 5;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: start;
+  gap: 2px 8px;
+  min-height: 0;
+}
+
+.game-frame-content #g-train .tr-grp {
+  margin: 2px 0;
+  font-size: .62rem;
+}
+
+.game-frame-content #g-train .tr-anims > :nth-child(1),
+.game-frame-content #g-train .tr-anims > :nth-child(3),
+.game-frame-content #g-train .tr-anims > :nth-child(5),
+.game-frame-content #g-train .tr-anims > :nth-child(7) {
+  grid-column: 1;
+}
+
+.game-frame-content #g-train .tr-anims > :nth-child(2),
+.game-frame-content #g-train .tr-anims > :nth-child(4),
+.game-frame-content #g-train .tr-anims > :nth-child(6),
+.game-frame-content #g-train .tr-anims > :nth-child(8) {
+  grid-column: 2;
+}
+
+.game-frame-content #g-train .tr-anims > :nth-child(1),
+.game-frame-content #g-train .tr-anims > :nth-child(3) {
+  grid-row: 1;
+}
+
+.game-frame-content #g-train .tr-anims > :nth-child(2),
+.game-frame-content #g-train .tr-anims > :nth-child(4) {
+  grid-row: 2;
+}
+
+.game-frame-content #g-train .tr-anims > :nth-child(5),
+.game-frame-content #g-train .tr-anims > :nth-child(7) {
+  grid-row: 3;
+}
+
+.game-frame-content #g-train .tr-anims > :nth-child(6),
+.game-frame-content #g-train .tr-anims > :nth-child(8) {
+  grid-row: 4;
+}
+
+.game-frame-content #g-train .tr-row {
+  gap: 3px;
+}
+
+.game-frame-content #g-train .tr-a {
+  width: 48px;
+  padding: 3px 1px;
+  font-size: .58rem;
+}
+
+.game-frame-content #g-train .tr-a b {
+  font-size: .95rem;
+}
+
+.game-frame-content #g-train > .plank.panel > .hint {
+  grid-column: 1 / -1;
+  grid-row: 6;
+  margin: 0;
+  font-size: .62rem;
+}
+
+.game-frame-content #g-combat.world-boss-screen.active {
+  display: block;
+  padding: 0;
+  background: #0b0c0d;
+}
+
+.game-frame-content #g-combat.world-boss-screen > .ov-bar,
+.game-frame-content #g-combat.world-boss-screen #arena-title,
+.game-frame-content #g-combat.world-boss-screen #log {
+  display: none;
+}
+
+.game-frame-content #g-combat.world-boss-screen #arena {
+  position: absolute;
+  inset: 0;
+  align-self: stretch;
+  width: auto;
+  height: auto;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.game-frame-content #g-combat.world-boss-screen .arena-top {
+  position: absolute;
+  z-index: 4;
+  top: 50px;
+  left: 453px;
+  margin: 0;
+}
+
+.game-frame-content #g-combat.world-boss-screen .speed {
+  gap: 4px;
+}
+
+.game-frame-content #g-combat.world-boss-screen .speed .btn {
+  min-width: 34px;
+  min-height: 34px;
+  padding: 5px 8px;
+  font-size: .75rem;
+}
+
+.game-frame-content #g-combat.world-boss-screen .arenawrap {
+  position: absolute;
+  inset: 0;
+}
+
+.game-frame-content #g-combat.world-boss-screen #cv-arena {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  object-fit: contain;
+  border: 0;
+  box-shadow: none;
+}
+
+.game-frame-content #g-combat.world-boss-screen #endscreen {
+  z-index: 5;
+  padding: 18px;
+  background: rgba(0, 0, 0, .78);
+}
+
+.game-frame-content #g-combat.world-boss-screen #endscreen h2 {
+  margin: 0;
+  font-size: clamp(1.4rem, 3vw, 2rem);
+}
+
+.game-frame-content #g-combat.world-boss-screen #endscreen p {
+  max-width: 80%;
+  margin: 4px 0;
+}
+
+.game-frame-content #g-combat.world-boss-screen > .ov-bar {
+  display: none;
+}
+
+.game-frame-content #g-combat.world-boss-screen.active {
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.game-frame-content #g-combat.world-boss-screen #arena {
+  grid-row: 1;
+}
+
+.game-frame-content #g-combat.world-boss-screen #worldboss-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.game-frame-content #g-combat.world-boss-screen #worldboss-actions .btn {
+  min-height: 38px;
+  padding: 8px 12px;
+  font-size: .82rem;
+}
+
+.game-frame-content #g-combat.world-boss-screen #worldboss-actions .btn:disabled {
+  opacity: .35;
+  cursor: not-allowed;
+}
+
+.game-frame-content #g-combat .wb-leaderboard {
+  position: absolute;
+  z-index: 90;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  background: rgba(0, 0, 0, .76);
+}
+
+.game-frame-content #g-combat .wb-leaderboard-box {
+  box-sizing: border-box;
+  width: min(560px, 100%);
+  max-height: 100%;
+  padding: 14px;
+  overflow: hidden;
+  color: var(--txt);
+  background: rgba(8, 9, 10, .96);
+  border: 1px solid var(--neon);
+  box-shadow: var(--glow);
+}
+
+.game-frame-content #g-combat .wb-leaderboard-box header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--neon);
+}
+
+.game-frame-content #g-combat .wb-leaderboard-box header .btn {
+  min-width: 34px;
+  min-height: 34px;
+  padding: 0;
+}
+
+.game-frame-content #g-combat .wb-rotation {
+  margin: 8px 0;
+  color: var(--txt);
+  text-align: center;
+  font-size: .82rem;
+}
+/* ===== PvP : combat plein écran épuré ===== */
+.game-frame-content #g-combat.pvp-screen:not(.pvp-preview) > .ov-bar,
+.game-frame-content #g-combat.pvp-screen:not(.pvp-preview) #pvp-panel,
+.game-frame-content #g-combat.pvp-screen:not(.pvp-preview) .log {
+  display: none;
+}
+
+.game-frame-content #g-combat.pvp-screen:not(.pvp-preview).active {
+  grid-template-rows: minmax(0, 1fr);
+  padding: 0;
+  background: #0b0c0d;
+}
+
+.game-frame-content #g-combat.pvp-screen:not(.pvp-preview) #arena {
+  position: relative;
+  grid-column: 1 / -1;
+  grid-row: 1;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.game-frame-content #g-combat.pvp-screen:not(.pvp-preview) .arena-top {
+  position: absolute;
+  z-index: 6;
+  top: 50px;
+  left: 453px;
+  right: auto;
+  width: auto;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+}
+
+.game-frame-content #g-combat.pvp-screen:not(.pvp-preview) .speed {
+  gap: 4px;
+}
+
+.game-frame-content #g-combat.pvp-screen:not(.pvp-preview) .speed .btn {
+  min-width: 34px;
+  min-height: 34px;
+  padding: 5px 8px;
+  font-size: .75rem;
+}
+
+.game-frame-content #g-combat.pvp-screen:not(.pvp-preview) #arena-title {
+  display: none;
+}
+
+.game-frame-content #g-combat.pvp-screen:not(.pvp-preview) .arenawrap {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.game-frame-content #g-combat.pvp-screen:not(.pvp-preview) #cv-arena {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  object-fit: contain;
+  border: 0;
+  box-shadow: none;
+}
+
+.game-frame-content #g-combat.pvp-screen:not(.pvp-preview) #endscreen {
+  z-index: 8;
+  background: rgba(0, 0, 0, .75);
+}
+
+.game-frame-content #g-combat .wb-leaderboard .rd-lb {
+  max-height: 390px;
+  overflow-y: auto;
+}
+
+.game-frame-content #g-combat .rd-draft {
+  position: absolute;
+  z-index: 80;
+  inset: 0;
+}
+/* ===== PvP : aperçu seul (le combat garde l'ancien layout) ===== */
+.game-frame-content #g-combat.pvp-screen.pvp-preview.active {
+  display: block;
+  padding: 0;
+  background: #0b0c0d;
+}
+
+.game-frame-content #g-combat.pvp-preview > .ov-bar {
+  position: absolute;
+  z-index: 6;
+  top: 12px;
+  right: 14px;
+  width: auto;
+  max-width: none;
+  margin: 0;
+}
+
+.game-frame-content #g-combat.pvp-preview > .ov-bar .termbar,
+.game-frame-content #g-combat.pvp-preview .arena-top,
+.game-frame-content #g-combat.pvp-preview #log,
+.game-frame-content #g-combat.pvp-preview #arena::before {
+  display: none;
+}
+
+.game-frame-content #g-combat.pvp-preview #arena {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.game-frame-content #g-combat.pvp-preview .arenawrap {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.game-frame-content #g-combat.pvp-preview #cv-arena {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  object-fit: contain;
+  border: 0;
+  box-shadow: none;
+}
+
+.game-frame-content #g-combat.pvp-screen.pvp-preview #pvp-panel {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  pointer-events: none;
+}
+
+.game-frame-content #g-combat.pvp-preview .pvp-left {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  bottom: auto;
+  box-sizing: border-box;
+  width: min(520px, 48%);
+  padding: 8px;
+  background: rgba(26, 16, 8, .9);
+  border: 1px solid #c9953a;
+  pointer-events: auto;
+}
+
+.game-frame-content #g-combat.pvp-preview .pvp-right {
+  position: absolute;
+  top: 62px;
+  right: 14px;
+  bottom: 14px;
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.game-frame-content #g-combat.pvp-preview .pvp-tickets {
+  margin: 0;
+  padding: 4px;
+  background: rgba(26, 16, 8, .9);
+}
+
+.game-frame-content #g-combat.pvp-preview .pvp-cibles {
+  flex: 1 1 0;
+  min-height: 0;
+  flex-direction: column;
+  flex-wrap: nowrap;
+}
+
+.game-frame-content #g-combat.pvp-preview .pvp-c {
+  flex: 1 1 0;
+  min-width: 0;
+  justify-content: center;
+  font-size: 14px;
+}
+
+#cs-train {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 2633 / 264;
+  padding: 0;
+  overflow: hidden;
+  border: 2px solid #c9953a;
+  background: #1b1714;
+  cursor: default;
+}
+
+#cs-train #cv-train {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+
+#cs-train .train-sign {
+  position: absolute;
+  top: 14%;
+  left: 1.5%;
+  height: 72%;
+  padding: 2px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  background: rgba(24, 15, 8, 0.85);
+  border: 1px solid #c9953a;
+  border-radius: 3px;
+  color: #ffe23d;
+  font-family: monospace;
+  font-weight: bold;
+  font-size: 11px;
+  line-height: 1.1;
+  cursor: pointer;
+  transition: transform 0.08s, filter 0.12s;
+}
+
+#cs-train .train-sign:hover:not(.disabled) {
+  transform: scale(1.06);
+  filter: brightness(1.18);
+}
+
+#cs-train .train-sign .train-cnt {
+  font-size: 9px;
+  color: #e6dcc8;
+}
+
+#cs-train .train-sign.disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

@@ -1,0 +1,1 @@
+the exact character of the reference, remove the weapon of his hand, holding an invisible handle, image, 3/4 side view, 2.5D beat-em-up perspective. Rows layout: row 1 has 4 basic punch animation loops, row 2 has 4 forward thrust stab loops, row 3 has 4 jumping overhead attack loops, row 4 has 4 weapon throwing loops. Transparent background.

@@ -1,0 +1,1 @@
+the exact character of the reference, remove weapon of his hand, image, 34 side view, 2.5D beat-em-up perspective. Rows layout row 1 has 4 idle animation loops, row 2 has 4 running dash loops, row 3 has 2 dodging frames and 3 hurt flinching frames, row 4 has 3 dead knocked-out frames lying on the floor. Transparent background.

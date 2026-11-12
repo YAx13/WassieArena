@@ -1,0 +1,527 @@
+Structure du dossier
+Le numéro de série du volume est 8455-7515
+C:.
+|   help.webm
+|   index.html
+|   Structure-update.cmd
+|   
++---assets
+|   +---backgrounds
+|   |   +---afk
+|   |   |   +---empereur
+|   |   |   |       afk-1.jpeg
+|   |   |   |       afk-2.jpg
+|   |   |   |       
+|   |   |   +---frankenstein
+|   |   |   |       afk-1.jpeg
+|   |   |   |       afk-10.jpeg
+|   |   |   |       afk-2.jpeg
+|   |   |   |       
+|   |   |   +---general
+|   |   |   |       afk-1.jpeg
+|   |   |   |       afk-2.jpeg
+|   |   |   |       
+|   |   |   +---hazmat
+|   |   |   |       afk-1.jpeg
+|   |   |   |       afk-2.jpeg
+|   |   |   |       
+|   |   |   +---human
+|   |   |   |       afk-1.jpeg
+|   |   |   |       afk-10.jpeg
+|   |   |   |       afk-11.jpeg
+|   |   |   |       afk-4.jpeg
+|   |   |   |       afk-6.jpeg
+|   |   |   |       afk-7.jpeg
+|   |   |   |       afk-8.jpeg
+|   |   |   |       
+|   |   |   +---inversebrah
+|   |   |   |       afk-1.jpeg
+|   |   |   |       
+|   |   |   +---momie
+|   |   |   |       afk-1.jpeg
+|   |   |   |       afk-2.jpeg
+|   |   |   |       afk-5.jpeg
+|   |   |   |       
+|   |   |   +---samourai
+|   |   |   |       afk-1.jpg
+|   |   |   |       afk-10.jpg
+|   |   |   |       afk-2.jpg
+|   |   |   |       afk-3.jpg
+|   |   |   |       afk-4.jpg
+|   |   |   |       
+|   |   |   \---zeus
+|   |   |           afk-1.jpeg
+|   |   |           afk-2.jpeg
+|   |   |           afk-3.jpeg
+|   |   |           
+|   |   +---boss
+|   |   |   +---paper
+|   |   |   |       bossroom-1.jpg
+|   |   |   |       bossroom-2.jpg
+|   |   |   |       
+|   |   |   +---pet
+|   |   |   |       bossroom-1.jpg
+|   |   |   |       bossroom-2.jpg
+|   |   |   |       bossroom-4.jpg
+|   |   |   |       
+|   |   |   +---weapon
+|   |   |   |       bossroom-1.jpg
+|   |   |   |       bossroom-2.jpg
+|   |   |   |       bossroom-3.jpg
+|   |   |   |       
+|   |   |   \---world
+|   |   |           bossroom-0.jpg
+|   |   |           bossroom-1.jpg
+|   |   |           bossroom-2.jpg
+|   |   |           bossroom-4.jpg
+|   |   |           bossroom-5.jpg
+|   |   |           bossroom-6.jpg
+|   |   |           
+|   |   +---pvp
+|   |   |   |   nuclear-1.jpeg
+|   |   |   |   nuclear-2.jpeg
+|   |   |   |   nuclear-3.jpeg
+|   |   |   |   robot-1.jpeg
+|   |   |   |   robot-2.jpeg
+|   |   |   |   robot-3.jpeg
+|   |   |   |   
+|   |   |   +---empereur
+|   |   |   |       pvpPreview.jpeg
+|   |   |   |       
+|   |   |   +---frankenstein
+|   |   |   |       pvpPreview.jpeg
+|   |   |   |       
+|   |   |   +---general
+|   |   |   |       pvpPreview.jpeg
+|   |   |   |       
+|   |   |   +---hazmat
+|   |   |   |       pvpPreview.jpeg
+|   |   |   |       
+|   |   |   +---human
+|   |   |   |       pvpPreview.jpeg
+|   |   |   |       
+|   |   |   +---inversebrah
+|   |   |   |       pvpPreview.jpeg
+|   |   |   |       
+|   |   |   +---momie
+|   |   |   |       pvpPreview.jpeg
+|   |   |   |       
+|   |   |   +---samourai
+|   |   |   |       pvpPreview.jpeg
+|   |   |   |       
+|   |   |   \---zeus
+|   |   |           pvpPreview.jpeg
+|   |   |           
+|   |   \---train
+|   |       +---empereur
+|   |       |       trainBanner.png
+|   |       |       
+|   |       +---frankenstein
+|   |       |       trainBanner.png
+|   |       |       
+|   |       +---general
+|   |       |       trainBanner.png
+|   |       |       
+|   |       +---hazmat
+|   |       |       trainBanner.png
+|   |       |       
+|   |       +---human
+|   |       |       trainBanner.png
+|   |       |       
+|   |       +---inversebrah
+|   |       |       trainBanner.png
+|   |       |       
+|   |       +---momie
+|   |       |       trainBanner.png
+|   |       |       
+|   |       +---samourai
+|   |       |       trainBanner.png
+|   |       |       
+|   |       \---zeus
+|   |               trainBanner.png
+|   |               
+|   +---bosses
+|   |   +---paper
+|   |   |   \---sheets
+|   |   |           sheet-1.png
+|   |   |           
+|   |   +---pet
+|   |   |   \---sheets
+|   |   |           sheet-1.png
+|   |   |           
+|   |   +---weapon
+|   |   |   \---sheets
+|   |   |           sheet-1.png
+|   |   |           
+|   |   \---world
+|   |       \---sheets
+|   |               sheet-1.png
+|   |               
+|   +---characters
+|   |   +---empereur
+|   |   |   |   portrait.png
+|   |   |   |   sprite.png
+|   |   |   |   
+|   |   |   +---sheets
+|   |   |   |       sheet-1.png
+|   |   |   |       sheet-2.png
+|   |   |   |       sheet-3.png
+|   |   |   |       sheet-4.png
+|   |   |   |       
+|   |   |   \---weapons
+|   |   |           weapon-1-transparent.png
+|   |   |           weapon-1.jpeg
+|   |   |           
+|   |   +---frankenstein
+|   |   |   |   starter.jpeg
+|   |   |   |   
+|   |   |   +---sheets
+|   |   |   |       sheet-1.png
+|   |   |   |       sheet-2.png
+|   |   |   |       sheet-3.png
+|   |   |   |       sheet-4.png
+|   |   |   |       
+|   |   |   \---weapons
+|   |   |           weapon-1-transparent.png
+|   |   |           weapon-1.jpeg
+|   |   |           
+|   |   +---general
+|   |   |   |   portrait.png
+|   |   |   |   sprite.png
+|   |   |   |   starter.jpeg
+|   |   |   |   
+|   |   |   +---sheets
+|   |   |   |       sheet-1.png
+|   |   |   |       sheet-2.png
+|   |   |   |       sheet-3.png
+|   |   |   |       sheet-4.png
+|   |   |   |       
+|   |   |   \---weapons
+|   |   |           weapon-1-transparent.png
+|   |   |           weapon-1.jpeg
+|   |   |           weapon-2-transparent.png
+|   |   |           weapon-2.jpeg
+|   |   |           weapon-3-transparent.png
+|   |   |           weapon-3.jpeg
+|   |   |           weapon-4-transparent.png
+|   |   |           weapon-4.jpeg
+|   |   |           
+|   |   +---hazmat
+|   |   |   |   sprite.png
+|   |   |   |   starter.jpeg
+|   |   |   |   
+|   |   |   +---sheets
+|   |   |   |       sheet-1.png
+|   |   |   |       sheet-2.png
+|   |   |   |       sheet-3.png
+|   |   |   |       sheet-4.png
+|   |   |   |       
+|   |   |   \---weapons
+|   |   |           weapon-1-transparent.png
+|   |   |           weapon-1.jpeg
+|   |   |           weapon-2-transparent.png
+|   |   |           weapon-2.jpeg
+|   |   |           weapon-3-transparent.png
+|   |   |           weapon-3.jpeg
+|   |   |           
+|   |   +---human
+|   |   |   |   starter.jpeg
+|   |   |   |   
+|   |   |   +---sheets
+|   |   |   |       sheet-1.png
+|   |   |   |       sheet-2.png
+|   |   |   |       sheet-3.png
+|   |   |   |       sheet-4.png
+|   |   |   |       
+|   |   |   \---weapons
+|   |   |           weapon-1-transparent.png
+|   |   |           weapon-1.jpeg
+|   |   |           weapon-2-transparent.png
+|   |   |           weapon-2.jpeg
+|   |   |           weapon-3-transparent.png
+|   |   |           weapon-3.jpeg
+|   |   |           
+|   |   +---inversebrah
+|   |   |   |   sprite.png
+|   |   |   |   starter.jpeg
+|   |   |   |   
+|   |   |   +---sheets
+|   |   |   |       sheet-1.png
+|   |   |   |       sheet-2.png
+|   |   |   |       sheet-3.png
+|   |   |   |       sheet-4.png
+|   |   |   |       
+|   |   |   \---weapons
+|   |   |           weapon-1-transparent.png
+|   |   |           weapon-1.jpeg
+|   |   |           weapon-2-transparent.png
+|   |   |           weapon-2.jpeg
+|   |   |           weapon-3-transparent.png
+|   |   |           weapon-3.jpeg
+|   |   |           weapon-4-transparent.png
+|   |   |           weapon-4.jpeg
+|   |   |           
+|   |   +---momie
+|   |   |   |   sprite.png
+|   |   |   |   starter.jpeg
+|   |   |   |   
+|   |   |   +---sheets
+|   |   |   |       sheet-1.png
+|   |   |   |       sheet-2.png
+|   |   |   |       sheet-3.png
+|   |   |   |       sheet-4.png
+|   |   |   |       
+|   |   |   \---weapons
+|   |   |           weapon-1-transparent.png
+|   |   |           weapon-1.jpeg
+|   |   |           weapon-2-transparent.png
+|   |   |           weapon-2.jpeg
+|   |   |           weapon-3-transparent.png
+|   |   |           weapon-3.jpeg
+|   |   |           
+|   |   +---samourai
+|   |   |   |   sprite.png
+|   |   |   |   starter.jpeg
+|   |   |   |   
+|   |   |   +---sheets
+|   |   |   |       sheet-1.png
+|   |   |   |       sheet-2.png
+|   |   |   |       sheet-3.png
+|   |   |   |       sheet-4.png
+|   |   |   |       
+|   |   |   \---weapons
+|   |   |           weapon-1-transparent.png
+|   |   |           weapon-1.jpeg
+|   |   |           weapon-2-transparent.png
+|   |   |           weapon-2.jpeg
+|   |   |           weapon-3-transparent.png
+|   |   |           weapon-3.jpeg
+|   |   |           
+|   |   \---zeus
+|   |       |   sprite.png
+|   |       |   starter.jpeg
+|   |       |   
+|   |       +---sheets
+|   |       |       sheet-1.png
+|   |       |       sheet-2.png
+|   |       |       sheet-3.png
+|   |       |       sheet-4.png
+|   |       |       
+|   |       \---weapons
+|   |               weapon-1-transparent.png
+|   |               weapon-1.jpeg
+|   |               weapon-2-transparent.png
+|   |               weapon-2.jpeg
+|   |               weapon-3-transparent.png
+|   |               weapon-3.jpeg
+|   |               
+|   \---companion
+|       +---empereur
+|       |       background.jpeg
+|       |       foreground.png
+|       |       
+|       +---form-1
+|       |       aqua.png
+|       |       beetle.png
+|       |       bird.png
+|       |       bull.png
+|       |       cat.png
+|       |       dog.png
+|       |       eagle.png
+|       |       lizard.png
+|       |       ours.png
+|       |       racoon.png
+|       |       snake.png
+|       |       spectre.png
+|       |       wolf.png
+|       |       
+|       +---form-2
+|       |       aqua.png
+|       |       beetle.png
+|       |       bird.png
+|       |       bull.png
+|       |       cat.png
+|       |       dog.png
+|       |       eagle.png
+|       |       lizard.png
+|       |       ours.png
+|       |       racoon.png
+|       |       snake.png
+|       |       spectre.png
+|       |       wolf.png
+|       |       
+|       +---form-3
+|       |       aqua.png
+|       |       beetle.png
+|       |       bird.png
+|       |       bull.png
+|       |       cat.png
+|       |       dog.png
+|       |       eagle.png
+|       |       lizard.png
+|       |       ours.png
+|       |       racoon.png
+|       |       snake.png
+|       |       spectre.png
+|       |       wolf.png
+|       |       
+|       +---frankenstein
+|       |       background.jpeg
+|       |       foreground.png
+|       |       
+|       +---general
+|       |       background.jpeg
+|       |       foreground.png
+|       |       
+|       +---hazmat
+|       |       background.jpeg
+|       |       foreground.png
+|       |       
+|       +---human
+|       |       background.jpeg
+|       |       foreground.png
+|       |       
+|       +---inversebrah
+|       |       background.jpeg
+|       |       foreground.png
+|       |       
+|       +---momie
+|       |       background.jpeg
+|       |       foreground.png
+|       |       
+|       +---samourai
+|       |       background.jpeg
+|       |       foreground.png
+|       |       
+|       \---zeus
+|               background.jpeg
+|               foreground.png
+|               
++---css
+|       character-select.css
+|       game-frame.css
+|       styles.css
+|       
++---docs
+|   |   PROJECT_STRUCTURE.txt
+|   |   
+|   \---prompt
+|       |   cell.paint
+|       |   
+|       +---Nouveau dossier
+|       |       compagnon cell.txt
+|       |       image_ff637b67.jpg
+|       |       
+|       \---spritesheet
+|           |   prompt boss.txt
+|           |   prompt PLANCHE 1.txt
+|           |   prompt PLANCHE 2.txt
+|           |   prompt PLANCHE 3.txt
+|           |   prompt PLANCHE 4.txt
+|           |   sprite nomenclature.txt
+|           |   
+|           \---companion
+|                   &.png
+|                   &é.png
+|                   '.png
+|                   (.png
+|                   Prompt compagnon.txt
+|                   
++---js
+|   +---core
+|   |       data.js
+|   |       main.js
+|   |       state.js
+|   |       
+|   +---systems
+|   |       afk.js
+|   |       combat.js
+|   |       pvp.js
+|   |       raids.js
+|   |       simulateur.js
+|   |       
+|   \---ui
+|           armurerie.js
+|           caserne.js
+|           character-select.js
+|           game-frame.js
+|           recorder.js
+|           renderer.js
+|           ui-core.js
+|           
+\---raw
+    |   A UTILISER.jpeg
+    |   dog.jpeg
+    |   fond.txt
+    |   ours-3.jpeg
+    |   starter.jpeg
+    |   
+    +---avif
+    |       frankenstein.avif
+    |       hazmat.avif
+    |       inversebrah.avif
+    |       momie.avif
+    |       samourai.avif
+    |       zeus.avif
+    |       
+    +---boss
+    |   +---pet
+    |   |       image_65816223-transparent.png
+    |   |       image_65816223.jpeg
+    |   |       image_667026fd.jpeg
+    |   |       
+    |   \---weapon
+    |           image_19cef7c8-transparent.png
+    |           image_19cef7c8.jpeg
+    |           image_ddd92bc8.jpeg
+    |           image_f6ccc56b-transparent.png
+    |           image_f6ccc56b.jpeg
+    |           
+    +---form-1raw
+    |       aqua.jpeg
+    |       beetle.jpeg
+    |       bird.jpeg
+    |       bull.jpeg
+    |       cat.jpeg
+    |       dog.jpeg
+    |       eagle.jpeg
+    |       lizard.jpeg
+    |       ours.jpeg
+    |       racoon.jpeg
+    |       snake.jpeg
+    |       spectre.jpeg
+    |       wolf.jpeg
+    |       
+    +---form-2raw
+    |       aqua.jpeg
+    |       beetle.jpeg
+    |       bird.jpeg
+    |       bull.jpeg
+    |       cat.jpeg
+    |       dog.jpeg
+    |       eagle.jpeg
+    |       lizard.jpeg
+    |       ours.jpeg
+    |       racoon.jpeg
+    |       snake.jpeg
+    |       spectre.jpeg
+    |       wolf.jpeg
+    |       
+    +---form-3raw
+    |       aqua.jpeg
+    |       beetle.jpeg
+    |       bird.jpeg
+    |       bull.jpeg
+    |       cat.jpeg
+    |       dog.jpeg
+    |       eagle.jpeg
+    |       lizard.jpeg
+    |       ours.jpeg
+    |       racoon.jpeg
+    |       snake.jpeg
+    |       spectre.jpeg
+    |       wolf.jpeg
+    |       
+    \---screenshots
+            human-style-description.png
+            
