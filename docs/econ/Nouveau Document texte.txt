@@ -1,0 +1,201 @@
+Refonte économie et loot : design sans caisses (v0.1)
+Arène des Brutes · GDD · v0.1 · Toutes les valeurs sont des hypothèses [PLACEHOLDER] jusqu'au playtest.
+Changelog
+• v0.1 : analyse du code existant, nouvelle architecture sans caisses, objectifs de complétion, checklist de suppression, risques.
+1. Ce que dit le code aujourd'hui
+1.  Les caisses sont la seule source d'armes. Combat.rollDrop est du code mort en pratique : le PvP passe recompenses:false et aucun autre mode ne donne de drop. Les caisses sont aussi la seule source de maîtrise d'arme (via les doublons). Sans remplacement, armes et maîtrise disparaissent.
+2.  Le Boss des Armes gonfle l'équipement. La formule round((p-1)*.4) + pick([-1,0,0,1]) donne environ 75 % de pièces Divines dès le palier 13 et presque 100 % dès le palier 17. « Première pièce Divine » se fait en quelques jours.
+3.  L'Or n'a aucun puits et est très inflationniste. L'AFK paie 3×niveau Or/s avec un plafond de 4 h (le commentaire « 28 800 » est périmé). Cela fait 43 k Or par récolte au niveau 1 et 2,1 M au niveau 50, contre 100 Or la caisse. Le seul autre puits visible est l'entraînement Mutagène, que je ne peux pas chiffrer sans caserne.js.
+4.  La fusion est gratuite et aveugle aux slots. Une pièce Divine coûte 243 Communs, et seule la meilleure pièce par slot compte pour les stats : toute pièce excédentaire est du poids mort.
+5.  Le Boss Mondial ne paie rien. Il a un classement et 2 clés par jour, mais aucun butin.
+6.  Bug Pierre. Les récompenses de saison appellent donnerRecompense("pierres_transmutation"), mais cle() ne connaît pas cet alias : elle renvoie false et les pierres ne sont jamais accordées.
+7.  Collectionner les armes affaiblit. Le combat fait pick(A.br.weapons) de façon uniforme : débloquer le Bouclier (dmg 2) baisse la moyenne des coups d'arme. « Obtenir toutes les armes » exige un équipement d'armes (voir §6).
+2. Piliers
+• L'énergie achète un objectif choisi, pas un ticket de loterie. L'acquisition est ciblée, avec une variance contrôlée.
+• L'énergie rythme l'acquisition, l'Or rythme la conversion. L'Or doit rester pertinent du jour 1 au jour 200.
+• Aucune impasse. Chaque ressource a un usage et il n'y a aucun doublon gaspillé.
+3. Nouvelle architecture
+Avant
+Après
+Caisses 📦
+Supprimées
+Pièces d'équipement (aléatoires)
+Ferraille + Forge (vous choisissez le slot)
+Arme (via caisse)
+Éclats d'arme, farmés sur une arme cible que vous choisissez
+Les doublons donnent la maîtrise
+La maîtrise s'achète avec des éclats et de l'Or
+Fusion gratuite
+La Forge coûte de la Ferraille et de l'Or
+3.1 Victoire au Boss des Armes, palier p
+• Ferraille = 2 + ⌊p/4⌋ (×1,5 sur les paliers-murs 5/10/15/20)
+• Éclats sur l'arme cible = 3 + ⌊p/5⌋
+• 8 % de Surcharge : les deux récompenses ×2. C'est le pic de dopamine, peu coûteux et borné.
+• La première victoire au palier 1 donne 100 éclats : la première arme arrive en environ 10 minutes.
+• Prime quotidienne : la première victoire de chaque lane chaque jour paie ×2. Cela évite que les lanes Parchemins et Familier soient ignorées.
+3.2 Forge (par slot, au choix)
+Passer de r à r+1 coûte 30×3^r Ferraille et 1 000×3^r Or. Il y a 8 % de « Coup de génie » qui saute deux rangs.
+Étape
+Ferraille
+Or
+Ferraille cumulée
+C→PC
+30
+1 k
+30
+PC→R
+90
+3 k
+120
+R→É
+270
+9 k
+390
+É→L
+810
+27 k
+1 200
+L→D
+2 430
+81 k
+3 630
+3.3 Armes
+• Déblocage : 100 éclats et 5 000 Or.
+• Maîtrise de niveau n (1 à 10) : 60+30n éclats et 2 000n Or. L'effet est inchangé (+10 % de puissance et +1 % de critique par niveau).
+• Une arme de 0 à +10 coûte 2 350 éclats et 115 k Or. Les 16 armes coûtent 37 600 éclats et 1,84 M Or.
+3.4 Or
+• L'AFK devient 200 + 50×niveau Or/heure (niveau 1 : 250/h, niveau 50 : 2 700/h), avec le même plafond de 4 h. Il faut passer l'unité d'Or/s à Or/h, car l'arrondi entier de tauxOrAfk casse à ces taux.
+• Les victoires de boss paient 15×p Or.
+• Les puits finis sur toute la durée de vie représentent environ 2,3 M Or (forge 484 k plus armes 1,84 M). L'entraînement Mutagène est le puits ouvert par-dessus.
+3.5 Autres sources
+Saison PvP (remplace les caisses) :
+Grade
+Or
+Ferraille
+Éclats
+Pierre
+Bronze
+200
+–
+–
+–
+Argent
+500
+–
+10
+–
+Or
+1 000
+40
+25
+–
+Élite
+2 000
+100
+60
+1
+Légende
+4 000
+200
+120
+1
+• Run de Boss Mondial : 5 + 5×palier éclats sur votre arme cible (palier 0 à 5 selon des tranches de dégâts, à calibrer).
+• Paliers de niveau (tous les 5) : +1 Parchemin et 30×(N/5) Ferraille.
+4. Objectifs de complétion
+Ces estimations supposent 25 / 10 / 45 énergie Armes par jour pour les profils engagé / casual / hardcore. Je n'ai pas vu la classe Energy : c'est l'hypothèse la plus fragile. Traitez ces chiffres à ±30 %.
+Jalon
+Coût
+Hardcore
+Engagé
+Casual
+Première arme
+100 éclats
+10 min
+10 min
+10 min
+4 armes
+400
+J2
+J4
+J10
+Toutes les 16 armes
+1 600
+J8
+J14
+J38
+Première arme +10
+2 350
+J10 (ciblé)
+J18 ciblé / J28 typique
+J75
+4 armes +10
+9 400
+J36
+J62
+J170
+Toutes les armes +10
+37 600
+J110
+~J190
+irréaliste
+Premier slot Épique
+390 F
+J3
+J6
+J14
+4 slots Épiques
+1 560 F
+J9
+J18
+J45
+Premier Légendaire
+1 200 F
+J7
+J14
+J35
+4 Légendaires
+4 800 F
+J22
+J40
+J95
+Première pièce Divine
+3 630 F
+J16
+J32
+J80
+4 Divines
+14 520 F
+J55
+~J90
+J230
+Leviers. Le temps est linéaire en fonction du coût de base de la forge K (actuellement 30). Pour viser la première Divine vers J50 au lieu de J32, prendre K≈45. Le temps de déblocage d'arme évolue de la même façon avec le coût de 100 éclats.
+5. Checklist de suppression des caisses
+• data.js : supprimer GachaShop.
+• state.js :
+    ◦ supprimer caisses dans defaultRessources, les alias de cle() et la puce 📦 ;
+    ◦ supprimer brancherCargos, majCargos, acheterCaisse, ouvrirCaisse et PRIX_CAISSE ;
+    ◦ retirer le caisses++ à chaque 5e niveau.
+• pvp.js : remplacer caisses dans GRADES et dans le texte de la pop-up de fin de saison. Corriger l'alias pierres_transmutation.
+• raids.js : la branche Armes de finExpe et la chaîne de description du butin.
+• combat.js : supprimer rollDrop.
+• index.html : remplacer #btn-chest, #btn-chest-open, #chest et #chest-result par un panneau Forge et Armurerie.
+• Modèle de données : garder gear en tableau mais n'autoriser qu'une pièce par slot, pour que gearBonus et calculerPuissance ne changent pas.
+• Migration de sauvegarde (v1→v2) :
+    ◦ 1 caisse → 50 Ferraille + 25 éclats ;
+    ◦ garder la meilleure pièce par slot, les pièces excédentaires → 15×3^r Ferraille ;
+    ◦ armes possédées et niveaux de maîtrise inchangés ;
+    ◦ l'Or est inchangé.
+6. Dépendances et risques
+• Équipement d'armes. Je recommande des slots aux niveaux 1/10/25, comme pour les compétences. Sans cela, « obtenir toutes les armes » est un piège (voir §1.7).
+• Dominance d'une lane. Armes paie deux monnaies : « toute l'énergie dans Armes » pourrait devenir la stratégie dominante. La prime quotidienne aide, mais Parchemins et Familier doivent offrir une valeur équivalente. Leur butin n'est pas modifié ici. Je corrigerais aussi le coût de tirage des Parchemins en 2^n, qui rend « les 32 compétences » mathématiquement impossible.
+• Les casuals risquent le manque d'Or. Ils gagnent environ un tiers de l'Or, car le plafond AFK de 4 h implique une seule récolte par jour.
+Seuils « cassé » (à définir avant le playtest) :
+• Plus de 25 % des joueurs débloquent toutes les armes avant J10.
+• Le temps médian vers la première Divine sort de la plage J25 à J60.
+• Plus de 40 % des étapes de forge sont limitées par l'Or pour les joueurs engagés.
+• L'Or gagné par joueur actif et par jour croît de plus de 15 % plus vite que les puits d'Or.
+7. Prochaines étapes
+Il me faudrait caserne.js, armurerie.js et la classe Energy pour chiffrer l'entraînement Mutagène et confirmer l'hypothèse de régénération. Je peux ensuite produire :
+• un GDD complet avec changelog et fiches de mécaniques ;
+• un tableur d'équilibrage avec formules actives, pour bouger K, les coûts en éclats et les profils ;
+• le patch de code pour les sections 3 et 5.
