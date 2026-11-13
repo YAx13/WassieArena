@@ -1,7 +1,7 @@
 Structure du dossier
 Le numéro de série du volume est 8455-7515
 C:.
-|   help.webm
+|   .gitattributes
 |   index.html
 |   Structure-update.cmd
 |   
@@ -405,6 +405,13 @@ C:.
 +---docs
 |   |   PROJECT_STRUCTURE.txt
 |   |   
+|   +---.md
+|   |       game designer.txt
+|   |       senior developer.txt
+|   |       
+|   +---econ
+|   |       Nouveau Document texte.txt
+|   |       
 |   \---prompt
 |       |   cell.paint
 |       |   
