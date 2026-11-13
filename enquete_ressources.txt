@@ -1,0 +1,162 @@
+﻿data.js [L.67] : chien: "dog", loup: "wolf", ours: "ours", serpent: "snake",
+data.js [L.68] : oiseau: "bird", arthropode: "beetle", felin: "cat", taureau: "bull",
+data.js [L.69] : aquatique: "aqua", chimere: "racoon", lezard: "lizard",
+data.js [L.70] : spectre: "spectre", tempete: "eagle"
+data.js [L.173] : planches: [1, 2, 3, 4].map(n => assetPath.sheet(k, n))
+data.js [L.182] : chien_friche:{ base:"Chien de friche", forms:[
+state.js [L.9] : KEY: "arene_gamestate_v1",
+state.js [L.10] : VERSION: 1,
+state.js [L.12] : NIVEAU_MAX: 50,
+state.js [L.13] : PALIERS: 20,                       // paliers par Boss (source unique, lue par Raids)
+state.js [L.14] : MAITRISE_MAX: 10,
+state.js [L.20] : SAVED: ["ressources", "energieTs", "achatsStats", "tentativesParchemins", "reputation", "saisonDebut", "monde", "vip",
+state.js [L.26] : boss: { armes: 0, parchemins: 0, familier: 0, mondial: 0 },   // palier atteint par mode
+state.js [L.27] : presets: { actif: 1, 1: null, 2: null, 3: null },
+state.js [L.28] : monde: { cles: 2, jour: "", rotation: -1, record: 0 },        // Boss Mondial (voir raids.js)
+state.js [L.29] : achatsStats: 0,            // Entraînements Mutagènes achetés
+state.js [L.30] : tentativesParchemins: 0,   // tirages de compétence (coût en Parchemins = 2^n)
+state.js [L.31] : reputation: 1000,          // Elo PvP
+state.js [L.32] : maitriseArmes: {},         // { idArme: 0..10 } via les doublons de caisse
+state.js [L.33] : ticketsPvp: 5, skipsGratuits: 3
+state.js [L.66] : parchemin: "parchemins", parchemins: "parchemins", nourriture: "nourriture", pierre: "pierres", pierres: "pierres", transmutation: "pierres" };
+afk.js [L.4] : BG_IMAGE:"",          // décor de secours si une brute n'a pas d'AFK1
+afk.js [L.5] : HERO_SIZE:156,         // taille d'affichage (px) de la brute
+afk.js [L.6] : MINION_SPRITES:["inversebrah"] // clés de sprites dans DataEngine.SPRITES (ex: ["inversebrah"])
+afk.js [L.10] : CAP_SEC:4*3600,                                            // plafond de la jauge de butin (4 h hors-ligne = 28 800 Or). Modifiable.
+afk.js [L.11] : COLORS:["#c0392b","#e67e22","#8e44ad","#16a085","#2980b9","#f1c40f"],
+afk.js [L.13] : attacks:[["punch",5],["thrust",5],["overhead",4],["uppercut",1.5],["pierce",1.5],["meteor",1]],
+afk.js [L.14] : KILLS:{punch:1,thrust:1,overhead:2,uppercut:1,pierce:2,meteor:3},   // minions tués par attaque
+afk.js [L.15] : lastAttack:"",recoilDistance:40,heroX:0,heroPhase:"idle",heroAnim:"idle",heroFrom:0,heroTo:0,heroPhaseStart:0,heroDuration:0,attackImpactAt:0,attackImpact:false,
+afk.js [L.186] : transition:"all "+(ms/1000)+"s steps(4)"},css);
+afk.js [L.225] : boxShadow: "-6px 4px 0 #ddd, 6px 4px 0 #ddd, 0 -6px 0 #fff", transform: "translate(-50%,0)" },
+afk.js [L.269] : boxShadow: "0 -6px 0 #fff, 0 6px 0 #fff, -6px 0 0 #fff, 6px 0 0 #fff, 0 -12px 0 #ffe600, 0 12px 0 #ffe600, -12px 0 0 #ffe600, 12px 0 0 #ffe600" },
+afk.js [L.314] : armes:     {label:"Boss des Armes",      cls:"mode-armes",      bgImage:"", sprite:"", name:"Boss des Armes",      energyCost:1},  // fond #0f172a
+afk.js [L.315] : parchemins:{label:"Boss des Parchemins", cls:"mode-parchemins", bgImage:"", sprite:"", name:"Boss des Parchemins", energyCost:1},  // fond #0f3af8
+afk.js [L.316] : familier:  {label:"Boss du Familier",    cls:"mode-familier",   bgImage:"", sprite:"", name:"Boss du Familier",    energyCost:1},  // fond #064e3b
+afk.js [L.317] : mondial:   {label:"Boss Mondial",        cls:"mode-mondial",    bgImage:"", sprite:"", name:"Boss Mondial",        energyCost:1}   // fond #450a0a
+combat.js [L.232] : K:{punch:{a:"punch",T:[400,800,1100],h:480},estoc:{a:"thrust",T:[250,620,900],h:330},overhead:{a:"overhead",T:[450,950,1300],h:620,jump:24},
+combat.js [L.233] : throw:{a:"throw",T:[0,720,980],h:520,rel:220,ranged:1},uppercut:{a:"uppercut",T:[420,920,1250],h:560,amp:9},pierce:{a:"pierce",T:[260,700,1050],h:200,through:1,amp:9},
+combat.js [L.234] : meteor:{a:"meteor",T:[520,1100,1450],h:620,jump:40,amp:13},salto:{a:"salto",T:[0,950,1200],h:650,rel:500,ranged:1,amp:9},
+combat.js [L.235] : self:{a:"taunt",T:[0,700,700],h:200},idle:{a:"idle",T:[0,500,500],h:100}},
+combat.js [L.456] : sbires:[
+combat.js [L.461] : boss:[
+combat.js [L.488] : mode:  'triptyque' | 'vagues' | 'endurance',
+combat.js [L.489] : fond:  '#0f172a' ou 'decors/mon-image.jpg'   (ignoré en triptyque : décor arene-1..3.jpg),
+combat.js [L.493] : resultat : { mode, victoire, pvRestants, pvMax } +
+pvp.js [L.14] : SAISON_MS: 48 * 3600 * 1000,       // saison de 48 h réelles
+pvp.js [L.15] : ELO_DEPART: 1000,                  // Elo d'un joueur sans réputation (et Elo de départ de chaque saison)
+pvp.js [L.16] : K: 32,                             // facteur K du calcul Elo
+pvp.js [L.17] : TICKETS_MAX: 5,                    // tickets PvP quotidiens
+pvp.js [L.18] : OR_VICTOIRE: 25, OR_DEFAITE: 10,   // Or par niveau de la brute
+pvp.js [L.19] : RECOMPENSE_PIERRE: "pierres_transmutation",   // clé passée à donnerRecompense() (à adapter si ton inventaire utilise un autre nom)
+pvp.js [L.22] : GRADES: [
+pvp.js [L.30] : DIFFICULTES: [
+raids.js [L.11] : NIV_MIN: 1, NIV_MAX: 50,                              // niveau recommandé : palier 1 → Niv. 1, dernier palier → Niv. 50
+raids.js [L.12] : EXPE: {
+raids.js [L.13] : armes:      { nom: "Boss des Armes",      fond: assetPath.bossRoom("weapon", 1), fondSecours: "#0f172a", drop: "100 % d’équipement",
+raids.js [L.14] : boss: { id: "boss_armes",      nom: "Gardien de l’Arsenal", hue: 210, forme: "boss", scale: 1.35, pvMult: 1.6,
+raids.js [L.16] : previewAnimations: ["idle"],
+raids.js [L.17] : portraitBounds: { x: 38, y: 18, w: 136, h: 122 } } },
+raids.js [L.18] : parchemins: { nom: "Boss des Parchemins", fond: assetPath.bossRoom("paper", 1), fondSecours: "#2e1065", drop: "Parchemins de compétence",
+raids.js [L.19] : boss: { id: "boss_parchemins", nom: "Archiviste Corrompu",    hue: 270, forme: "boss", scale: 1.35, pvMult: 1.6,
+raids.js [L.21] : previewAnimations: ["idle"],
+raids.js [L.22] : portraitBounds: { x: 38, y: 18, w: 136, h: 122 } } },
+raids.js [L.23] : familier:   { nom: "Boss du Familier",    fond: assetPath.bossRoom("pet", 1), fondSecours: "#064e3b", drop: "100 % Nourriture + 2 à 10 % de Pierre de Transmutation",
+raids.js [L.24] : boss: { id: "boss_familier",   nom: "Maître des Meutes",      hue: 150, forme: "boss", scale: 1.35, pvMult: 1.6,
+raids.js [L.26] : previewAnimations: ["idle"],
+raids.js [L.27] : portraitBounds: { x: 38, y: 18, w: 136, h: 122 } } }
+raids.js [L.29] : sel: { armes: 1, parchemins: 1, familier: 1 },       // palier choisi (non sauvegardé)
+raids.js [L.32] : MONDIAL_FOND: "#450a0a",
+raids.js [L.34] : MONDIAL: [
+raids.js [L.39] : BOTS: ["Vex_Ratchet", "Kasumi-9", "Dr.Boulon", "N30N_Wolf", "Tuyau_Man", "Zorg le Bref", "Mamie_Molotov", "Cable_Queen", "Rouille42", "Pioupiou_X"],
+raids.js [L.160] : competencesBonus: [], worldBoss: true, deferStart: true, allowSkip: false, onFin: r => this.finMondial(r) };
+simulateur.js [L.4] : NAMES:{general:"Général",empereur:"Empereur",inversebrah:"Inversebrah",hazmat:"Hazmat",momie:"Momie",samourai:"Samourai",zeus:"Zeus",frankenstein:"Frankenstein",human:"Humain"},
+simulateur.js [L.5] : GROUPS:[
+simulateur.js [L.14] : decorList: [],
+simulateur.js [L.15] : decorIdx: 0,
+armurerie.js [L.23] : STATS:[["hp","Vie","❤️"],["str","Force","💪"],["agi","Agilité","🌀"],["spd","Rapidité","⚡"]],
+armurerie.js [L.24] : STAT_TIP:{
+armurerie.js [L.25] : hp:"Chaque point donne +10 PV max et réduit un peu les dégâts reçus.",
+armurerie.js [L.26] : str:"Augmente les dégâts de tous vos coups et la solidité des boucliers.",
+armurerie.js [L.27] : agi:"Améliore la précision et les chances de coup critique.",
+armurerie.js [L.28] : spd:"Réduit le délai entre deux actions : vous jouez plus souvent."
+armurerie.js [L.30] : STYLE:{estoc:"Estoc",overhead:"Frappe haute",throw:"Lancer"},
+armurerie.js [L.31] : TYPE:{A:"Attaque",C:"Contrôle",S:"Soutien"},
+armurerie.js [L.32] : STAGE:["Base","Milieu","Légende"],
+armurerie.js [L.323] : x:10+(i%cols)*13.2,
+armurerie.js [L.325] : size:26,
+armurerie.js [L.326] : angle:0,
+caserne.js [L.12] : NIV_SLOTS: [1, 5, 10],        // niveau requis pour les slots 1, 2, 3
+caserne.js [L.13] : STAT_CAP: 250,                // plafond des stats de base
+caserne.js [L.14] : MAX_ACHATS_STATS: 100,        // nombre maximum d'entraînements mutagènes
+caserne.js [L.15] : ARME_SELECTOR: "[data-arme],[data-weapon],[data-weapon-id]",  // éléments de l'UI représentant une arme possédée (id lu dans data-arme / data-weapon / data-weapon-id)
+caserne.js [L.17] : _lastChestHTML: "",
+character-select.js [L.17] : general: { glow: "rgba(143,155,114,.45)", png: "", gradient: "radial-gradient(circle at 76% 17%,#d7e2a8 0 5%,rgba(143,155,114,.55) 14%,transparent 32%),repeating-linear-gradient(90deg,rgba(143,155,114,.08) 0 1px,transparent 1px 16px),linear-gradient(180deg,#455044,#252d27 52%,#172019)" },
+character-select.js [L.18] : empereur: { glow: "rgba(216,177,92,.45)", png: "", gradient: "radial-gradient(circle at 76% 17%,#fff0b0 0 5%,rgba(216,177,92,.5) 14%,transparent 32%),repeating-linear-gradient(90deg,rgba(216,177,92,.08) 0 1px,transparent 1px 16px),linear-gradient(180deg,#563b68,#30233f 52%,#1b1729)" },
+character-select.js [L.19] : frankenstein: { glow: "rgba(121,214,111,.45)", png: "", gradient: "radial-gradient(circle at 76% 17%,#d7ff9f 0 5%,rgba(121,214,111,.5) 14%,transparent 32%),repeating-linear-gradient(90deg,rgba(121,214,111,.08) 0 1px,transparent 1px 16px),linear-gradient(180deg,#416a4b,#263d31 52%,#16251f)" },
+character-select.js [L.20] : hazmat: { glow: "rgba(229,217,75,.45)", png: "", gradient: "radial-gradient(circle at 76% 17%,#fffba5 0 5%,rgba(229,217,75,.5) 14%,transparent 32%),repeating-linear-gradient(90deg,rgba(229,217,75,.08) 0 1px,transparent 1px 16px),linear-gradient(180deg,#656333,#3c3b25 52%,#222418)" },
+character-select.js [L.21] : human: { glow: "rgba(107,183,232,.45)", png: "", gradient: "radial-gradient(circle at 76% 17%,#d3f0ff 0 5%,rgba(107,183,232,.5) 14%,transparent 32%),repeating-linear-gradient(90deg,rgba(107,183,232,.08) 0 1px,transparent 1px 16px),linear-gradient(180deg,#3b596c,#293744 52%,#17232d)" },
+character-select.js [L.22] : inversebrah: { glow: "rgba(229,107,216,.45)", png: "", gradient: "radial-gradient(circle at 76% 17%,#ffd1f4 0 5%,rgba(229,107,216,.5) 14%,transparent 32%),repeating-linear-gradient(90deg,rgba(229,107,216,.08) 0 1px,transparent 1px 16px),linear-gradient(180deg,#68445e,#3e2a43 52%,#211b31)" },
+character-select.js [L.23] : momie: { glow: "rgba(213,185,131,.45)", png: "", gradient: "radial-gradient(circle at 76% 17%,#fff1c8 0 5%,rgba(213,185,131,.5) 14%,transparent 32%),repeating-linear-gradient(90deg,rgba(213,185,131,.08) 0 1px,transparent 1px 16px),linear-gradient(180deg,#70614b,#453d32 52%,#27231e)" },
+character-select.js [L.24] : samourai: { glow: "rgba(230,106,85,.45)", png: "", gradient: "radial-gradient(circle at 76% 17%,#ffd1a8 0 5%,rgba(230,106,85,.5) 14%,transparent 32%),repeating-linear-gradient(90deg,rgba(230,106,85,.08) 0 1px,transparent 1px 16px),linear-gradient(180deg,#713c3c,#462b31 52%,#251c26)" },
+character-select.js [L.25] : zeus: { glow: "rgba(121,200,255,.45)", png: "", gradient: "radial-gradient(circle at 76% 17%,#e0f6ff 0 5%,rgba(121,200,255,.55) 14%,transparent 32%),repeating-linear-gradient(90deg,rgba(121,200,255,.08) 0 1px,transparent 1px 16px),linear-gradient(180deg,#3e6480,#293b55 52%,#171f35)" }
+character-select.js [L.37] : border:1px solid var(--frame-glow);border-radius:2px;box-shadow:inset 0 0 40px rgba(0,0,0,.7),0 0 14px var(--frame-glow)}
+character-select.js [L.124] : level: 1, xp: 0, xpMax: 100, energy: 15, energyMax: 15, gold: 300,
+character-select.js [L.125] : weapons: [], gear: [], skills: D.pickSkills(1), companion: null
+renderer.js [L.9] : idle:{s:"base",r:0,fps:6,loop:1}, dash:{s:"base",r:1,fps:12,loop:1}, dodge:{s:"base",f:[8,9],fps:8}, hit:{s:"base",f:[10,11],fps:8}, death:{s:"base",r:3,fps:6},
+renderer.js [L.10] : punch:{s:"atk",r:0,fps:10,fb:[4,5,6,7]}, thrust:{s:"atk",r:1,fps:13,fb:[5,6,7,7]}, overhead:{s:"atk",r:2,fps:8,fb:[4,5,7,6]}, throw:{s:"atk",r:3,fps:9,fb:[5,5,6,4]},
+renderer.js [L.11] : uppercut:{s:"crit",r:0,fps:8,fb:[4,5,7,7]}, pierce:{s:"crit",r:1,fps:14,fb:[5,6,7,7]}, meteor:{s:"crit",r:2,fps:7,fb:[4,5,7,6]}, salto:{s:"crit",r:3,fps:8,fb:[6,5,4,5]},
+renderer.js [L.12] : whistle:{s:"trn",r:0,fps:7,fb:[2,3,2,3]}, surprise:{s:"trn",r:1,fps:8,fb:[10,11,10,11]}, taunt:{s:"trn",r:2,fps:8,loop:1,fb:[0,1,2,3]}, victory:{s:"trn",r:3,fps:7,loop:1,fb:[0,1,2,3]}
+renderer.js [L.15] : worldBoss:{
+renderer.js [L.16] : idle:{s:"base",r:0,fps:6,loop:1},
+renderer.js [L.17] : dash:{s:"base",r:1,fps:12,loop:1},
+renderer.js [L.18] : dodge:{s:"base",r:1,fps:12,loop:1},
+renderer.js [L.19] : hit:{s:"base",r:2,fps:8,loop:1},
+renderer.js [L.20] : death:{s:"base",r:2,fps:8,loop:1},
+renderer.js [L.21] : punch:{s:"base",r:2,fps:8,loop:1},
+renderer.js [L.22] : thrust:{s:"base",r:2,fps:8,loop:1},
+renderer.js [L.23] : overhead:{s:"base",r:2,fps:8,loop:1},
+renderer.js [L.24] : throw:{s:"base",r:2,fps:8,loop:1},
+renderer.js [L.25] : uppercut:{s:"base",r:2,fps:8,loop:1},
+renderer.js [L.26] : pierce:{s:"base",r:2,fps:8,loop:1},
+renderer.js [L.27] : meteor:{s:"base",r:2,fps:8,loop:1},
+renderer.js [L.28] : salto:{s:"base",r:2,fps:8,loop:1},
+renderer.js [L.29] : taunt:{s:"base",r:3,fps:8,loop:1},
+renderer.js [L.30] : victory:{s:"base",r:3,fps:8,loop:1}
+renderer.js [L.32] : paperBoss:{
+renderer.js [L.33] : idle:{s:"base",r:0,fps:6,loop:1},
+renderer.js [L.34] : dash:{s:"base",r:1,fps:12,loop:1},
+renderer.js [L.35] : dodge:{s:"base",r:1,fps:12,loop:1},
+renderer.js [L.36] : hit:{s:"base",r:2,fps:8,loop:1},
+renderer.js [L.37] : death:{s:"base",r:3,fps:8,loop:1},
+renderer.js [L.38] : punch:{s:"base",r:2,fps:8,loop:1},
+renderer.js [L.39] : thrust:{s:"base",r:2,fps:8,loop:1},
+renderer.js [L.40] : overhead:{s:"base",r:2,fps:8,loop:1},
+renderer.js [L.41] : throw:{s:"base",r:2,fps:8,loop:1},
+renderer.js [L.42] : uppercut:{s:"base",r:2,fps:8,loop:1},
+renderer.js [L.43] : pierce:{s:"base",r:2,fps:8,loop:1},
+renderer.js [L.44] : meteor:{s:"base",r:2,fps:8,loop:1},
+renderer.js [L.45] : salto:{s:"base",r:2,fps:8,loop:1},
+renderer.js [L.46] : taunt:{s:"base",r:0,fps:8,loop:1},
+renderer.js [L.47] : victory:{s:"base",r:0,fps:8,loop:1}
+renderer.js [L.53] : thrust:[[30,38,-.3],[38,37,-.1],[50,36,0],[54,36,0]],
+renderer.js [L.54] : overhead:[[34,12,-2.3],[36,8,-1.7],[47,30,.5],[50,40,1.3]],
+renderer.js [L.55] : throw:[[30,30,-1],[36,26,-.6],[48,30,0],null],
+renderer.js [L.56] : pierce:[[30,38,-.3],[44,36,0],[54,36,0],[54,36,0]],
+renderer.js [L.57] : meteor:[[34,10,-2.3],[36,6,-1.8],[46,34,.6],[50,42,1.3]],
+renderer.js [L.58] : salto:[[30,36,-.6],[34,30,-1],[44,30,-.4],null]
+ui-core.js [L.18] : stack:[],
+ui-core.js [L.19] : reg:{
+ui-core.js [L.20] : caserne:{pane:"g-fiche",onOpen(){ renderFiche(S.cur); Caserne.snap(0); }},
+ui-core.js [L.21] : pvp:{pane:"g-combat",onOpen(){ if(!Combat.act) lancerCombat({mode:"triptyque"}); },onClose(){ Combat.stop(); }},
+ui-core.js [L.22] : cargos:{pane:"g-shop"},
+ui-core.js [L.23] : sim:{pane:"g-train",onOpen(){ TRAIN.open(); }},
+ui-core.js [L.24] : forge:{pane:"g-forge",onOpen(){ renderForge(); }},
+ui-core.js [L.25] : evo:{pane:"g-evo"},
+ui-core.js [L.26] : expe:{pane:"g-expe"},
+ui-core.js [L.27] : bossArmes:{pane:"g-boss",boss:"armes"},
+ui-core.js [L.28] : bossParchemins:{pane:"g-boss",boss:"parchemins"},
+ui-core.js [L.29] : bossFamilier:{pane:"g-boss",boss:"familier"},
+ui-core.js [L.30] : bossMondial:{pane:"g-boss",boss:"mondial"}
+ui-core.js [L.176] : idx:0,N:5,prev:[],mode:"",sx:0,sy:0,st:0,dx:0,swiped:0,
+ui-core.js [L.226] : INTERVAL:15*60*1000,

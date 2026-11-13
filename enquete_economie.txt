@@ -1,0 +1,31 @@
+﻿data.js [L.237] : static addSouls(n){ const d=this.load(); d.mutant_souls=Math.max(0,d.mutant_souls+Math.round(n)); this.save(d); return d.mutant_souls; }
+main.js [L.35] : if(!k) return; ProfileManager.addSouls(-5); ProfileManager.setBuff(k,+(bf[k]+.1).toFixed(2)); }
+main.js [L.41] : b.level=1; b.xp=0; b.xpMax=100; b.gold=0; ProfileManager.addSouls(so); persist(); toast("Ascension ! +"+so+" Âmes de Mutants"); await ascensionShop();
+main.js [L.106] : p.onclick=ev=>{ const a=ev.target.dataset.a, b=S.cur; if(!a||!b) return; if(a==="g") b.gold+=1000; if(a==="l") b.level++; if(a==="s") ProfileManager.addSouls(10); if(a==="a"){ ascend(b,true); return; } persist(); };
+state.js [L.205] : /* ---- XP (Brute + compagnon) : donnerRecompense("xp") ---- */
+state.js [L.220] : /* ---- Équipement : donnerRecompense("equipement", n, { rarite, part }) ---- */
+state.js [L.262] : if (!depenserRessource("or", GachaShop.PRICE)) { toast("Pas assez d’Or."); return; }
+state.js [L.263] : donnerRecompense("caisses", 1); toast("Caisse Wass-E volée !");
+state.js [L.306] : function donnerRecompense(type, quantite, options){
+state.js [L.317] : function depenserRessource(type, quantite){
+combat.js [L.372] : if(gold>0) donnerRecompense("or",gold);                 // GameState : Or + mise à jour du Header
+pvp.js [L.7] : Utilise GameState (reputation = Elo, saisonDebut, ticketsPvp, ticketsPvpJour), donnerRecompense(), calculerPuissance()
+pvp.js [L.11] : l'Or de combat est donné ici, via donnerRecompense("or", ...).
+pvp.js [L.19] : RECOMPENSE_PIERRE: "pierres_transmutation",   // clé passée à donnerRecompense() (à adapter si ton inventaire utilise un autre nom)
+pvp.js [L.100] : donnerRecompense("or", or);
+pvp.js [L.128] : donnerRecompense("or", g.or);
+pvp.js [L.129] : if (g.caisses) donnerRecompense("caisses", g.caisses);
+pvp.js [L.130] : if (g.pierres) donnerRecompense(this.RECOMPENSE_PIERRE, g.pierres);
+raids.js [L.65] : if (!depenserRessource("energie", 1)) { toast("Énergie insuffisante (1 ⚡ requise)."); return; }
+raids.js [L.76] : const xp = 80 * p, lv = donnerRecompense("xp", xp).niveaux; let drop;
+raids.js [L.79] : const g = donnerRecompense("equipement", 1, { rarite: rar })[0], pt = D.PARTS.find(x => x.id === g.part);
+raids.js [L.82] : const n = D.rnd(1, 2) + Math.floor(p / 2); donnerRecompense("parchemins", n); drop = "📜 ×" + n + " Parchemin" + (n > 1 ? "s" : "");
+raids.js [L.84] : const n = D.rnd(2, 4) + p; donnerRecompense("nourriture", n); drop = "🍖 ×" + n + " Nourriture";
+raids.js [L.85] : if (Math.random() < .02 + .08 * (p - 1) / (this.PALIERS - 1)) { donnerRecompense("pierres", 1); drop += " + 💎 Pierre de Transmutation !"; }
+raids.js [L.91] : if (xp > 0) donnerRecompense("xp", xp);
+caserne.js [L.30] : if (!depenserRessource("or", cout)) { toast("Or insuffisant (" + cout + " requis)."); return; }
+caserne.js [L.155] : if (!depenserRessource("parchemins", cout)) { toast("Parchemins insuffisants (" + cout + " requis)."); return; }
+caserne.js [L.165] : if (!depenserRessource("or", GS.PRIX_CAISSE)) { toast("Or insuffisant (" + GS.PRIX_CAISSE + " Or requis)."); return; }
+caserne.js [L.166] : donnerRecompense("caisses", 1);
+caserne.js [L.304] : if (!depenserRessource("nourriture", 1)) { toast("Pas de Nourriture."); return; }
+caserne.js [L.312] : if (!depenserRessource("pierres", 1)) return;

@@ -1,0 +1,8 @@
+﻿data.js [L.320] : brute.gold-=this.PRICE;
+data.js [L.322] : if(result.type==="dup") brute.gold+=25;
+main.js [L.25] : b.gold-=1; left--; k=DataEngine.rnd(0,31); }
+main.js [L.41] : b.level=1; b.xp=0; b.xpMax=100; b.gold=0; ProfileManager.addSouls(so); persist(); toast("Ascension ! +"+so+" Âmes de Mutants"); await ascensionShop();
+main.js [L.106] : p.onclick=ev=>{ const a=ev.target.dataset.a, b=S.cur; if(!a||!b) return; if(a==="g") b.gold+=1000; if(a==="l") b.level++; if(a==="s") ProfileManager.addSouls(10); if(a==="a"){ ascend(b,true); return; } persist(); };
+afk.js [L.109] : b.gold+=g; b.afkTs=Date.now(); persist(); this.hud(); toast("+"+g.toLocaleString("fr-FR")+" Or récoltés !");
+combat.js [L.365] : const en=E.f[1].br, rw=cfg.recompenses!==false, xp=rw?(win?30:10):0, gold=rw?(win?40:10):0, lv=[];
+caserne.js [L.378] : const gold = document.createElement("div"); gold.id = "cs-stats-gold"; gold.className = "cs-gold"; gold.setAttribute("aria-live", "polite");

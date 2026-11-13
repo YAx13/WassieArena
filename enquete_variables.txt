@@ -1,0 +1,86 @@
+﻿data.js [L.4] : const assetPath = {
+main.js [L.3] : function uiDialog(title,body,buttons,escVal){
+main.js [L.45] : function beginCharacterRename(){
+main.js [L.72] : function startAfkButtonEditing(){
+main.js [L.84] : function toggleDevMode(){
+state.js [L.8] : const GameState = {
+state.js [L.306] : function donnerRecompense(type, quantite, options){
+state.js [L.317] : function depenserRessource(type, quantite){
+state.js [L.329] : function calculerPuissance(b = GameState.brute){
+afk.js [L.3] : const AFK_ASSETS={
+afk.js [L.8] : const AFKMode={
+afk.js [L.313] : const BOSS_MODES={
+afk.js [L.323] : const BossModes={
+combat.js [L.104] : const Combat={
+combat.js [L.455] : const ENNEMIS_COMBAT={
+combat.js [L.465] : function placeholderEnnemi(ctx,b,t,anim,fi){            // dessin 64x64 : mêmes poses simulées que le cube d'origine
+combat.js [L.497] : function lancerCombat(config){ return Combat.lancer(config); }
+pvp.js [L.13] : const PvP = {
+raids.js [L.9] : const Raids = {
+simulateur.js [L.3] : const TRAIN={
+armurerie.js [L.3] : function enterGame(b){
+armurerie.js [L.13] : function persist(){ GameState.save(); renderGame(); GameState.majRate(); }
+armurerie.js [L.14] : function renderGame(){
+armurerie.js [L.22] : const FX={
+armurerie.js [L.68] : function fxFam(c){ return CompanionData.family(c)||{key:"?",icon:"🐾",name:c.name,stages:[c.name,c.name,c.name],spec:"Compagnon polyvalent"}; }
+armurerie.js [L.69] : function fxBuffs(){ try{ return ProfileManager.getBuffs(); }catch(e){ return null; } }
+armurerie.js [L.72] : function tipHTML(code){
+armurerie.js [L.125] : function hideTip(){ $("#wtip").classList.add("hidden"); }
+armurerie.js [L.126] : function showTip(el){
+armurerie.js [L.146] : const WEAPON_RACK_LAYOUT_KEY="arene_weapon_rack_dev_layout_v1";
+armurerie.js [L.147] : let weaponRackEditing=false, weaponRackPositions=null, weaponRackDrag=null;
+armurerie.js [L.148] : function readWeaponRackPositions(){
+armurerie.js [L.163] : function saveWeaponRackPositions(){
+armurerie.js [L.168] : function rackPositionText(){
+armurerie.js [L.171] : function updateRackPositionExport(){
+armurerie.js [L.175] : function rackPositionBounds(position,grid){
+armurerie.js [L.181] : function clampRackPosition(position,grid){
+armurerie.js [L.188] : function applyRackPosition(button,position,grid){
+armurerie.js [L.200] : function rackPositionOverlaps(position,grid,id){
+armurerie.js [L.208] : function beginWeaponRackEditing(grid){
+armurerie.js [L.232] : function attachWeaponRackEditor(grid){
+armurerie.js [L.270] : function updateWeaponRackDevUI(){
+armurerie.js [L.282] : function fitWeaponRack(rack){
+armurerie.js [L.314] : const weaponRackObserver=typeof ResizeObserver==="undefined"?null:new ResizeObserver(entries=>entries.forEach(({target})=>fitWeaponRack(target)));
+armurerie.js [L.316] : const COMP_LAYOUT_KEY="arene_companion_dev_layout_v1";
+armurerie.js [L.317] : let compEditing=false, compPositions=null, compDrag=null;
+armurerie.js [L.319] : function defaultCompPositions(){
+armurerie.js [L.330] : function readCompPositions(){
+armurerie.js [L.339] : function saveCompPositions(){
+armurerie.js [L.345] : const HOLO_LAYOUT_KEY="arene_comp_holo_layout_v1";
+armurerie.js [L.346] : let holoPositions=null, holoDrag=null;
+armurerie.js [L.348] : function defaultHoloPositions(){
+armurerie.js [L.357] : function readHoloPositions(){
+armurerie.js [L.363] : function saveHoloPositions(){
+armurerie.js [L.368] : function applyHoloItemPos(el,pos){
+armurerie.js [L.384] : function applyCompPosition(btn,pos,stage){
+armurerie.js [L.395] : function updateCompDevUI(){
+armurerie.js [L.412] : function attachCompEditor(stage){
+armurerie.js [L.462] : function renderFiche(b){
+caserne.js [L.11] : const CaserneUI = {
+caserne.js [L.392] : function renderForge(){
+character-select.js [L.10] : const CharacterSelect = (() => {
+character-select.js [L.181] : function genBrute(){ return CharacterSelect.genBrute(); }   // compat : combat.js et pvp.js l'appellent en global
+game-frame.js [L.3] : const GameFrame = (() => {
+recorder.js [L.3] : const Recorder={
+ui-core.js [L.3] : const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+ui-core.js [L.4] : const renderer=new CanvasRenderer();
+ui-core.js [L.6] : const S={cur:null,forgeKey:null};
+ui-core.js [L.8] : function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove("show"),2200)}
+ui-core.js [L.9] : function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+ui-core.js [L.10] : function seg(v,max,cls){let h=`<div class="seg ${cls}">`;const n=14,f=Math.ceil(v/max*n);for(let i=0;i<n;i++)h+=`<i class="${i<f?"on":""}"></i>`;return h+"</div>"}
+ui-core.js [L.17] : const OV={
+ui-core.js [L.55] : const AFK_MENU_LAYOUT_KEY="arene_brutes_afk_menu_layout_v1";
+ui-core.js [L.56] : const afkLayoutButtons=()=>Array.from($("#afk-menu").querySelectorAll(":scope > button")).concat($("#btn-harvest"));
+ui-core.js [L.57] : function loadAfkMenuPositions(){
+ui-core.js [L.71] : let afkMenuPositions=loadAfkMenuPositions(), afkButtonDrag=null, afkClickToSuppress=null, afkLastOpenTs=0, devMenuWasOpen=false;
+ui-core.js [L.72] : function setAfkMenuOpen(open){
+ui-core.js [L.78] : function applyAfkButtonPosition(button,position){
+ui-core.js [L.88] : function applyAfkMenuPositions(){
+ui-core.js [L.96] : function saveAfkMenuPositions(){
+ui-core.js [L.156] : const EVO_SPRITES={};   // ← VOS SPRITES : EVO_SPRITES["chien:0"]="sprites/cyber-chauve.png" (clé = famille:index 0-2). Vide = emoji de la famille.
+ui-core.js [L.157] : function openEvo(key){
+ui-core.js [L.171] : function gameTab(n){ const k={combat:"pvp",fiche:"caserne",forge:"forge",shop:"cargos",train:"sim"}[n]; if(k) OV.open(k); else OV.closeAll(); }
+ui-core.js [L.175] : const Caserne={
+ui-core.js [L.214] : function setTab(i){
+ui-core.js [L.225] : const Energy={
