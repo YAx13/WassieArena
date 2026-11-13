@@ -125,13 +125,13 @@ const CharacterSelect = (() => {
       weapons: [], gear: [], skills: D.pickSkills(1), companion: null
     };
   }
-  // Loot caché à la création (jamais annoncé) : 65 % rien, 25 % 1 arme, 10 % 1 compagnon
-  function rollLoot(b){
-    const r = Math.random();
-    if (r < .65) return;
-    if (r < .90){ const w = DataEngine.pick(DataEngine.WEAPONS); if (!b.weapons.includes(w.id)) b.weapons.push(w.id); return; }
-    b.companion = CompanionData.create(DataEngine.pick(Object.keys(CompanionData.SPECIES)));
-  }
+  // Loot caché à la création (jamais annoncé) : 35 % rien, 65 % 1 arme,
+// Loot caché à la création (jamais annoncé) : 35 % rien, 65 % 1 arme
+function rollLoot(b){
+  if (Math.random() < .35) return;
+  const w = DataEngine.pick(DataEngine.WEAPONS);
+  if (!b.weapons.includes(w.id)) b.weapons.push(w.id);
+}
 
   /* ---------- Affichage ---------- */
   function redrawAvatars(){

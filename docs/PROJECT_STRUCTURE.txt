@@ -403,6 +403,10 @@ C:.
 |       styles.css
 |       
 +---docs
+|   |   enquete_economie.txt
+|   |   enquete_gold.txt
+|   |   enquete_ressources.txt
+|   |   enquete_variables.txt
 |   |   PROJECT_STRUCTURE.txt
 |   |   
 |   +---.md
@@ -460,6 +464,9 @@ C:.
     |   A UTILISER.jpeg
     |   dog.jpeg
     |   fond.txt
+    |   image_207d3a66.jpeg
+    |   image_3488da6e.jpeg
+    |   image_6d6b5f1a.jpeg
     |   ours-3.jpeg
     |   starter.jpeg
     |   

@@ -28,19 +28,6 @@ async function divineAwakening(b){   // révélation d'une compétence divine al
 { const ab=document.createElement("button"); ab.className=$("#btn-fuse").className; ab.id="btn-auto"; ab.textContent="⚡ Auto-Forge"; $("#btn-fuse").after(ab);
   ab.onclick=async()=>{ const r=ForgeSystem.autoFuse(S.cur); if(!r.n){ toast("Aucun trio à fusionner."); return; } S.forgeKey=null; toast(r.n+" fusion(s) automatique(s)."); for(let i=0;i<r.div;i++) await divineAwakening(S.cur); persist(); }; }
 /* --- Ascension --- */
-async function ascensionShop(){
-  for(;;){ const so=ProfileManager.getSouls(), bf=ProfileManager.getBuffs(); if(so<5){ toast("Âmes insuffisantes (5 requises)."); return; }
-    const k=await uiDialog("🌌 Boutique d'Ascension","Âmes de Mutants : "+so+" — +10% par achat (5 âmes)\nVie "+bf.hp.toFixed(1)+"x · Force "+bf.str.toFixed(1)+"x · Agilité "+bf.agi.toFixed(1)+"x · Vitesse "+bf.spd.toFixed(1)+"x",
-      [["Vie","hp"],["Force","str"],["Agilité","agi"],["Vitesse","spd"],["Quitter",null]],null);
-    if(!k) return; ProfileManager.addSouls(-5); ProfileManager.setBuff(k,+(bf[k]+.1).toFixed(2)); }
-}
-async function ascend(b,force){
-  if(!force&&b.level<10){ if(ProfileManager.getSouls()>=5) await ascensionShop(); else toast("Ascension : niveau 10 requis."); return; }
-  const so=Math.max(1,Math.floor(b.level/2)+Math.floor(b.gold/200));
-  if(!force&&!(await uiDialog("🌌 Ascension","Niveau et or sacrifiés (+"+so+" Âmes). Armes, compagnon et équipements conservés.",[["Ascendre",true],["Annuler",false]],false))) return;
-  b.level=1; b.xp=0; b.xpMax=100; b.gold=0; ProfileManager.addSouls(so); persist(); toast("Ascension ! +"+so+" Âmes de Mutants"); await ascensionShop();
-}
-$("#btn-ascend").onclick=e=>{ e.stopPropagation(); if(S.cur) ascend(S.cur); };
 $("#fx-rename").onclick=e=>{ e.stopPropagation(); beginCharacterRename(); };
 function beginCharacterRename(){
   const b=S.cur, row=$("#fx-name-row"), name=$("#fx-name"), rename=$("#fx-rename");
@@ -97,7 +84,7 @@ function toggleDevMode(){
   const R=DataEngine.RARITIES, tw=R.reduce((s,r)=>s+r.w,0);
   p.innerHTML='<b>DEV</b> <button data-a="g">+1000 or</button> <button data-a="l">+1 niv</button> <button data-a="a">Ascension</button> <button data-a="s">+10 âmes</button><small style="display:block;margin-top:5px">Glissez les boutons du menu pour les déplacer. Positions sauvegardées automatiquement.</small>'+
    '<label style="display:grid;grid-template-columns:1fr auto;gap:4px;margin-top:8px">Recul AFK <output id="dev-afk-recoil-value">40 px</output><input id="dev-afk-recoil" type="range" min="0" max="150" step="1" value="40" style="grid-column:1 / -1;width:100%"></label><small style="display:block;margin-top:8px">Râtelier : activez « Éditer le râtelier » dans la Caserne. Glissez les armes, molette = taille, Maj + molette = rotation.</small><textarea id="dev-rack-positions" readonly aria-label="Coordonnées des armes du râtelier" style="box-sizing:border-box;width:100%;height:100px;margin-top:4px;background:#071b1d;color:#9f9;border:1px solid #596b59;font:10px monospace;pointer-events:auto"></textarea><pre style="white-space:pre-wrap;margin:6px 0 0">'+
-   "Recrutement : 65% rien / 25% arme / 10% compagnon\nDrop victoire : 25% (arme/compétence)\nArme/tour : "+BattleEngine.WEAPON_CHANCE*100+"% · Familier/tour : "+BattleEngine.PET_CHANCE*100+"%\nCaisses : "+R.map(r=>r.name+" "+(r.w/tw*100).toFixed(1)+"%").join(", ")+"</pre>";
+   "Recrutement : 35% rien / 65% arme\nDrop victoire : 25% (arme/compétence)\nArme/tour : "+BattleEngine.WEAPON_CHANCE*100+"% · Familier/tour : "+BattleEngine.PET_CHANCE*100+"%\nCaisses : "+R.map(r=>r.name+" "+(r.w/tw*100).toFixed(1)+"%").join(", ")+"</pre>";
   const recoil=p.querySelector("#dev-afk-recoil"), recoilValue=p.querySelector("#dev-afk-recoil-value");
   p.querySelectorAll("button,input").forEach(control=>control.style.pointerEvents="auto");
   p.querySelector("#dev-rack-positions").addEventListener("focus",event=>event.target.select());
