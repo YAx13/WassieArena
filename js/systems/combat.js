@@ -38,8 +38,51 @@ class BattleEngine {
     A.next+=(100/A.spd)*(.9+Math.random()*.2)*(S.slow>0?1.5:1)*(S.spdUp>0?.7:1); this.round++;
     let sk=null, wp=null, wl=null;
     if(Math.random()<.4){ for(let t=0;t<4&&!sk;t++){ const k=DataEngine.SKILLS[DataEngine.pick(A.br.skills)]; if(!this.useless(k,A,D)) sk=k; } }
-    // Ordre au familier : le compagnon attaque à la place de la Brute
-    if(!sk && A.br.companion && Math.random()<BattleEngine.PET_CHANCE){ const c=A.br.companion; sk={name:c.name,pet:c,t:"A",pw:(.7+c.level*.05)*(c.form===3&&c.species==="chien_friche"?1.6:1),fx:c.form===3&&c.species==="ours_decharge"?{stun:1}:{},desc:""}; }
+    // Ordre au familier : attaque et effets propres aux 13 familles (Forme 1 -> 2 -> 3 Légendaire)
+    const petChance = A.br.companion ? BattleEngine.PET_CHANCE + ((A.br.companion.form || 1) - 1) * 0.04 : 0;
+    if(!sk && A.br.companion && Math.random() < petChance){
+      const c = A.br.companion, fam = CompanionData.family(c), fk = fam ? fam.key : c.species, f = c.form || 1;
+      let pw = 0.7 + c.level * 0.05, el = 0, fx = {};
+      if(fk === "chien"){
+        pw *= f === 3 ? 1.6 : f === 2 ? 1.2 : 1;
+        A.next -= (100 / A.spd) * (f >= 2 ? 0.25 : 0.1);
+      } else if(fk === "loup"){
+        fx = { crit: f === 3 ? 1 : f === 2 ? 0.35 : 0.15 };
+      } else if(fk === "ours"){
+        pw *= 1.15;
+        fx = { stun: f === 3 ? 1 : f === 2 ? 0.45 : 0.2 };
+      } else if(fk === "serpent"){
+        el = 3;
+        fx = { dot: [f === 3 ? 1.2 : 0.7, f >= 2 ? 3 : 2, "poison"] };
+      } else if(fk === "oiseau"){
+        el = 1;
+        fx = f === 3 ? { sure: 1, dot: [0.9, 2, "brûlure"] } : { sure: 1, acc: 20 };
+      } else if(fk === "arthropode"){
+        el = 5;
+        fx = f === 3 ? { reflect: [0.4, 3] } : { dr: [f === 2 ? 0.25 : 0.15, 2] };
+      } else if(fk === "felin"){
+        el = 6;
+        fx = { crit: 0.25, dodge: [f === 3 ? 25 : f === 2 ? 15 : 10, f === 3 ? 3 : 2] };
+      } else if(fk === "taureau"){
+        el = 5; pw *= 1.2;
+        fx = f === 3 ? { pierce: 1, push: 1 } : f === 2 ? { pierce: 1 } : {};
+      } else if(fk === "aquatique"){
+        el = 3;
+        fx = { heal: f === 3 ? 0.15 : f === 2 ? 0.08 : 0.04 };
+      } else if(fk === "chimere"){
+        fx = f === 3 ? { dispel: 1, slow: 2 } : f === 2 ? { slow: 2 } : { crit: 0.15 };
+      } else if(fk === "lezard"){
+        el = 4;
+        fx = { spdUp: f === 3 ? 3 : f === 2 ? 2 : 1 };
+      } else if(fk === "spectre"){
+        el = 1;
+        fx = f === 3 ? { accD: [f === 3 ? 25 : f === 2 ? 20 : 12, 2], dot: [0.8, 2, "brûlure"] } : { accD: [f === 2 ? 20 : 12, 2] };
+      } else if(fk === "tempete"){
+        el = 4; pw *= f === 3 ? 1.3 : 1.1;
+        fx = { stun: f === 3 ? 0.5 : f === 2 ? 0.25 : 0.1 };
+      }
+      sk = { name: c.name, pet: c, el, t: "A", pw, fx, desc: "" };
+    }
     // Recours à l'arme : si aucune compétence ce tour-ci, chance de sortir une arme débloquée (Estoc)
     if(!sk && A.br.weapons && A.br.weapons.length && Math.random()<BattleEngine.WEAPON_CHANCE){
       wp=DataEngine.WEAPONS[DataEngine.pick(A.br.weapons)];
@@ -57,7 +100,13 @@ class BattleEngine {
     out.forEach(e=>this.emit(e.type,e));
     if(dead){ this.over=true; this.winner=j; this.emit("on_death",{i,j,dead:i,msg:A.name+" succombe à ses blessures."}); }
     else if(!stunned){
-      const fx=sk?sk.fx:{}, pw=sk?sk.pw:1, fl=[];
+      const fx=Object.assign({},sk?sk.fx:{}), fl=[];
+      let pw=sk?sk.pw:1;
+      DataEngine.getSynergies(A.br.skills||[]).forEach(syn=>{
+        if(sk&&sk.el===syn.el&&syn.def.dmg) pw*=syn.def.dmg[syn.idx];
+        if(syn.def.crit) fx.crit=(fx.crit||0)+syn.def.crit[syn.idx];
+        if(syn.def.heal&&fx.heal) fx.heal*=syn.def.heal[syn.idx];
+      });
       if(pw>0){
         const acc=Math.max(15,Math.min(95,75+(A.agi-D.agi)*1.5+(fx.acc||0)-(S.accD?S.accD.v:0)-(D.st.dodge?D.st.dodge.v:0)));
         if(D.st.block){ D.st.block=0; this.emit("on_dodge",{i,j,msg:D.name+" bloque le coup derrière un mur de gravats !"}); }
@@ -81,7 +130,14 @@ class BattleEngine {
           if(fx.selfDelay){ A.next+=(100/A.spd)*fx.selfDelay; fl.push(A.name+" met du temps à récupérer"); }
         } else this.emit("on_dodge",{i,j,msg:D.name+" esquive !"});
       }
-      if(sk&&sk.t!=="A"||(sk&&pw===0)){   // effets sur soi
+      // Application des synergies élémentaires actives sur la Brute
+      const syns = DataEngine.getSynergies(A.br.competencesEquipees || A.br.skills || []);
+      syns.forEach(syn => {
+        if (sk && sk.el === syn.el && syn.def.dmg) pw *= syn.def.dmg[syn.idx];
+        if (syn.def.crit) fx.crit = (fx.crit || 0) + syn.def.crit[syn.idx];
+        if (syn.def.heal && fx.heal) fx.heal *= syn.def.heal[syn.idx];
+      });
+      if(sk&&(sk.t!=="A"||pw===0||sk.pet)){   // effets sur soi (compétences de soutien ou passifs de familier)
         if(fx.dr) S.dr={v:fx.dr[0],n:fx.dr[1]}; if(fx.dodge) S.dodge={v:fx.dodge[0],n:fx.dodge[1]}; if(fx.reflect) S.reflect={v:fx.reflect[0],n:fx.reflect[1]};
         if(fx.rage) S.rage=fx.rage; if(fx.spdUp) S.spdUp=fx.spdUp; if(fx.block) S.block=1; if(fx.shield) S.shield=Math.round(8+A.str*fx.shield);
         if(fx.cleanse){ S.dot=[]; S.stun=0; S.slow=0; S.accD=null; }
@@ -196,11 +252,16 @@ const Combat={
   // Crée le moteur du combat en cours (PV du joueur conservés d'un ennemi à l'autre) et les combattants affichés
   spawn(c,first){
     const ent=this.file[this.idx], en=ent.brute, E=this.eng=new BattleEngine(this.pv,en,ProfileManager.getBuffs());
+    if(first){
+      DataEngine.getSynergies(this.pv.skills||[]).forEach(syn=>{
+        this.lg(`Synergie ${syn.icon} ${syn.name} (${syn.count}) : ${syn.desc}`,"crit");
+      });
+    }
     if(ent.infini){ const f=E.f[1]; f.max=f.hp=999999; this.baseStr=f.str; this.baseSpd=f.spd; }       // Endurance : PV « infinis » (rechargés à chaque action)
     else if(ent.pvMult){ const f=E.f[1]; f.max=f.hp=Math.round(f.max*ent.pvMult); }
     if(!first) E.f[0].hp=Math.min(E.f[0].max,Math.max(1,Math.round(this.carry)));
     ["on_attack","on_hit","on_dot","on_skill","on_dodge","on_death","on_end"].forEach(n=>E.on(n,e=>this.q.push(e)));
-    const mk=(b,i)=>({b,name:b.name+(ent.infini&&i?" ∞":""),x:i?310:90,bx:i?310:90,y:188,flip0:!!i,flip:!!i,anim:"idle",t0:c,flash0:-1e6,hp:E.f[i].hp,dh:E.f[i].hp,lastHp:E.f[i].hp,hit0:-1e6,max:E.f[i].max,win:false,air:0,wpn:null,scale:b.scale||1});
+    const mk=(b,i)=>({b,name:b.name+(ent.infini&&i?" ∞":""),x:i?310:90,bx:i?310:90,y:188,flip0:!!i,flip:!!i,anim:"idle",t0:c,flash0:-1e6,hp:E.f[i].hp,dh:E.f[i].hp,lastHp:E.f[i].hp,hit0:-1e6,max:E.f[i].max,win:false,air:0,wpn:null,scale:b.scale||1,st:{}});
     if(first){
       this.V=[this.pv,en].map(mk);
       this.P=this.V.map((v,i)=>{ const cp=v.b.companion; if(!cp) return null; const hx=v.bx+(i?54:-54);
@@ -219,6 +280,7 @@ const Combat={
   // Une action du moteur. Endurance : décompte des dégâts, PV du boss rechargés, enragement progressif (+15 % de Force et +10 % de Rapidité toutes les 5 actions)
   stepEng(){
     const E=this.eng, ent=this.file[this.idx]; E.step();
+    E.f.forEach((f,k)=>{ if(this.V[k]) this.V[k].st=JSON.parse(JSON.stringify(f.st)); });
     if(ent.infini){
       const b=E.f[1];
       this.q.forEach(e=>{ if(e.type==="on_hit"&&e.i===0) this.degats+=e.dmg; if(e.type==="on_dot"&&e.i===1) this.degats+=e.dmg;
@@ -363,26 +425,18 @@ const Combat={
     if(this.mode==="triptyque"){
       // Récompenses PvP d'origine (XP, Or, niveaux, compagnon, drop) ; désactivables avec config.recompenses=false
       const en=E.f[1].br, rw=cfg.recompenses!==false, xp=rw?(win?30:10):0, gold=rw?(win?40:10):0, lv=[];
-      const nv0=b.level, compagnonNiv0=b.companion&&b.companion.level;
-      const gainXp=xp>0?GameState.gagnerXp(xp):null;            // GameState attribue l'XP à la Brute et au compagnon
+      const nv0=b.level;
+      if(xp>0) GameState.gagnerXp(xp);
       for(let n=nv0+1;n<=b.level;n++) lv.push("Niveau "+n+" !");
-      let cLv=0, cEvo=false;
-      if(rw&&b.companion){ cLv=b.companion.level-compagnonNiv0; cEvo=!!(gainXp&&gainXp.evolution); }
       const drop=rw&&win?this.rollDrop(b,en):null;
-      if(gold>0) donnerRecompense("or",gold);                 // GameState : Or + mise à jour du Header
+      if(gold>0) donnerRecompense("or",gold);
       Object.assign(res,{xp,or:gold,drop:drop?drop.name:null,niveauxGagnes:lv.length});
       this.lg("──── Récapitulatif : "+(win?"VICTOIRE":"DÉFAITE")+" ────",win?"win":"");
       this.lg("XP Brute ("+b.name+") : +"+xp+" XP — niv. "+b.level+", "+b.xp+"/"+b.xpMax+".");
       lv.forEach(m=>this.lg(m,"crit"));
-      if(b.companion){
-        const c=b.companion;
-        this.lg("XP Compagnon ("+c.name+") : +"+xp+" XP — niv. "+c.level+(c.level>=CompanionData.LEVEL_CAP?" (max)":", "+c.xp+"/"+c.xpMax)+".");
-        if(cLv>0) this.lg(c.name+" gagne "+cLv+" niveau"+(cLv>1?"x":"")+" !","crit");
-        if(cEvo) this.lg(c.name+" évolue : Forme "+c.form+(c.form===3?" Légendaire":"")+" !","crit");
-      }
       this.lg("Or amassé : +"+gold+" (total "+b.gold+").");
       this.lg("Drop : "+(drop?drop.kind+" — "+drop.name:"aucun")+".",drop?"crit":"");
-      txt="+"+xp+" XP"+(b.companion?" (Brute + Compagnon)":"")+", +"+gold+" Or."+(drop?" Drop : "+drop.name+".":"")+(lv.length?" "+lv.join(" "):"");
+      txt="+"+xp+" XP, +"+gold+" Or."+(drop?" Drop : "+drop.name+".":"")+(lv.length?" "+lv.join(" "):"");
     }
     else if(this.mode==="vagues"){
       Object.assign(res,{ennemisVaincus:this.tues,vaguesCompletes:win?3:ent.vague,bossVaincu:win});
@@ -397,8 +451,9 @@ const Combat={
     persist();
     $("#end-title").textContent=titre; $("#end-rewards").textContent=txt;
     $("#endscreen").className="end "+(win?"win":"lose");
-    $("#btn-again").classList.toggle("hidden",!!cfg.worldBoss);
-    $("#worldboss-actions").classList.toggle("hidden",!cfg.worldBoss);
+    const customEnd = !!(cfg.worldBoss || cfg.raid || this.mode === "triptyque");
+    $("#btn-again").classList.toggle("hidden", customEnd);
+    $("#worldboss-actions").classList.toggle("hidden", !customEnd);
     if(typeof cfg.onFin==="function"){ try{ cfg.onFin(res); }catch(e){ console.error("onFin :",e); } }   // fin du match
   },
   // ----- Branchements (à appeler une fois, à la place de l'ancien câblage de l'arène) -----
@@ -422,6 +477,7 @@ const Combat={
       renderer.skip();
     };
     $("#btn-again").onclick=()=>this.relancer();
+    this.initDevGroupUI();
   },
   // Vitesse persistante ; le x4 est ramené à x2 si le joueur n'est pas VIP
   vitesse(){ let sp=ProfileManager.getSpeed(); if(sp===4&&!GameState.illimite){ sp=2; ProfileManager.setSpeed(2); } return sp; },
@@ -439,11 +495,97 @@ const Combat={
   patchRenderer(){
     const P=CanvasRenderer.prototype; if(P._combatPatched) return; P._combatPatched=true;
     const blit=P.blit, drawBrute=P.drawBrute;
-    P.blit=function(ctx,f,c){ const s=f.scale||1; if(s===1) return blit.call(this,ctx,f,c);
-      ctx.save(); ctx.translate(f.x,f.y); ctx.scale(s,s); ctx.translate(-f.x,-f.y); blit.call(this,ctx,f,c); ctx.restore(); };
+    P.blit=function(ctx,f,c){
+      const g=Combat.devGroup||{scale:1,dx:0,dy:0}, s=f.scale||1;
+      const hasGroup=g.scale!==1||g.dx!==0||g.dy!==0;
+      if(!hasGroup&&s===1) return blit.call(this,ctx,f,c);
+      ctx.save();
+      if(hasGroup){ ctx.translate(200+g.dx,188+g.dy); ctx.scale(g.scale,g.scale); ctx.translate(-200,-188); }
+      if(s!==1){ ctx.translate(f.x,f.y); ctx.scale(s,s); ctx.translate(-f.x,-f.y); }
+      blit.call(this,ctx,f,c);
+      ctx.restore();
+    };
     P.drawBrute=function(ctx,b,t,anim="idle",fi=null){
       if(b&&b.placeholder&&!DataEngine.spriteBase(b.sprite)) return placeholderEnnemi(ctx,b,t,anim,fi);
       return drawBrute.call(this,ctx,b,t,anim,fi); };
+  },
+  initDevGroupUI(){
+    const KEY="dev_combat_group";
+    try{ const raw=localStorage.getItem(KEY); if(raw) this.devGroup=Object.assign({scale:1,dx:0,dy:0},JSON.parse(raw)); }catch(_){}
+    if(!this.devGroup) this.devGroup={scale:1,dx:0,dy:0};
+    const host=document.getElementById("devbox");
+    if(!host||document.getElementById("dev-combat-group")) return;
+
+    const g=this.devGroup; let editing=false, backup={...g}, drag=null;
+    const box=document.createElement("div");
+    box.id="dev-combat-group";
+    box.style.cssText="margin-top:8px;padding-top:6px;border-top:1px dashed #596b59;pointer-events:auto";
+    box.innerHTML=`<div style="display:flex;gap:4px;align-items:center">
+        <button type="button" id="dcg-toggle" style="flex:1;padding:3px 6px;font:bold 11px monospace;cursor:pointer">📐 Repositionner</button>
+        <button type="button" id="dcg-reset" title="Réinitialiser" style="padding:3px 6px;font:11px monospace;cursor:pointer">↺</button>
+      </div>
+      <div id="dcg-info" style="margin-top:3px;font-size:10px;color:#9f9">Groupe combat : ${g.scale.toFixed(2)}x · X ${g.dx} · Y ${g.dy}</div>
+      <div id="dcg-help" class="hidden" style="margin-top:2px;font-size:10px;color:#ffe23d">Glisser sur l'arène = déplacer · Molette = taille</div>`;
+    const pre=host.querySelector("pre");
+    if(pre) pre.before(box); else host.appendChild(box);
+
+    const btnToggle=box.querySelector("#dcg-toggle"), btnReset=box.querySelector("#dcg-reset"), info=box.querySelector("#dcg-info"), help=box.querySelector("#dcg-help");
+    const cv=document.getElementById("cv-arena");
+    const maj=()=>{ info.textContent=`Taille : ${g.scale.toFixed(2)}x · X : ${Math.round(g.dx)} · Y : ${Math.round(g.dy)}`; };
+    const sauver=()=>{ try{ localStorage.setItem(KEY,JSON.stringify(g)); }catch(_){} maj(); };
+
+    const setEdit=on=>{
+      editing=on;
+      if(on){
+        backup={...g};
+        btnToggle.textContent="✔ Confirmer";
+        btnToggle.style.background="#133818"; btnToggle.style.borderColor="#39ff14"; btnToggle.style.color="#39ff14";
+        help.classList.remove("hidden");
+        if(cv){ cv.style.cursor="move"; cv.style.outline="2px dashed #39ff14"; }
+      } else {
+        btnToggle.textContent="📐 Repositionner";
+        btnToggle.style.background="#261a0c"; btnToggle.style.borderColor="#c9953a"; btnToggle.style.color="#ffd35c";
+        help.classList.add("hidden");
+        if(cv){ cv.style.cursor=""; cv.style.outline=""; }
+      }
+    };
+
+    btnToggle.onclick=e=>{
+      e.stopPropagation();
+      if(!editing) setEdit(true);
+      else { sauver(); setEdit(false); if(typeof toast==="function") toast("Position et taille du groupe confirmées !"); }
+    };
+    btnReset.onclick=e=>{
+      e.stopPropagation();
+      Object.assign(g,{scale:1,dx:0,dy:0});
+      sauver();
+      if(typeof toast==="function") toast("Groupe réinitialisé.");
+    };
+
+    if(cv){
+      cv.addEventListener("pointerdown",e=>{
+        if(!editing) return;
+        e.preventDefault(); e.stopPropagation();
+        cv.setPointerCapture(e.pointerId);
+        const r=cv.getBoundingClientRect();
+        drag={x:e.clientX,y:e.clientY,dx0:g.dx,dy0:g.dy,sx:400/(r.width||400),sy:225/(r.height||225)};
+      });
+      cv.addEventListener("pointermove",e=>{
+        if(!editing||!drag) return;
+        g.dx=Math.round(drag.dx0+(e.clientX-drag.x)*drag.sx);
+        g.dy=Math.round(drag.dy0+(e.clientY-drag.y)*drag.sy);
+        maj();
+      });
+      const endDrag=e=>{ if(drag){ drag=null; if(cv.hasPointerCapture(e.pointerId)) cv.releasePointerCapture(e.pointerId); } };
+      cv.addEventListener("pointerup",endDrag);
+      cv.addEventListener("pointercancel",endDrag);
+      cv.addEventListener("wheel",e=>{
+        if(!editing) return;
+        e.preventDefault(); e.stopPropagation();
+        g.scale=Math.max(0.4,Math.min(2.5,+(g.scale+(e.deltaY<0?0.05:-0.05)).toFixed(2)));
+        maj();
+      },{passive:false});
+    }
   }
 };
 

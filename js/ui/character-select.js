@@ -125,7 +125,6 @@ const CharacterSelect = (() => {
       weapons: [], gear: [], skills: D.pickSkills(1), companion: null
     };
   }
-  // Loot caché à la création (jamais annoncé) : 35 % rien, 65 % 1 arme,
 // Loot caché à la création (jamais annoncé) : 35 % rien, 65 % 1 arme
 function rollLoot(b){
   if (Math.random() < .35) return;

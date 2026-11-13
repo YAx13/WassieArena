@@ -64,14 +64,16 @@ const Raids = {
     if (p > this.palierMax(mode)) { toast("Palier verrouillé : gagnez le palier précédent."); return; }
     if (!depenserRessource("energie", 1)) { toast("Énergie insuffisante (1 ⚡ requise)."); return; }
     const s = this.statsPalier(p);
-    lancerCombat({ mode: "vagues", cleanUI: true, fond: c.fond, fondSecours: c.fondSecours, boss: this.bossPalier(mode, p), palier: p,
+    lancerCombat({ mode: "vagues", raid: true, cleanUI: true, fond: c.fond, fondSecours: c.fondSecours, boss: this.bossPalier(mode, p), palier: p,
       ptsSbires: s.sbires, statsSbires: s.sbires, ptsBoss: s.boss, statsBoss: s.boss,
       onFin: r => this.finExpe(mode, p, r) });
+    this.updateExpeEndActions(mode, p, false);
     Combat.lg("Expédition : " + c.nom + " — palier " + p + "/" + this.PALIERS + (this.mur(p) ? " (MUR)" : "") + ".");
   },
   finExpe(mode, p, r){
-    const D = DataEngine, GS = GameState; let txt;
+    const D = DataEngine, GS = GameState; let txt, premiereVictoire = false;
     if (r.victoire) {
+      premiereVictoire = (GS.boss[mode] || 0) < p;
       GS.validerPalier(mode, p);
       const xp = 80 * p, lv = donnerRecompense("xp", xp).niveaux; let drop;
       if (mode === "armes") {
@@ -85,7 +87,7 @@ const Raids = {
         if (Math.random() < .02 + .08 * (p - 1) / (this.PALIERS - 1)) { donnerRecompense("pierres", 1); drop += " + 💎 Pierre de Transmutation !"; }
       }
       txt = "VICTOIRE palier " + p + " : +" + xp + " XP" + (lv ? " (+" + lv + " niveau" + (lv > 1 ? "x" : "") + ")" : "") + " · " + drop
-        + (p < this.PALIERS && GS.boss[mode] === p ? " · palier " + (p + 1) + " débloqué !" : "");
+        + (premiereVictoire && p < this.PALIERS ? " · palier " + (p + 1) + " débloqué !" : "");
     } else {
       const xp = r.ennemisVaincus * 15 * p;
       if (xp > 0) donnerRecompense("xp", xp);
@@ -94,6 +96,7 @@ const Raids = {
     $("#end-rewards").textContent = txt;
     Combat.lg("Expédition : " + txt, r.victoire ? "win" : "");
     this.rendre();
+    this.updateExpeEndActions(mode, p, premiereVictoire);
   },
 
   /* ================= BOSS MONDIAL ================= */
@@ -232,8 +235,12 @@ const Raids = {
   /* ================= INTERFACE (panneau #rd-panel de la pop-up #g-boss ; appelée par OV.reg.boss*.onOpen) ================= */
   ouvrir(mode){
     this.mode = mode;
-    if (mode === "mondial") $("#boss-name").textContent = this.bossMondial().nom;
     if (mode === "mondial") {
+      $("#boss-name").textContent = this.bossMondial().nom;
+      if ($("#wb-leaderboard")) {
+        $("#wb-leaderboard").classList.remove("hidden");
+        $("#wb-leaderboard").textContent = "CLASSEMENT MONDIAL";
+      }
       $("#wb-restart").onclick = () => this.lancerMondial();
       $("#wb-menu").onclick = () => {
         this.fermerClassement();
@@ -244,6 +251,44 @@ const Raids = {
       this.updateWorldBossEndActions();
     }
     this.rendre();
+  },
+  updateExpeEndActions(mode, p, premiereVictoire){
+    const btnNext = $("#wb-restart"), btnPaliers = $("#wb-leaderboard"), btnMenu = $("#wb-menu");
+    if (!btnNext || !btnMenu) return;
+    const energie = GameState.ressources.energie, maxE = GameState.ENERGIE_MAX;
+    const peutSuivant = premiereVictoire && p < this.PALIERS;
+    const ciblePalier = peutSuivant ? p + 1 : p;
+
+    btnNext.textContent = peutSuivant
+      ? `⏭ Palier ${ciblePalier} (1 ⚡ · ${energie}/${maxE})`
+      : `🔄 Recommencer Palier ${p} (1 ⚡ · ${energie}/${maxE})`;
+    btnNext.disabled = energie < 1;
+    btnNext.onclick = e => {
+      e.stopPropagation();
+      Combat.stop();
+      this.sel[mode] = ciblePalier;
+      if (typeof BossModes !== "undefined") BossModes.showBoss(mode, ciblePalier);
+      this.lancerExpe(mode);
+    };
+
+    if (btnPaliers) {
+      btnPaliers.classList.remove("hidden");
+      btnPaliers.textContent = "CHOIX DU PALIER";
+      btnPaliers.onclick = e => {
+        e.stopPropagation();
+        Combat.stop();
+        if (OV.stack.includes("combat")) OV.close("combat");
+        this.rendre();
+      };
+    }
+
+    btnMenu.onclick = e => {
+      e.stopPropagation();
+      Combat.stop();
+      if (OV.stack.includes("combat")) OV.close("combat");
+      const ovKey = { armes: "bossArmes", parchemins: "bossParchemins", familier: "bossFamilier" }[mode];
+      if (ovKey && OV.stack.includes(ovKey)) OV.close(ovKey);
+    };
   },
   rendre(){
     const box = $("#rd-panel"), mode = this.mode; if (!mode || !GameState.brute) return;

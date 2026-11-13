@@ -15,7 +15,7 @@ const PvP = {
   ELO_DEPART: 1000,                  // Elo d'un joueur sans réputation (et Elo de départ de chaque saison)
   K: 32,                             // facteur K du calcul Elo
   TICKETS_MAX: 5,                    // tickets PvP quotidiens
-  OR_VICTOIRE: 25, OR_DEFAITE: 10,   // Or par niveau de la brute
+  OR_VICTOIRE: 60, OR_DEFAITE: 25,   // Or par niveau de la brute
   RECOMPENSE_PIERRE: "pierres_transmutation",   // clé passée à donnerRecompense() (à adapter si ton inventaire utilise un autre nom)
   /* min/max = bornes d'Elo · rar = rareté d'équipement de base des bots (0 Commun … 5 Divin)
      armes / comp = nb d'armes / de compétences des bots · or / caisses / pierres = récompense de fin de saison */
@@ -106,6 +106,7 @@ const PvP = {
     Combat.lg("Elo : " + txt, r.victoire ? "win" : "");
     this._adv = null;
     this.majPanneau();
+    this.majActionsFin();
   },
   async ouvrir(){                                   // appelée à l'ouverture de la bulle PvP : affiche le choix des 3 cibles
     this.tickets();
@@ -156,6 +157,54 @@ const PvP = {
       `<button type="button" class="pvp-c ${lock ? "off" : ""}" data-k="${k}"><span class="pvp-cd">${c.diff.icone} ${c.diff.nom}</span>`
       + `<b>${c.nom}</b><span>Elo ${c.elo}</span><span>⚔️ ${c.puissance.toLocaleString("fr-FR")}</span></button>`).join("");
     this.majTimer();
+  },
+  classementBracket(){
+    const g = this.grade(), pts = this.elo(), me = (S.cur && (S.cur.name || S.cur.nom)) || "Vous";
+    const noms = ["Krag_99", "ValkyrieX", "Brute_Zero", "Zed_Fer", "Moka_Tôle", "Silex", "Néon_Rex", "Rusty_Joe", "Hache_Noire", "Torg_Alpha"];
+    const min = g.min, max = g.max === Infinity ? Math.max(2100, pts + 150) : g.max;
+    const liste = noms.map((nom, idx) => ({
+      nom,
+      elo: Math.round(max - (max - min) * ((idx + 0.5) / (noms.length + 1))),
+      bot: true
+    }));
+    liste.push({ nom: me, elo: pts, bot: false });
+    return liste.sort((a, b) => b.elo - a.elo);
+  },
+  ouvrirClassementBracket(){
+    document.querySelector(".wb-leaderboard")?.remove();
+    const g = this.grade(), popup = document.createElement("div");
+    popup.className = "wb-leaderboard";
+    popup.innerHTML = `<section class="wb-leaderboard-box"><header><b>Classement Bracket · ${g.icone} ${g.nom}</b><button type="button" class="btn" aria-label="Fermer">×</button></header><p class="wb-rotation">Saison en cours · Fin dans ${this.fmt(this.restant())}</p><div class="rd-lb"></div></section>`;
+    popup.querySelector(".rd-lb").innerHTML = this.classementBracket().map((entry, i) =>
+      `<div class="rd-row ${entry.bot ? "" : "me"}"><span>${i + 1}.</span><span>${entry.nom}${entry.bot ? "" : " (vous)"}</span><b>${entry.elo} Elo</b></div>`).join("");
+    popup.querySelector("button").onclick = () => popup.remove();
+    this.Q("#g-combat").appendChild(popup);
+  },
+  majActionsFin(){
+    const btnAdv = this.Q("#wb-restart"), btnLb = this.Q("#wb-leaderboard"), btnMenu = this.Q("#wb-menu");
+    if (!btnAdv || !btnMenu) return;
+    btnAdv.disabled = false;
+    btnAdv.textContent = "⚔️ CHOIX DES ADVERSAIRES";
+    btnAdv.onclick = e => {
+      e.stopPropagation();
+      Combat.stop();
+      this.tirerCibles();
+      this.majPanneau();
+      Combat.showPreview();
+      $("#g-combat").classList.add("pvp-screen", "pvp-preview");
+    };
+    if (btnLb) {
+      btnLb.classList.remove("hidden");
+      btnLb.textContent = "🏆 CLASSEMENT BRACKET";
+      btnLb.onclick = e => { e.stopPropagation(); this.ouvrirClassementBracket(); };
+    }
+    btnMenu.onclick = e => {
+      e.stopPropagation();
+      document.querySelector(".wb-leaderboard")?.remove();
+      Combat.stop();
+      if (OV.stack.includes("pvp")) OV.close("pvp");
+      if (OV.stack.includes("combat")) OV.close("combat");
+    };
   },
 
   /* ---------- Démarrage ---------- */

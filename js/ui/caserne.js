@@ -148,15 +148,30 @@ const CaserneUI = {
     persist();
   },
   coutParchemin(){ return 1 + Math.floor(GameState.tentativesParchemins * 1.5); },  // 1, 2, 4, 5, 7, 8…
-  debloquerCompetence(){
+  async debloquerCompetence(){
     const b = S.cur, D = DataEngine, pool = D.SKILLS.filter(s => !b.skills.includes(s.id));
     if (!pool.length) { toast("Toutes les compétences sont déjà débloquées."); return; }
     const cout = this.coutParchemin();
     if (!depenserRessource("parchemins", cout)) { toast("Parchemins insuffisants (" + cout + " requis)."); return; }
-    const k = D.pick(pool); b.skills.push(k.id); GameState.tentativesParchemins++;
-    const eq = this.equipees(), auto = eq.length < this.slotsOuverts();        // slot libre : équipée automatiquement
+    GameState.tentativesParchemins++;
+    persist();
+
+    const choix = pool.slice().sort(() => Math.random() - 0.5).slice(0, Math.min(3, pool.length));
+    let k = choix[0];
+    if (choix.length > 1) {
+      const ov = document.createElement("div");
+      ov.className = "rd-draft";
+      document.body.appendChild(ov);
+      const id = await Raids.carte("📜 PARCHEMIN : choisissez 1 compétence", choix.map(s => s.id), ov, false);
+      ov.remove();
+      if (id !== null) k = D.SKILLS[id] || k;
+    }
+
+    b.skills.push(k.id);
+    const eq = this.equipees(), auto = eq.length < this.slotsOuverts();
     if (auto) { eq.push(k.id); GameState.competencesEquipees = eq; }
-    persist(); toast("Nouvelle compétence : " + D.EL_ICON[k.el] + " " + k.name + (auto ? " (équipée)" : "") + " !");
+    persist();
+    toast("Nouvelle compétence : " + D.EL_ICON[k.el] + " " + k.name + (auto ? " (équipée)" : "") + " !");
   },
   /* ---------- 2b. CAISSES EN 1 CLIC & AUTO-FORGE ---------- */
   actionCaisse(){
@@ -232,6 +247,13 @@ const CaserneUI = {
       return `<button class="cs-slot on" data-slot="${i}" style="--c:${D.EL_COL[s.el]}"><span>${D.EL_ICON[s.el]}</span><small>${E(s.name)}</small></button>`;
     }).join("");
     this.Q("#cs-slots").querySelectorAll("[data-slot]").forEach(x => x.onclick = e => { e.stopPropagation(); this.choisirSlot(+x.dataset.slot); });
+    const synBox = this.Q("#cs-synergies");
+    if (synBox) {
+      const syns = DataEngine.getSynergies(eq), maxSlots = this.slotsOuverts();
+      synBox.innerHTML = syns.length
+        ? syns.map(s => `<div style="margin:6px 0;padding:6px 10px;border:1px solid ${s.col};background:rgba(15,20,28,.85);border-radius:4px;font-size:12px;color:#fff4d6"><b>${s.icon} Synergie ${s.name} (${s.count}/${maxSlots}) :</b> ${s.desc}</div>`).join("")
+        : `<div style="margin:6px 0;padding:5px 10px;border:1px dashed rgba(255,255,255,.2);border-radius:4px;font-size:11px;color:#9aa5b1">💡 Équipez 2 ou 3 compétences du même élément pour activer un bonus de synergie.</div>`;
+    }
     // Presets
     this.Q("#cs-presets").innerHTML = [1, 2, 3].map(n => `<span class="cs-pre"><button class="fx-mini" data-pl="${n}" ${GS.presets[n] ? "" : "disabled"}>📂 Preset ${n}</button><button class="fx-mini" data-ps="${n}" title="Sauvegarder le build actuel dans le Preset ${n}">💾</button></span>`).join("");
     this.Q("#cs-presets").querySelectorAll("[data-pl]").forEach(x => x.onclick = e => { e.stopPropagation(); this.preset(+x.dataset.pl, "load"); });
@@ -297,22 +319,27 @@ const CaserneUI = {
       btn.onclick = e => { e.stopPropagation(); this.fusionnerGroupe(btn.dataset.fk); };
     });
   },
-  /* ---------- 4. COMPAGNON : Nourriture + évolution Forme 3 (pop-up Évolutions) ---------- */
+/* ---------- 4. COMPAGNON : Nourriture + évolution Forme 3 (pop-up Évolutions) ---------- */
   nourrir(key){
-    const c = S.cur.companion; if (!c) return;
-    if (c.level >= CompanionData.LEVEL_CAP) { toast("Niveau maximum atteint."); return; }
+    const c = S.cur && S.cur.companion;
+    if (!c) { toast("Aucun compagnon actif."); return; }
+    if (c.level >= CompanionData.LEVEL_CAP) { toast(c.name + " est déjà au niveau maximum (" + CompanionData.LEVEL_CAP + ") !"); return; }
     if (!depenserRessource("nourriture", 1)) { toast("Pas de Nourriture."); return; }
-    const r = CompanionData.gainXp(c, Math.max(1, c.xpMax - c.xp));            // 1 Nourriture = +1 niveau
-    persist(); toast(c.name + " passe niveau " + c.level + (r.evolved ? " et évolue : Forme " + r.form + " !" : " !"));
+    const res = CompanionData.gainXp(c, 50);
+    persist();
+    toast(res.evolved ? `✨ ${c.name} évolue en Forme ${res.form} !` : res.levels > 0 ? `🐾 ${c.name} passe niveau ${c.level} !` : `🍖 +50 XP (${c.xp}/${c.xpMax})`);
     openEvo(key);
   },
   peutForme3(c){ return c && c.form === 2 && c.level >= CompanionData.EVO_LEVELS[2] && GameState.ressources.pierres >= 1; },
   evoluerForme3(key){
-    const c = S.cur.companion; if (!this.peutForme3(c)) return;
-    if (!depenserRessource("pierres", 1)) return;
-    c.formeFinale = true; c.form = 3;
-    const def = (CompanionData.SPECIES[c.species] || {forms: []}).forms.find(x => x.form === 3); if (def && def.name) c.name = def.name;
-    persist(); toast(c.name + " atteint sa Forme 3 !");
+    const c = S.cur && S.cur.companion;
+    if (!c) { toast("Aucun compagnon actif."); return; }
+    if (c.level < CompanionData.LEVEL_CAP) { toast("Niveau " + CompanionData.LEVEL_CAP + " requis pour la Transmutation."); return; }
+    if (c.form === 3) { toast(c.name + " a déjà atteint sa forme Légendaire !"); return; }
+    if (!depenserRessource("pierres", 1)) { toast("Pierre de Transmutation requise (💎)."); return; }
+    CompanionData.transmute(c);
+    persist();
+    toast(`💎 Transmutation réussie : ${c.name} (Forme Légendaire) !`);
     openEvo(key);
   },
   attacherEvo(key){                                                           // ajoute le panneau sous la frise existante
@@ -381,7 +408,7 @@ const CaserneUI = {
     const pw = document.createElement("div"); pw.id = "cs-power"; pw.className = "cs-power"; this.Q("#fx-stats").before(pw);
     // Slots + presets + parchemins au-dessus de la grille des compétences
     const pn = document.createElement("div"); pn.id = "cs-skills";
-    pn.innerHTML = '<div id="cs-slots" class="cs-slots"></div><div id="cs-presets" class="cs-pres"></div><button id="cs-unlock" class="fx-btn cs-btn"></button>';
+    pn.innerHTML = '<div id="cs-slots" class="cs-slots"></div><div id="cs-synergies"></div><div id="cs-presets" class="cs-pres"></div><button id="cs-unlock" class="fx-btn cs-btn"></button>';
     this.Q("#fx-sgrid").before(pn);
     this.Q("#cs-unlock").onclick = e => { e.stopPropagation(); this.debloquerCompetence(); };
     this.Q("#btn-fuse").onclick = () => this.fusionner();                    // Forge

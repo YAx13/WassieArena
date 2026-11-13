@@ -18,19 +18,19 @@ const GameState = {
 
   /* Clés persistées (hors brute) : snapshot() les lit telles quelles */
   SAVED: ["ressources", "energieTs", "achatsStats", "tentativesParchemins", "reputation", "saisonDebut", "monde", "vip",
-          "ticketsPvp", "skipsGratuits", "jourReset", "maitriseArmes", "competencesEquipees", "presets", "boss"],
+          "ticketsPvp", "skipsGratuits", "jourReset", "maitriseArmes", "competencesEquipees", "presets", "boss", "queteCompagnon"],
 
-  /* Progression d'une partie neuve : source unique (recruter, effacer, charger) */
   _vierge(){
     return {
-      boss: { armes: 0, parchemins: 0, familier: 0, mondial: 0 },   // palier atteint par mode
+      boss: { armes: 0, parchemins: 0, familier: 0, mondial: 0 },
       presets: { actif: 1, 1: null, 2: null, 3: null },
-      monde: { cles: 2, jour: "", rotation: -1, record: 0 },        // Boss Mondial (voir raids.js)
-      achatsStats: 0,            // Entraînements Mutagènes achetés
-      tentativesParchemins: 0,   // tirages de compétence (coût en Parchemins = 2^n)
-      reputation: 1000,          // Elo PvP
-      maitriseArmes: {},         // { idArme: 0..10 } via les doublons de caisse
-      ticketsPvp: 5, skipsGratuits: 3
+      monde: { cles: 2, jour: "", rotation: -1, record: 0 },
+      achatsStats: 0,
+      tentativesParchemins: 0,
+      reputation: 1000,
+      maitriseArmes: {},
+      ticketsPvp: 5, skipsGratuits: 3,
+      queteCompagnon: false
     };
   },
   _reset(){
@@ -45,7 +45,7 @@ const GameState = {
   slotsPourNiveau(n){ n = +n || 1; return n >= 10 ? 3 : n >= 5 ? 2 : 1; },
   defaultRessources(){ return { or: 300, caisses: 0, energie: this.ENERGIE_MAX, parchemins: 0, nourriture: 0, pierres: 0 }; },
   _n(v, def = 0){ v = Math.floor(+v); return Number.isFinite(v) && v >= 0 ? v : def; },
-  xpMaxPour(niveau){ return Math.floor(100 * Math.pow(1.18, (+niveau || 1) - 1)); },
+  xpMaxPour(niveau){ return Math.floor(100 * Math.pow(1.11, (+niveau || 1) - 1)); },
   _lire(k){ try { return localStorage.getItem(k); } catch (e) { return null; } },   // localStorage peut être bloqué (iframe sandbox)
 
   /* ---- Quotidien : minuit, heure locale (tickets, skips, clés du Boss Mondial) ---- */
@@ -114,6 +114,7 @@ const GameState = {
     this.jourReset = typeof d.jourReset === "string" ? d.jourReset : "";
     ["achatsStats", "tentativesParchemins", "reputation", "ticketsPvp", "skipsGratuits"].forEach(k => this[k] = this._n(d[k], v[k]));
     this.boss = {}; Object.keys(v.boss).forEach(k => this.boss[k] = Math.min(this.PALIERS, this._n(d.boss && d.boss[k])));
+    this.queteCompagnon = d.queteCompagnon === true;
     this.maitriseArmes = {}; Object.keys(d.maitriseArmes || {}).forEach(k => this.maitriseArmes[k] = Math.min(this.MAITRISE_MAX, this._n(d.maitriseArmes[k])));
     this.presets = Object.assign(v.presets, d.presets);
     this.monde = Object.assign(v.monde, d.monde); this.monde.cles = this._n(this.monde.cles, 2); this.monde.record = this._n(this.monde.record);
@@ -186,8 +187,8 @@ const GameState = {
     };
     essayer(["jpeg", "jpg", "png"]);
   },
-  /* ---- Or AFK : 3 × niveau par seconde (×1,5 en VIP). Source unique : AFKMode.RATE l'appelle ---- */
-  tauxOrAfk(){ return Math.round(3 * (this.brute ? this.brute.niveau : 1) * (this.vip ? 1.5 : 1)); },
+  /* ---- Or AFK : 1 + 0,5 × niveau par seconde (×1,5 en VIP). Source unique : AFKMode.RATE l'appelle ---- */
+  tauxOrAfk(){ return Math.max(1, Math.round((1 + 0.5 * (this.brute ? this.brute.niveau : 1)) * (this.vip ? 1.5 : 1))); },
   majRate(){ const el = $("#afk-rate"); if (el) el.textContent = "+" + this.tauxOrAfk() + " Or / sec"; },
 
   /* ---- Header ---- */
@@ -201,7 +202,6 @@ const GameState = {
     if (S.cur) renderGame();
     AFKMode.hud(); this.majRate(); this.majCargos();
   },
-
   /* ---- XP (Brute + compagnon) : donnerRecompense("xp") ---- */
   gagnerXp(q){
     const b = this.brute, st = [], recompenses = []; let niveaux = 0;
@@ -213,8 +213,9 @@ const GameState = {
     }
     if (b.level >= this.NIVEAU_MAX) b.xp = 0;
     b.xpMax = this.xpMaxPour(b.level);
-    const evolution = b.companion ? CompanionData.gainXp(b.companion, q).evolved : false;
+    const evolution = false;
     this.save(); this.rafraichir();
+    this.verifierQueteCompagnon();
     return { xp: q, niveaux, stats: st, recompenses, evolution };
   },
   /* ---- Équipement : donnerRecompense("equipement", n, { rarite, part }) ---- */
@@ -228,6 +229,49 @@ const GameState = {
     this.save(); this.rafraichir(); return out;
   },
 
+  /* ---- Presets de compétences (1/2/3) ---- */
+  sauverPreset(n){
+    n = +n; if (![1, 2, 3].includes(n) || !this.brute) return false;
+    this.presets[n] = { competences: this.competencesEquipees.slice() }; this.presets.actif = n; this.save(); return true;
+  },
+  chargerPreset(n){
+    n = +n; const p = this.presets[n]; if (!p || !this.brute) return false;
+    this.competencesEquipees = p.competences.filter(id => this.brute.skills.includes(id)).slice(0, this.brute.slotsCompetences);
+    this.presets.actif = n; this.save(); this.rafraichir(); return true;
+  },
+
+  /* ---- Boss : palier atteint par mode ---- */
+  validerPalier(mode, n){
+    if (!(mode in this.boss)) return false;
+    this.boss[mode] = Math.max(this.boss[mode], Math.min(this.PALIERS, this._n(n)));
+    this.save();
+    this.verifierQueteCompagnon();
+    return true;
+  },
+
+  /* ---- Quête d'initiation : 1er compagnon aléatoire ---- */
+  async verifierQueteCompagnon(){
+    const b = this.brute;
+    if (!b || this.queteCompagnon || b.companion) return false;
+    if (b.level < 2 || (this.boss.familier || 0) < 1) return false;
+
+    this.queteCompagnon = true;
+    const famille = DataEngine.pick(CompanionData.FAMILIES);
+    b.companion = CompanionData.create(famille.species || famille.key);
+    this.save();
+    this.rafraichir();
+
+    const fam = CompanionData.family(b.companion);
+    const icone = fam ? fam.icon : "🐾";
+    const spec = fam ? "\nSpécialité : " + fam.spec : "";
+    await uiDialog(
+      "🐾 QUÊTE ACCOMPLIE !",
+      "Vous avez débloqué votre premier compagnon :\n" + icone + " " + b.companion.name + spec,
+      [["Génial !", true]],
+      true
+    );
+    return true;
+  },
   /* ---- Presets de compétences (1/2/3) ---- */
   sauverPreset(n){
     n = +n; if (![1, 2, 3].includes(n) || !this.brute) return false;

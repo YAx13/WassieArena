@@ -124,6 +124,25 @@ class DataEngine {
  ].map((k,i)=>({id:i,name:k[0],el:k[1],t:k[2],pw:k[3],fx:k[4],desc:k[5]}));
   static EL_ICON = ["👊","🔥","❄️","💧","⚡","🪨","🌪️"];
   static EL_COL = ["#c9c2b0","#ff6a2b","#7fd8ff","#3b8cff","#ffe23d","#a8793f","#b9e8d0"];
+  static EL_SYNERGIES = [
+    { el: 0, p2: "+12 % Dégâts Physiques",     p3: "+25 % Dégâts Physiques & +10 % Critique", dmg: [1.12, 1.25], crit: [0, 0.10] },
+    { el: 1, p2: "+15 % Dégâts de Feu",        p3: "+30 % Dégâts de Feu & Brûlure renforcée", dmg: [1.15, 1.30], dot: [1.15, 1.35] },
+    { el: 2, p2: "+15 % Dégâts de Glace",      p3: "+30 % Dégâts de Glace & +15 % Gel/Ralenti", dmg: [1.15, 1.30], ctrl: [0.10, 0.20] },
+    { el: 3, p2: "+15 % Dégâts d'Eau & Soin",  p3: "+30 % Dégâts d'Eau & +20 % Soins reçus",   dmg: [1.15, 1.30], heal: [1.15, 1.30] },
+    { el: 4, p2: "+15 % Dégâts Électriques",   p3: "+30 % Dégâts Électriques & +10 % Vitesse", dmg: [1.15, 1.30], spd: [1.05, 1.12] },
+    { el: 5, p2: "+15 % Dégâts de Terre",      p3: "+30 % Dégâts de Terre & −12 % Dégâts reçus", dmg: [1.15, 1.30], dr: [0.06, 0.12] },
+    { el: 6, p2: "+15 % Dégâts d'Air",         p3: "+30 % Dégâts d'Air & +10 % Esquive",       dmg: [1.15, 1.30], dodge: [5, 10] }
+  ];
+  static getSynergies(skillIds = []){
+    const counts = {};
+    (skillIds || []).forEach(id => { const s = this.SKILLS[id]; if (s) counts[s.el] = (counts[s.el] || 0) + 1; });
+    return Object.entries(counts)
+      .filter(([, n]) => n >= 2)
+      .map(([el, n]) => {
+        const tier = n >= 3 ? 3 : 2, idx = tier - 2, def = this.EL_SYNERGIES[+el];
+        return { el: +el, count: n, tier, icon: this.EL_ICON[+el], name: this.ELEMENTS[+el], col: this.EL_COL[+el], desc: tier === 3 ? def.p3 : def.p2, def, idx };
+      });
+  }
   static pickSkills(n){ const a=[...Array(32).keys()]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]} return a.slice(0,n); }
   static SYL_A = ["Gor","Bru","Thor","Ska","Ma","Dra","Ur","Kra","Bal","Vor","Mor","Ras","Tor","Gru"];
   static SYL_B = ["gar","nak","mund","dor","gul","bak","rik","thar","zul","gan","dric","mok"];
@@ -209,6 +228,14 @@ class CompanionData {
     }
     return r;
   }
+  static transmute(c){
+    if(!c || c.level < this.LEVEL_CAP || c.form === 3) return false;
+    c.formeFinale = true;
+    c.form = 3;
+    const def = (this.SPECIES[c.species] || this.SPECIES.chien_friche).forms.find(x => x.form === 3);
+    if(def && def.name) c.name = def.name;
+    return true;
+  }
 }
 
 /* ================= ProfileManager ================= */
@@ -261,21 +288,35 @@ CompanionData.SPECIES.aigle_veille={base:"Aigle de surveillance",forms:[{form:1,
 // spec = spécialité de combat affichée sur la fiche (modifiable) ; legend = bonus réel du stade Légende, si déjà implémenté.
 CompanionData.EVO_LEVELS=[1,10,20];
 CompanionData.FAMILIES=[
-  {key:"chien",     icon:"🐕", name:"Chien",       stages:["Cyber-Chauve","Orthros","Cerbère"],                spec:"Vitesse et Harcèlement",          species:"chien_friche",  legend:"Légende : dégâts ×1,6"},
-  {key:"loup",      icon:"🐺", name:"Loup",        stages:["Loup-Mutant","Amarok","Fenrir"],                   spec:"Traque et Morsures critiques"},
+  {key:"chien",     icon:"🐕", name:"Chien",       stages:["Cyber-Chauve","Orthros","Cerbère"],                spec:"Vitesse et Harcèlement",          species:"chien_friche",  legend:"Légende : dégâts ×1,6 et attaque rapide"},
+  {key:"loup",      icon:"🐺", name:"Loup",        stages:["Loup-Mutant","Amarok","Fenrir"],                   spec:"Traque et Morsures critiques",    legend:"Légende : coup critique garanti (+50 % dégâts)"},
   {key:"ours",      icon:"🐻", name:"Ours",        stages:["Ours-Broyeur","Nandi","Béhémoth"],                 spec:"Force brute et Étourdissement",   species:"ours_decharge", legend:"Légende : étourdit à coup sûr"},
-  {key:"serpent",   icon:"🐍", name:"Serpent",     stages:["Cyber-Vipère","Basilic","Hydre"],                  spec:"Poison et Contrôle"},
-  {key:"oiseau",    icon:"🦅", name:"Oiseau",      stages:["Cyber-Moineau","Roc-Mineur","Phénix"],             spec:"Précision et Frappes aériennes",  species:"aigle_veille"},
-  {key:"arthropode",icon:"🦂", name:"Arthropode",  stages:["Gratte-Terre","Chitin-Garde","Manticore"],         spec:"Armure et Contre-attaque"},
-  {key:"felin",     icon:"🐈", name:"Félin",       stages:["Cyber-Gouttière","Lynx-Traqueur","Sphinx"],        spec:"Esquive et Embuscade"},
-  {key:"taureau",   icon:"🐂", name:"Taureau",     stages:["Cyber-Biquet","Khalkotauroi","Minotaure"],         spec:"Charge et Impact"},
-  {key:"aquatique", icon:"🐙", name:"Aquatique",   stages:["Néon-Sangsue","Leviathan-Proto","Kraken"],         spec:"Drain et Étreinte"},
-  {key:"chimere",   icon:"🦁", name:"Chimère",     stages:["Scrap-Raton","Griffon-Basse-Cour","Chimère"],      spec:"Polyvalence hybride"},
-  {key:"lezard",    icon:"🦎", name:"Lézard",      stages:["Éco-Lézard","Raiju-Shiba","Kirin"],                spec:"Réflexes et Affinité élémentaire"},
-  {key:"spectre",   icon:"👻", name:"Spectre",     stages:["Néon-Chiot","Bakeneko","Nekomata"],                spec:"Illusions et Malédictions"},
-  {key:"tempete",   icon:"⛈️", name:"Tempête",     stages:["Scrap-Piaf","Condor-Glaive","Thunderbird"],        spec:"Foudre et Dégâts de zone"}
+  {key:"serpent",   icon:"🐍", name:"Serpent",     stages:["Cyber-Vipère","Basilic","Hydre"],                  spec:"Poison et Contrôle",              legend:"Légende : poison virulent sur 3 tours"},
+  {key:"oiseau",    icon:"🦅", name:"Oiseau",      stages:["Cyber-Moineau","Roc-Mineur","Phénix"],             spec:"Précision et Frappes aériennes",  species:"aigle_veille",  legend:"Légende : esquive impossible + brûlure"},
+  {key:"arthropode",icon:"🦂", name:"Arthropode",  stages:["Gratte-Terre","Chitin-Garde","Manticore"],         spec:"Armure et Contre-attaque",        legend:"Légende : renvoie 40 % des dégâts (3 tours)"},
+  {key:"felin",     icon:"🐈", name:"Félin",       stages:["Cyber-Gouttière","Lynx-Traqueur","Sphinx"],        spec:"Esquive et Embuscade",            legend:"Légende : +25 % d'esquive à la Brute (3 tours)"},
+  {key:"taureau",   icon:"🐂", name:"Taureau",     stages:["Cyber-Biquet","Khalkotauroi","Minotaure"],         spec:"Charge et Impact",                legend:"Légende : ignore l'armure + propulsion"},
+  {key:"aquatique", icon:"🐙", name:"Aquatique",   stages:["Néon-Sangsue","Leviathan-Proto","Kraken"],         spec:"Drain et Étreinte",               legend:"Légende : soigne la Brute de 15 % PV max"},
+  {key:"chimere",   icon:"🦁", name:"Chimère",     stages:["Scrap-Raton","Griffon-Basse-Cour","Chimère"],      spec:"Polyvalence hybride",             legend:"Légende : dissipe les bonus + ralentit"},
+  {key:"lezard",    icon:"🦎", name:"Lézard",      stages:["Éco-Lézard","Raiju-Shiba","Kirin"],                spec:"Réflexes et Affinité élémentaire",legend:"Légende : confère Surtension (vitesse +30 %)"},
+  {key:"spectre",   icon:"👻", name:"Spectre",     stages:["Néon-Chiot","Bakeneko","Nekomata"],                spec:"Illusions et Malédictions",       legend:"Légende : −25 % précision adverse + brûlure"},
+  {key:"tempete",   icon:"⛈️", name:"Tempête",     stages:["Scrap-Piaf","Condor-Glaive","Thunderbird"],        spec:"Foudre et Dégâts de zone",        legend:"Légende : frappe électrique + 50 % étourdissement"}
 ];
-CompanionData.family=function(c){ return this.FAMILIES.find(f=>f.species===c.species)||null; };
+CompanionData.FAMILIES.forEach(f=>{
+  if(!f.species) f.species=f.key;
+  if(!CompanionData.SPECIES[f.species]){
+    CompanionData.SPECIES[f.species]={
+      base:f.stages[0],
+      forms:[
+        {form:1,minLevel:1,name:f.stages[0],legendary:false},
+        {form:2,minLevel:10,name:f.stages[1],legendary:false},
+        {form:3,minLevel:20,name:f.stages[2],legendary:true}
+      ]
+    };
+  }
+  [1,2,3].forEach(form=>{ DataEngine.PET_SHEETS[f.species+":"+form]=DataEngine.getCompanionArt(f.key,form); });
+});
+CompanionData.family=function(c){ return this.FAMILIES.find(f=>f.species===c.species||f.key===c.species)||null; };
 
 /* ================= ForgeSystem ================= */
 class ForgeSystem {

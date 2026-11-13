@@ -47,7 +47,7 @@ class CanvasRenderer {
       victory:{s:"base",r:0,fps:8,loop:1}
     }
   };
-  static PET={ idle:{r:0,fps:6,loop:1,fb:[0,1,2,3]}, run:{r:1,fps:14,loop:1,fb:[4,5,6,7]}, bite:{r:2,fps:12,fb:[6,7,6,5]}, death:{r:3,fps:6,fb:[12,13,14,15]} };
+  static PET={ idle:{r:0,fps:6,loop:1}, run:{r:1,fps:14,loop:1}, bite:{r:2,fps:12}, hit:{f:[12],fps:8}, fall:{f:[13],fps:8}, death:{f:[13,14,15],fps:6} };
   // Point d'ancrage de la main (px dans la case 64x64, rotation en rad) par frame ; null = arme absente (lâchée). Calibrez selon vos dessins.
   static ANCHORS={
     thrust:[[30,38,-.3],[38,37,-.1],[50,36,0],[54,36,0]],
@@ -153,15 +153,14 @@ class CanvasRenderer {
     ctx.restore();
   }
   sheet(spr,s){ return this.loadImg(DataEngine.spriteSheet(spr,s)); }
-  // Familier : planche réelle sinon mini-brute teintée (frames P1) tant que le PNG n'existe pas
+  // Familier : grille 4x4 (Row 1: idle, Row 2: run, Row 3: attack, Row 4: hit/fall/2x KO)
   drawPet(ctx,f,an,n){
-    const A=CanvasRenderer.PET[an]||CanvasRenderer.PET.idle, k=A.loop?n%4:Math.min(n,3);
+    const A=CanvasRenderer.PET[an]||CanvasRenderer.PET.idle, L=A.f?A.f.length:4, k=A.loop?n%L:Math.min(n,L-1);
     ctx.clearRect(0,0,64,64); ctx.imageSmoothingEnabled=false;
     const img=this.loadImg(DataEngine.PET_SHEETS[f.key]);
-    if(img){ const fr=A.r*4+k; ctx.drawImage(img,(fr%4)*64,((fr/4)|0)*64,64,64,0,0,64,64); return; }
-    const bi=this.sprite(f.owner.sprite), fb=A.fb[k];
-    if(bi){ ctx.drawImage(bi,(fb%4)*64,((fb/4)|0)*64,64,64,12,26,40,40); ctx.globalCompositeOperation="source-atop"; ctx.fillStyle="rgba(150,95,40,.55)"; ctx.fillRect(0,0,64,64); ctx.globalCompositeOperation="source-over"; }
-    else{ ctx.fillStyle="#8a5a2b"; ctx.fillRect(14,40,30,14); ctx.fillRect(40,34,12,10); ctx.fillStyle="#222"; ctx.fillRect(46,37,2,2); }
+    if(!img) return;
+    const fr=A.f?A.f[k]:A.r*4+k, cw=img.naturalWidth/4, ch=img.naturalHeight/4;
+    ctx.drawImage(img,(fr%4)*cw,((fr/4)|0)*ch,cw,ch,0,0,64,64);
   }
   freeze(ms){ this.frozen=performance.now()+ms; }   // freeze frame : l'horloge de jeu s'arrête
   animFrame(f,c){
@@ -230,6 +229,35 @@ class CanvasRenderer {
     [...A.V,...(A.P||[])].sort((a,b)=>a.y-b.y).forEach(f=>{
       ctx.fillStyle="rgba(0,0,0,.5)"; ctx.beginPath(); ctx.ellipse(f.x,f.y-2,f.pet?14:20,f.pet?4:5,0,0,7); ctx.fill();
       this.blit(ctx,f,c);
+      if(!f.pet && f.st && f.hp>0){
+        const st=f.st, badges=[];
+        if(st.stun>0) badges.push({ic:"💫",col:"#ffe23d"});
+        if(st.shield>0) badges.push({ic:"🛡️",col:"#7fd8ff",v:st.shield});
+        if(st.block>0) badges.push({ic:"🧱",col:"#b8b8b8"});
+        if(st.dr) badges.push({ic:"🔰",col:"#6fcf5a"});
+        if(st.reflect) badges.push({ic:"🪞",col:"#ff9d2e"});
+        if(st.dodge) badges.push({ic:"💨",col:"#b9e8d0"});
+        if(st.spdUp>0) badges.push({ic:"⚡",col:"#ffe23d"});
+        if(st.rage>0) badges.push({ic:"💢",col:"#ff5e7e"});
+        if(st.slow>0) badges.push({ic:"❄️",col:"#7fd8ff"});
+        if(st.accD) badges.push({ic:"🌫️",col:"#a8793f"});
+        if(st.dot&&st.dot.some(d=>d.n>0)){
+          if(st.dot.some(d=>/brûl/i.test(d.t||""))) badges.push({ic:"🔥",col:"#ff6a2b"});
+          if(st.dot.some(d=>/poison/i.test(d.t||""))) badges.push({ic:"☠️",col:"#6fcf5a"});
+          if(!badges.some(b=>b.ic==="🔥"||b.ic==="☠️")) badges.push({ic:"🩸",col:"#c58be0"});
+        }
+        if(badges.length){
+          const py=Math.round(f.y-(f.air||0)-CanvasRenderer.HEAD*(f.scale||1)-6);
+          const step=16, startX=Math.round(f.x-((badges.length-1)*step)/2);
+          badges.forEach((b,idx)=>{
+            const bx=startX+idx*step;
+            ctx.fillStyle="rgba(10,12,16,.82)"; ctx.beginPath(); ctx.arc(bx,py,7,0,7); ctx.fill();
+            ctx.strokeStyle=b.col; ctx.lineWidth=1; ctx.stroke();
+            ctx.font="9px serif"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText(b.ic,bx,py+.5);
+            if(b.v){ ctx.font="bold 7px monospace"; ctx.fillStyle="#fff"; ctx.fillText(b.v,bx,py-9); }
+          });
+        }
+      }
     });
     const pj=A.proj; if(pj&&c>=pj.t0&&c<=pj.t1){ const k=(c-pj.t0)/(pj.t1-pj.t0); ctx.save(); ctx.translate(pj.x0+(pj.x1-pj.x0)*k,pj.y0+(pj.y1-pj.y0)*k-Math.sin(Math.PI*k)*18); ctx.rotate(c/45); ctx.font="19px serif"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText(pj.ic,0,0); ctx.restore(); }
     ctx.textAlign="center";
