@@ -82,7 +82,7 @@ function toggleDevMode(){
   p=document.createElement("div"); p.id="devbox";
   p.style.cssText="position:fixed;left:8px;top:8px;z-index:99;background:rgba(235,240,235,.70);backdrop-filter:blur(2px);color:#000;padding:8px;font:11px monospace;border:1px solid #000;max-width:290px;pointer-events:none";
   const R=DataEngine.RARITIES, tw=R.reduce((s,r)=>s+r.w,0);
-  p.innerHTML='<style>#devbox,#devbox *{color:#000 !important}</style><b>DEV</b> <button data-a="g">+1000 or</button> <button data-a="l">+1 niv</button> <button data-a="a">Ascension</button> <button data-a="s">+10 âmes</button><small style="display:block;margin-top:5px">Glissez les boutons du menu pour les déplacer. Positions sauvegardées automatiquement.</small>'+
+  p.innerHTML='<style>#devbox,#devbox *{color:#000 !important}</style><b>DEV</b> <button data-a="g">+1000 or</button> <button data-a="l">+1 niv</button> <button data-a="a">Ascension</button> <button data-a="s">+10 âmes</button> <button data-a="all" style="font-weight:bold">🔓 Tout débloquer</button><small style="display:block;margin-top:5px">Glissez les boutons du menu pour les déplacer. Positions sauvegardées automatiquement.</small>'+
    '<label style="display:grid;grid-template-columns:1fr auto;gap:4px;margin-top:8px">Recul AFK <output id="dev-afk-recoil-value">40 px</output><input id="dev-afk-recoil" type="range" min="0" max="150" step="1" value="40" style="grid-column:1 / -1;width:100%"></label><small style="display:block;margin-top:8px">Râtelier : activez « Éditer le râtelier » dans la Caserne. Glissez les armes, molette = taille, Maj + molette = rotation.</small><textarea id="dev-rack-positions" readonly aria-label="Coordonnées des armes du râtelier" style="box-sizing:border-box;width:100%;height:100px;margin-top:4px;background:rgba(255,255,255,.85);color:#000;border:1px solid #333;font:10px monospace;pointer-events:auto"></textarea><div id="dev-dedicated-panels" style="display:flex;flex-direction:column;gap:6px;margin-top:6px;pointer-events:auto"></div><pre style="white-space:pre-wrap;margin:6px 0 0">'+
    "Recrutement : 35% rien / 65% arme\nDrop victoire : 25% (arme/compétence)\nArme/tour : "+BattleEngine.WEAPON_CHANCE*100+"% · Familier/tour : "+BattleEngine.PET_CHANCE*100+"%\nCaisses : "+R.map(r=>r.name+" "+(r.w/tw*100).toFixed(1)+"%").join(", ")+"</pre>";
   const recoil=p.querySelector("#dev-afk-recoil"), recoilValue=p.querySelector("#dev-afk-recoil-value");
@@ -90,7 +90,26 @@ function toggleDevMode(){
   p.querySelector("#dev-rack-positions").addEventListener("focus",event=>event.target.select());
   recoil.value=AFKMode.recoilDistance; recoilValue.textContent=AFKMode.recoilDistance+" px";
   recoil.oninput=()=>{ AFKMode.recoilDistance=Number(recoil.value); recoilValue.textContent=AFKMode.recoilDistance+" px"; };
-  p.onclick=ev=>{ const a=ev.target.dataset.a, b=S.cur; if(!a||!b) return; if(a==="g") b.gold+=1000; if(a==="l") b.level++; if(a==="s") ProfileManager.addSouls(10); if(a==="a"){ ascend(b,true); return; } persist(); };
+  p.onclick=ev=>{
+    const a=ev.target.dataset.a, b=S.cur; if(!a||!b) return;
+    if(a==="g") b.gold+=1000;
+    if(a==="l") b.level++;
+    if(a==="s") ProfileManager.addSouls(10);
+    if(a==="a"){ ascend(b,true); return; }
+    if(a==="all"){
+      b.gold+=999999; b.level=Math.max(b.level,50);
+      b.weapons=DataEngine.WEAPONS.map(w=>w.id);
+      b.skills=DataEngine.SKILLS.map(s=>s.id);
+      DataEngine.WEAPONS.forEach(w=>{ GameState.maitriseArmes[w.id]=GameState.MAITRISE_MAX; });
+      Object.assign(GameState.ressources,{or:999999,parchemins:999,nourriture:999,pierres:999,caisses:99});
+      if(b.companion){ b.companion.level=CompanionData.LEVEL_CAP; b.companion.form=3; }
+      ["helmet","chest","boots","necklace"].forEach(part=>["carnage","cyber","mutant"].forEach(set=>b.gear.push({part,rarity:5,set})));
+      for(let el=0;el<7;el++) b.gear.push({part:"ring",rarity:5,kind:"el",el});
+      ["hp","str","agi","spd"].forEach(stat=>b.gear.push({part:"ring",rarity:5,kind:"stat",stat}));
+      if(typeof toast==="function") toast("🔓 Tout débloqué (armes, compétences, sets Divins, ressources) !");
+    }
+    persist();
+  };
   GameFrame.mount(p);
   if(typeof DevLayoutManager!=="undefined") DevLayoutManager.mountAll(p);
   updateRackPositionExport();

@@ -298,13 +298,16 @@ const CaserneUI = {
       const syns = DataEngine.getAllSynergies(b, eq), maxSlots = this.slotsOuverts();
       if (syns.length) {
         const s = syns[0];
+        const descLines = E(s.desc).replace(/\s*&\s*/g, "<br>");
         synBox.classList.add("active");
         synBox.style.setProperty("--syn-c", s.col);
-        synBox.innerHTML = `<b style="color:${s.col}">${s.icon} ${s.name.toUpperCase()} (${s.count}/${maxSlots})</b><span>${E(s.desc)}</span>`;
+        synBox.title = `${s.name} (${s.count}/${maxSlots}) : ${s.desc}`;
+        synBox.innerHTML = `<b style="color:${s.col}">${s.icon} ${s.name.toUpperCase()} [${s.count}/${maxSlots}]</b><span>${descLines}</span>`;
       } else {
         synBox.classList.remove("active");
         synBox.style.removeProperty("--syn-c");
-        synBox.innerHTML = `<span style="opacity:.75">SYNERGIE INACTIVE<br><small>2+ même élément</small></span>`;
+        synBox.removeAttribute("title");
+        synBox.innerHTML = `<b style="opacity:.8">SYNERGIE</b><span style="opacity:.65">2+ même élément</span>`;
       }
     }
     // Presets
@@ -533,8 +536,11 @@ const CaserneUI = {
       + "#cs-equip-stage.is-editing [data-eq-item]{outline:1px dashed #f2b21c !important;background:rgba(242,178,28,.16) !important;cursor:grab !important;z-index:25;touch-action:none}"
       + "#cs-equip-stage.is-editing [data-eq-item]:active{cursor:grabbing !important}"
       + "#cs-equip-stage.is-editing [data-eq-item]>*{pointer-events:none}"
+      + ".fx-equip-tab .csd-corner-bar{position:absolute;right:12px;bottom:12px;z-index:30;display:flex;gap:5px;align-items:center}"
+      + ".fx-equip-tab .csd-corner-btn{width:auto !important;height:auto !important;min-height:0 !important;padding:5px 10px !important;font-size:11px !important;line-height:1.2 !important}"
+      + ".fx-equip-tab .csd-corner-mini{width:auto !important;height:auto !important;min-height:0 !important;padding:5px 8px !important;font-size:11px !important;line-height:1.2 !important}"
       + ".cs-gold-crate-wrap{display:flex;flex-direction:column;align-items:stretch;gap:3px}"
-      + ".cs-gold-crate{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:5px 7px;background:linear-gradient(180deg,#5a3b0c 0%,#2b1a04 100%);border:2px solid #ffd24d;border-radius:3px;box-shadow:0 0 22px rgba(255,196,46,.75),inset 0 0 10px rgba(255,215,90,.45),0 4px 10px #000;cursor:pointer;transition:transform .12s,box-shadow .15s}"
+      + ".cs-gold-crate{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:5px 7px;background:linear-gradient(180deg,#9c6b14 0%,#4a2e05 100%);border:2px solid #ffe066;border-radius:3px;box-shadow:0 0 26px rgba(255,210,60,.9),inset 0 0 12px rgba(255,235,130,.65),0 4px 10px #000;cursor:pointer;transition:transform .12s,box-shadow .15s}"
       + ".cs-gold-crate::before,.cs-gold-crate::after{content:'';position:absolute;width:5px;height:5px;background:#ffe98a;box-shadow:0 0 6px #ffb000}"
       + ".cs-gold-crate::before{top:2px;left:2px}.cs-gold-crate::after{top:2px;right:2px}"
       + ".cs-gold-crate:hover:not(:disabled){transform:translateY(-1px) scale(1.03);box-shadow:0 0 30px rgba(255,210,70,.95),inset 0 0 14px rgba(255,230,120,.7)}"
@@ -550,11 +556,11 @@ const CaserneUI = {
       + ".cs-crate-multi button:disabled{opacity:.38;cursor:not-allowed}"
       + ".cs-set-bar{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;align-items:center;padding:2px 6px;background:rgba(12,9,6,.68);border:1px solid rgba(232,168,48,.35);font:9.5px monospace;text-align:center}"
       + ".cs-set-pill{padding:1px 6px;border:1px solid var(--sc,#e8a830);background:rgba(0,0,0,.65);color:var(--sc,#fff)}"
-      + ".cs-eq-slot{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;background:transparent;border:none;text-align:center;cursor:pointer;transition:transform .12s}"
-      + ".cs-eq-slot:hover{transform:scale(1.08)}"
-      + ".cs-eq-slot.filled::after{content:'';position:absolute;inset:10%;border:1px solid var(--rc,#e8a830);box-shadow:0 0 10px var(--rc,#e8a830),inset 0 0 8px var(--rc,#e8a830);pointer-events:none;border-radius:2px}"
-      + ".cs-eq-ico{font-size:1.9em;line-height:1;filter:drop-shadow(0 2px 4px #000)}"
-      + ".cs-eq-badge{position:absolute;bottom:4px;padding:0 4px;background:rgba(10,8,6,.88);border:1px solid var(--rc,#5a4b32);font:bold 8px/1.2 monospace;color:var(--rc,#b9a88c);text-transform:uppercase;max-width:92%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}"
+      + ".cs-eq-slot{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:3px;background:rgba(10,8,6,.72);border:1px solid var(--rc,#5c4b32);border-radius:3px;box-shadow:inset 0 0 10px rgba(0,0,0,.85),0 2px 6px rgba(0,0,0,.85);text-align:center;cursor:pointer;transition:transform .12s,box-shadow .15s}"
+      + ".cs-eq-slot:hover{transform:scale(1.06)}"
+      + ".cs-eq-slot.filled{border-color:var(--rc,#e8a830);box-shadow:inset 0 0 12px color-mix(in srgb,var(--rc,#e8a830) 32%,transparent),0 0 10px color-mix(in srgb,var(--rc,#e8a830) 55%,transparent)}"
+      + ".cs-eq-ico{font-size:clamp(14px,1.9vw,22px);line-height:1;filter:drop-shadow(0 2px 3px #000)}"
+      + ".cs-eq-badge{padding:0 3px;background:rgba(10,8,6,.88);border:1px solid var(--rc,#5a4b32);font:bold 7.5px/1.2 monospace;color:var(--rc,#b9a88c);text-transform:uppercase;max-width:96%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}"
       + ".cs-inv-dock{display:flex;flex-direction:column;justify-content:space-between;gap:3px;padding:4px 6px;background:rgba(12,11,10,.78);border:none;overflow:hidden}"
       + ".cs-inv-head{display:flex;justify-content:space-between;align-items:center;gap:4px;font:bold 9.5px monospace;color:#ffd77a}"
       + ".cs-inv-filters{display:flex;gap:2px}"
@@ -572,8 +578,11 @@ const CaserneUI = {
       + ".cs-inv-acts button.trans-btn{border-color:#7fd8ff;color:#7fd8ff}"
       + ".cs-gold{align-self:flex-end;width:max-content;padding:3px 8px;color:#ffd77a;background:rgba(26,16,8,.88);border:1px solid #c9953a;font:11px monospace;white-space:nowrap}"
       + "#cs-skills{position:relative;width:100%;aspect-ratio:1408/752;background-size:100% 100%;background-repeat:no-repeat;margin:0 auto;overflow:hidden;user-select:none}"
-      + "#cs-skills .cs-syn-screen{position:absolute;padding:3px 6px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;font:clamp(8px,.8vw,10px)/1.15 monospace;color:#8ef6ff;text-shadow:0 0 6px rgba(79,240,230,.8);overflow:hidden}"
-      + "#cs-skills .cs-syn-screen.active{color:#fff;box-shadow:inset 0 0 12px var(--syn-c,#4ff0e6)}"
+      + "#cs-skills-fg{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none;z-index:20}"
+      + "#cs-skills .cs-syn-screen{position:absolute !important;z-index:15 !important;display:flex !important;flex-direction:column;justify-content:center;align-items:center;gap:3px;padding:4px 6px;box-sizing:border-box;text-align:center;background:rgba(4,14,18,.85);border:1px solid rgba(79,240,230,.45);border-radius:2px;font:700 clamp(7px,0.7vw,9.5px)/1.3 monospace !important;letter-spacing:.2px;color:#7ffcf4;text-shadow:0 0 6px rgba(79,240,230,.85);overflow:hidden}"
+      + "#cs-skills .cs-syn-screen b{display:block;width:100%;font-size:1.08em !important;line-height:1.2 !important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}"
+      + "#cs-skills .cs-syn-screen span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;width:100%;font-size:0.95em !important;line-height:1.25 !important;overflow:hidden;color:#d8fbff}"
+      + "#cs-skills .cs-syn-screen.active{color:#fff;box-shadow:inset 0 0 14px color-mix(in srgb,var(--syn-c,#4ff0e6) 40%,transparent)}"
       + "#cs-skills .cs-slots,#cs-skills .cs-ctrl-right,#cs-skills .cs-pres,#cs-skills #fx-sgrid{position:static;display:contents}"
       + "#cs-skills .cs-slot{position:absolute;min-height:0;background:transparent !important;border:none !important;box-shadow:none !important;padding:0;box-sizing:border-box;display:flex;align-items:center;justify-content:center;transition:filter .14s}"
       + "#cs-skills .cs-slot:hover:not(.lock){filter:drop-shadow(0 0 6px #7ffcf4)}"
@@ -607,8 +616,12 @@ const CaserneUI = {
     const sg = this.Q("#fx-sgrid"), pn = document.createElement("div");
     pn.id = "cs-skills";
     const bgUrl = typeof assetPath !== "undefined" && assetPath.competenceBg ? assetPath.competenceBg() : "assets/backgrounds/competence/background.jpeg";
+    const fgUrl = typeof assetPath !== "undefined" && assetPath.competenceFg ? assetPath.competenceFg() : "assets/backgrounds/competence/foreground.png";
     pn.style.backgroundImage = `url("${encodeURI(bgUrl)}")`;
-    pn.innerHTML = '<div id="cs-synergies" class="cs-syn-screen"></div><div id="cs-slots" class="cs-slots"></div><div class="cs-ctrl-right"><div id="cs-presets" class="cs-pres"></div><button id="cs-unlock" class="fx-btn cs-btn"></button></div>';
+    pn.innerHTML = '<div id="cs-synergies" class="cs-syn-screen"></div><div id="cs-slots" class="cs-slots"></div><div class="cs-ctrl-right"><div id="cs-presets" class="cs-pres"></div><button id="cs-unlock" class="fx-btn cs-btn"></button></div><img id="cs-skills-fg" alt="" aria-hidden="true">';
+    const fgImg = pn.querySelector("#cs-skills-fg");
+    fgImg.onerror = () => { fgImg.style.display = "none"; };
+    fgImg.src = encodeURI(fgUrl);
     sg.before(pn);
     pn.appendChild(sg);
     this.Q("#cs-unlock").onclick = e => { e.stopPropagation(); this.debloquerCompetence(); };
@@ -652,6 +665,7 @@ const CaserneUI = {
       if (Array.isArray(saved)) {
         saved.forEach(s => {
           if (s.id === "unlock" && s.size < 8) return;
+          if (s.id === "syn" && s.size > 30) return;
           const t = def.find(d => d.id === s.id);
           if (t && Number.isFinite(s.x) && Number.isFinite(s.y)) Object.assign(t, s);
         });
@@ -669,15 +683,15 @@ const CaserneUI = {
     console.log("SKILLS_LAYOUT =", JSON.stringify(clean));
   },
   applySkillItemPos(el, pos, stage){
-    const w = stage ? stage.clientWidth : 800;
+    const w = (stage && stage.clientWidth) || 800;
     el.style.position = "absolute";
     el.style.left = pos.x + "%";
     el.style.top = pos.y + "%";
     el.style.transform = `translate(-50%,-50%) rotate(${pos.angle || 0}deg)`;
     if (pos.id === "syn") {
       el.style.width = pos.size + "%";
-      el.style.height = (pos.size * 0.65) + "%";
-      el.style.fontSize = Math.max(7, w * pos.size * 0.0055) + "px";
+      el.style.height = (pos.size * 0.68) + "%";
+      el.style.removeProperty("font-size");
     } else if (pos.id.startsWith("pre_")) {
       el.style.width = pos.size + "%";
       el.style.height = "auto";
@@ -798,14 +812,14 @@ const CaserneUI = {
   _equipPositions: null,
   defaultEquipPositions(){
     return [
-      { id: "cargo",   x: 50.0, y: 39.2, size: 13.5, angle: 0 },
-      { id: "sets",    x: 50.0, y: 69.5, size: 42.0, angle: 0 },
-      { id: "slot_0",  x: 16.4, y: 37.8, size: 7.4,  angle: 0 },
-      { id: "slot_1",  x: 16.4, y: 52.3, size: 7.4,  angle: 0 },
-      { id: "slot_2",  x: 16.4, y: 66.8, size: 7.4,  angle: 0 },
-      { id: "slot_3",  x: 92.2, y: 47.0, size: 7.4,  angle: 0 },
-      { id: "slot_4",  x: 92.2, y: 61.5, size: 7.4,  angle: 0 },
-      { id: "slot_5",  x: 92.2, y: 76.0, size: 7.4,  angle: 0 },
+      { id: "cargo",   x: 50.0, y: 38.8, size: 13.5, angle: 0 },
+      { id: "sets",    x: 50.0, y: 69.2, size: 42.0, angle: 0 },
+      { id: "slot_0",  x: 16.3, y: 37.4, size: 7.5,  angle: 0 },
+      { id: "slot_1",  x: 16.3, y: 52.2, size: 7.5,  angle: 0 },
+      { id: "slot_2",  x: 16.3, y: 67.0, size: 7.5,  angle: 0 },
+      { id: "slot_3",  x: 91.9, y: 47.2, size: 7.5,  angle: 0 },
+      { id: "slot_4",  x: 91.9, y: 62.0, size: 7.5,  angle: 0 },
+      { id: "slot_5",  x: 91.9, y: 76.8, size: 7.5,  angle: 0 },
       { id: "inv",     x: 50.0, y: 86.2, size: 43.5, angle: 0 }
     ];
   },
@@ -861,53 +875,59 @@ const CaserneUI = {
   initEquipDevUI(){
     const stage = this.Q("#cs-equip-stage"); if (!stage) return;
     const host = stage.closest(".fx-equip-tab") || stage;
-    if (host.querySelector("#eqd-corner-bar")) return;
-    let drag = null;
-
-    const bar = document.createElement("div");
-    bar.id = "eqd-corner-bar";
-    bar.className = "csd-corner-bar";
-    bar.innerHTML = `<button type="button" id="eqd-copy" class="fx-btn csd-corner-mini" title="Copier JSON">📋</button>`
-      + `<button type="button" id="eqd-reset" class="fx-btn csd-corner-mini" title="Réinitialiser">↺</button>`
-      + `<button type="button" id="eqd-edit" class="fx-btn csd-corner-btn">ÉDITER L'ATELIER</button>`;
-    host.appendChild(bar);
-
     const isDev = () => !!document.getElementById("devbox") || !!GameState.illimite || /[?&]dev\b/.test(location.search);
     const setEdit = on => {
       this._equipEditing = on;
-      stage.classList.toggle("is-editing", on);
-      const btn = bar.querySelector("#eqd-edit");
+      const curStage = this.Q("#cs-equip-stage");
+      if (curStage) curStage.classList.toggle("is-editing", on);
+      const btn = host.querySelector("#eqd-edit");
       if (btn) btn.textContent = on ? "Terminer le placement" : "ÉDITER L'ATELIER";
     };
-    const syncVis = () => {
-      const on = isDev();
-      bar.style.display = on ? "flex" : "none";
-      if (!on && this._equipEditing) setEdit(false);
-    };
-    syncVis();
-    this._syncEquipDev = syncVis;
-    new MutationObserver(syncVis).observe(document.body, { childList: true });
 
-    bar.querySelector("#eqd-edit").onclick = e => {
-      e.stopPropagation();
-      setEdit(!this._equipEditing);
-      if (!this._equipEditing && typeof toast === "function") toast("Placement de l'atelier enregistré !");
-    };
-    bar.querySelector("#eqd-copy").onclick = e => {
-      e.stopPropagation();
-      const clean = this.getEquipPositions().map(({ id, x, y, size, angle }) => ({
-        id, x: +x.toFixed(2), y: +y.toFixed(2), size: +size.toFixed(1), angle: +(angle || 0).toFixed(1)
-      }));
-      if (navigator.clipboard) navigator.clipboard.writeText(JSON.stringify(clean));
-      if (typeof toast === "function") toast("Coordonnées atelier copiées !");
-    };
-    bar.querySelector("#eqd-reset").onclick = e => {
-      e.stopPropagation();
-      try { localStorage.removeItem(this.EQUIP_LAYOUT_KEY); } catch (_) {}
-      this._equipPositions = null;
-      this.applyEquipLayout();
-      if (typeof toast === "function") toast("Positions par défaut restaurées.");
-    };
+    if (!host.querySelector("#eqd-corner-bar")) {
+      const bar = document.createElement("div");
+      bar.id = "eqd-corner-bar";
+      bar.className = "csd-corner-bar";
+      bar.innerHTML = `<button type="button" id="eqd-copy" class="fx-btn csd-corner-mini" title="Copier JSON">📋</button>`
+        + `<button type="button" id="eqd-reset" class="fx-btn csd-corner-mini" title="Réinitialiser">↺</button>`
+        + `<button type="button" id="eqd-edit" class="fx-btn csd-corner-btn">ÉDITER L'ATELIER</button>`;
+      host.appendChild(bar);
+
+      const syncVis = () => {
+        const on = isDev();
+        bar.style.display = on ? "flex" : "none";
+        if (!on && this._equipEditing) setEdit(false);
+      };
+      syncVis();
+      this._syncEquipDev = syncVis;
+      new MutationObserver(syncVis).observe(document.body, { childList: true });
+
+      bar.querySelector("#eqd-edit").onclick = e => {
+        e.stopPropagation();
+        setEdit(!this._equipEditing);
+        if (!this._equipEditing && typeof toast === "function") toast("Placement de l'atelier enregistré !");
+      };
+      bar.querySelector("#eqd-copy").onclick = e => {
+        e.stopPropagation();
+        const clean = this.getEquipPositions().map(({ id, x, y, size, angle }) => ({
+          id, x: +x.toFixed(2), y: +y.toFixed(2), size: +size.toFixed(1), angle: +(angle || 0).toFixed(1)
+        }));
+        if (navigator.clipboard) navigator.clipboard.writeText(JSON.stringify(clean));
+        if (typeof toast === "function") toast("Coordonnées atelier copiées !");
+      };
+      bar.querySelector("#eqd-reset").onclick = e => {
+        e.stopPropagation();
+        try { localStorage.removeItem(this.EQUIP_LAYOUT_KEY); } catch (_) {}
+        this._equipPositions = null;
+        this.applyEquipLayout();
+        if (typeof toast === "function") toast("Positions par défaut restaurées.");
+      };
+    }
+
+    stage.classList.toggle("is-editing", this._equipEditing);
+    if (stage.dataset.devBound) return;
+    stage.dataset.devBound = "1";
+    let drag = null;
 
     stage.addEventListener("pointerdown", ev => {
       if (!this._equipEditing) return;
@@ -915,22 +935,22 @@ const CaserneUI = {
       ev.preventDefault(); ev.stopPropagation();
       const pos = this.getEquipPositions().find(p => p.id === el.dataset.eqItem); if (!pos) return;
       drag = { el, pos, pointerId: ev.pointerId };
-      el.setPointerCapture(ev.pointerId);
-    });
+      try { el.setPointerCapture(ev.pointerId); } catch (_) {}
+    }, true);
     stage.addEventListener("pointermove", ev => {
       if (!drag || ev.pointerId !== drag.pointerId) return;
       const rect = stage.getBoundingClientRect();
-      drag.pos.x = Math.max(4, Math.min(96, ((ev.clientX - rect.left) / rect.width) * 100));
-      drag.pos.y = Math.max(4, Math.min(96, ((ev.clientY - rect.top) / rect.height) * 100));
+      drag.pos.x = Math.max(2, Math.min(98, ((ev.clientX - rect.left) / rect.width) * 100));
+      drag.pos.y = Math.max(2, Math.min(98, ((ev.clientY - rect.top) / rect.height) * 100));
       this.applyEquipItemPos(drag.el, drag.pos, stage);
-    });
+    }, true);
     const endDrag = ev => {
       if (!drag || ev.pointerId !== drag.pointerId) return;
       drag = null;
       this.saveEquipPositions();
     };
-    stage.addEventListener("pointerup", endDrag);
-    stage.addEventListener("pointercancel", endDrag);
+    stage.addEventListener("pointerup", endDrag, true);
+    stage.addEventListener("pointercancel", endDrag, true);
     stage.addEventListener("click", ev => {
       if (!this._equipEditing || !ev.target.closest("[data-eq-item]")) return;
       ev.preventDefault(); ev.stopImmediatePropagation();
@@ -942,10 +962,10 @@ const CaserneUI = {
       const pos = this.getEquipPositions().find(p => p.id === el.dataset.eqItem); if (!pos) return;
       const d = ev.deltaY || ev.deltaX;
       if (ev.shiftKey) pos.angle = (pos.angle || 0) + (d < 0 ? 5 : -5);
-      else pos.size = Math.max(6, Math.min(98, (pos.size || 15) + (d < 0 ? 1.0 : -1.0)));
+      else pos.size = Math.max(4, Math.min(98, (pos.size || 15) + (d < 0 ? 1.0 : -1.0)));
       this.applyEquipItemPos(el, pos, stage);
       this.saveEquipPositions();
-    }, { passive: false });
+    }, { passive: false, capture: true });
 
     if (typeof ResizeObserver !== "undefined") {
       new ResizeObserver(() => this.applyEquipLayout()).observe(stage);
