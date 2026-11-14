@@ -1,0 +1,9 @@
+16:9 widescreen 16-bit pixel art game background, using Image 1 (Neutral Greybox Base) strictly as an exact 1:1 spatial blueprint.
+Strict Spatial Anchors (Keep exact position, scale, and dark screen interiors):
+• 4 Blank Dark Screens: Keep the top-left screen hanging on chains (suspended from an overhead arch, branch, cliff, or scaffold), the large top-right screen (mounted on a monolith or themed frame), the bottom-right screen (built into a low stone/terrain structure), and the wide angled front display built into the front edge of the low-profile circular floor podium in their exact 1:1 positions with completely blank solid dark interiors (no text or numbers).
+• Center Circular Floor Podium: Keep the wide, low-profile circular platform directly centered beneath the arms with a flat, empty top pad for the character sprite.
+• 2 Slender Overhead Arms: Keep the two compact, multi-jointed arms descending from an overhead structure/arch in the upper third of the frame, leaving wide open headroom above the podium.
+Total Thematic Transformation (100% Inspired by Image 2 & Images 3–6):
+• Open-Air Outdoor Environment: Completely erase the indoor grey room walls and ceiling, replacing them with deep open-air scenery (sky, horizon, distant monuments, cliffs, foliage, or ruins) and natural ground terrain matching Image 2 and the character in Images 3–6.
+• Customize the 2 Arms: Rebuild the two slender overhead arms in materials matching Image 2, adapting their fine claw and probe tips to hold or channel small tools, relics, or instruments iconic to the character in Images 3–6.
+• Art Style: Crisp 16-bit pixel art matching the exact line weight, pixel density, and shading of Image 1, leaving zero plain grey grid surfaces behind.
