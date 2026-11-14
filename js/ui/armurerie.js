@@ -186,10 +186,10 @@ function saveWeaponRackPositions(){
   if(!weaponRackPositions) return;
   try{ localStorage.setItem(WEAPON_RACK_LAYOUT_PREFIX+weaponRackBrute,JSON.stringify(weaponRackPositions)); }
   catch(error){ console.error("Impossible de sauvegarder la configuration DEV du râtelier.",error); }
-  console.log(`WEAPON_RACK_LAYOUT["${weaponRackBrute}"] =`,JSON.stringify(weaponRackPositions.map(({id,x,y,size,angle})=>({id,x:+x.toFixed(2),y:+y.toFixed(2),size:+size.toFixed(2),angle:+angle.toFixed(1)}))));
+  console.log(`WEAPON_RACK_LAYOUT["${weaponRackBrute}"] =`,JSON.stringify(weaponRackPositions.map(({id,x,y,size,angle,flip})=>({id,x:+x.toFixed(2),y:+y.toFixed(2),size:+size.toFixed(2),angle:+angle.toFixed(1),flip:!!flip}))));
 }
 function rackPositionText(){
-  return JSON.stringify(weaponRackPositions.map(({id,x,y,size,angle})=>({id,x:+x.toFixed(2),y:+y.toFixed(2),size:+size.toFixed(2),angle:+angle.toFixed(1)})),null,2);
+  return JSON.stringify(weaponRackPositions.map(({id,x,y,size,angle,flip})=>({id,x:+x.toFixed(2),y:+y.toFixed(2),size:+size.toFixed(2),angle:+angle.toFixed(1),flip:!!flip})),null,2);
 }
 function updateRackPositionExport(){
   const output=$("#dev-rack-positions");
@@ -219,7 +219,8 @@ function applyRackPosition(button,position,grid){
   button.style.position="absolute";
   button.style.margin="0";
   button.style.gridColumn=button.style.gridRow="auto";
-  button.style.transform=`translate(-50%,-50%) rotate(${position.angle}deg)`;}
+  button.style.transform=`translate(-50%,-50%) rotate(${position.angle}deg) scaleX(${position.flip?-1:1})`;
+}
 function rackPositionOverlaps(position,grid,id){
   const bounds=rackPositionBounds(position,grid);
   return weaponRackPositions.some(other=>{
@@ -290,17 +291,205 @@ function attachWeaponRackEditor(grid){
     saveWeaponRackPositions();updateRackPositionExport();
   },{passive:false});
 }
+const weaponPixelMetrics={};
+let weaponBuckleSize=30;
+
+function measureWeaponPixels(b,id){
+  const key=(b.sprite||"general")+":"+id;
+  if(weaponPixelMetrics[key]) return weaponPixelMetrics[key];
+  const skin=renderer.weaponSprite(b,id);
+  if(!skin||!skin.sheet||!skin.sheet.complete||!skin.sheet.naturalWidth) return null;
+  try{
+    const W=skin.width, H=skin.height, cv=document.createElement("canvas");
+    cv.width=W; cv.height=H;
+    const ctx=cv.getContext("2d");
+    ctx.drawImage(skin.sheet,skin.x,skin.y,W,H,0,0,W,H);
+    const data=ctx.getImageData(0,0,W,H).data;
+    const solid=new Uint8Array(W*H), vis=new Uint8Array(W*H);
+    for(let i=0;i<W*H;i++) if(data[i*4+3]>140) solid[i]=1;
+    // Isoler uniquement la composante connexe principale (supprime les pixels isolés)
+    let bestBlob=[];
+    const stack=new Int32Array(W*H);
+    for(let i=0;i<W*H;i++){
+      if(!solid[i]||vis[i]) continue;
+      let sp=0; stack[sp++]=i; vis[i]=1;
+      const blob=[];
+      while(sp>0){
+        const cur=stack[--sp]; blob.push(cur);
+        const cx=cur%W, cy=(cur-cx)/W;
+        for(let dy=-1;dy<=1;dy++) for(let dx=-1;dx<=1;dx++){
+          if(!dx&&!dy) continue;
+          const nx=cx+dx, ny=cy+dy;
+          if(nx>=0&&nx<W&&ny>=0&&ny<H){
+            const ni=ny*W+nx;
+            if(solid[ni]&&!vis[ni]){ vis[ni]=1; stack[sp++]=ni; }
+          }
+        }
+      }
+      if(blob.length>bestBlob.length) bestBlob=blob;
+    }
+    const cleanMask=new Uint8Array(W*H);
+    let minX=W, maxX=0, minY=H, maxY=0;
+    for(const idx of bestBlob){
+      cleanMask[idx]=1;
+      const x=idx%W, y=(idx-x)/W;
+      if(x<minX) minX=x; if(x>maxX) maxX=x;
+      if(y<minY) minY=y; if(y>maxY) maxY=y;
+    }
+    if(!bestBlob.length) return weaponPixelMetrics[key]={W:32,H:32,mask:new Uint8Array(1024).fill(1),wRatio:0.6,hRatio:0.6,area:0.35,tier:"med"};
+    const wRatio=(maxX-minX+1)/W, hRatio=(maxY-minY+1)/H;
+    const area=bestBlob.length/(W*H), maxDim=Math.max(wRatio,hRatio);
+    const tier=maxDim>=0.74||area>=0.22?"big":maxDim<=0.50&&area<=0.13?"small":"med";
+    return weaponPixelMetrics[key]={W,H,mask:cleanMask,wRatio,hRatio,area,tier};
+  }catch(e){
+    return weaponPixelMetrics[key]={W:32,H:32,mask:new Uint8Array(1024).fill(1),wRatio:0.65,hRatio:0.65,area:0.32,tier:"med"};
+  }
+}
+
+function generateWeaponRackChaos(b,grid,buckleSize=weaponBuckleSize){
+  const W=grid.clientWidth||900, H=grid.clientHeight||480;
+  // Grille haute précision (260px de large) pour détecter chaque lame et manche sans trou
+  const GW=260, GH=Math.max(120,Math.round(GW*(H/W)));
+  const occ=new Uint8Array(GW*GH);
+  const L=Math.round(GW*0.075), R=Math.round(GW*0.925), T=Math.round(GH*0.105), B=Math.round(GH*0.895);
+  const WASS_L=Math.round(GW*0.68), WASS_B=Math.round(GH*0.25);
+
+  const buckleW=DataEngine.WEAPONS.find(w=>/bouclier|shield|rondache|ecu|écu/i.test(w.name))||DataEngine.WEAPONS[DataEngine.WEAPONS.length-1];
+  const buckleId=buckleW.id;
+  const metrics=DataEngine.WEAPONS.map(w=>{
+    const m=measureWeaponPixels(b,w.id)||{W:32,H:32,mask:new Uint8Array(1024).fill(1),wRatio:0.65,hRatio:0.65,area:0.3,tier:"med"};
+    const baseSize=m.tier==="big"?25.5:m.tier==="small"?18.0:21.5;
+    return {id:w.id,...m,size:baseSize};
+  });
+
+  // Échantillonnage dense (chaque pixel du sprite) pour éviter tout chevauchement de pointes fines
+  const stampPoints=(m,pos)=>{
+    const rad=(pos.angle||0)*Math.PI/180, cos=Math.cos(rad), sin=Math.sin(rad);
+    const scale=(GH*(pos.size/100))/m.H;
+    const cx=(pos.x/100)*GW, cy=(pos.y/100)*GH;
+    const halfW=m.W/2, halfH=m.H/2;
+    const pts=[];
+    const step=m.W>64?2:1;
+    for(let sy=0;sy<m.H;sy+=step){
+      for(let sx=0;sx<m.W;sx+=step){
+        if(!m.mask[sy*m.W+sx]) continue;
+        const lx=(pos.flip?(halfW-sx):(sx-halfW))*scale;
+        const ly=(sy-halfH)*scale;
+        const gx=Math.round(cx+lx*cos-ly*sin);
+        const gy=Math.round(cy+lx*sin+ly*cos);
+        pts.push(gx,gy);
+      }
+    }
+    return pts;
+  };
+
+  const fits=(pts,pad)=>{
+    for(let i=0;i<pts.length;i+=2){
+      const gx=pts[i], gy=pts[i+1];
+      if(gx-pad<L||gx+pad>R||gy-pad<T||gy+pad>B) return false;
+      if(gx+pad>WASS_L&&gy-pad<WASS_B) return false;
+      for(let dy=-pad;dy<=pad;dy++){
+        const row=(gy+dy)*GW;
+        for(let dx=-pad;dx<=pad;dx++){
+          if(occ[row+gx+dx]) return false;
+        }
+      }
+    }
+    return true;
+  };
+
+  // Remplit chaque point + un halo 3x3 pour garantir une silhouette continue sans interstice
+  const commit=(pts)=>{
+    for(let i=0;i<pts.length;i+=2){
+      const gx=pts[i], gy=pts[i+1];
+      for(let dy=-1;dy<=1;dy++){
+        const ny=gy+dy; if(ny<0||ny>=GH) continue;
+        const row=ny*GW;
+        for(let dx=-1;dx<=1;dx++){
+          const nx=gx+dx; if(nx>=0&&nx<GW) occ[row+nx]=1;
+        }
+      }
+    }
+  };
+
+  const placed=[];
+  // 1. Bouclier / Boucle centrale verrouillé au centre du panneau bleu
+  const buckleM=metrics.find(m=>m.id===buckleId);
+  const bucklePos={id:buckleId,x:50,y:50,size:buckleSize,angle:0,flip:false};
+  commit(stampPoints(buckleM,bucklePos));
+  placed.push(bucklePos);
+
+  // 2. Placement du plus grand au plus petit : réduit progressivement la taille jusqu'à trouver une place 100% libre
+  const others=metrics.filter(m=>m.id!==buckleId).sort((a,c)=>(c.area*c.size)-(a.area*a.size));
+
+  others.forEach(m=>{
+    const pad=m.tier==="big"?3:m.tier==="small"?1:2;
+    let chosen=null;
+    for(const sizeMult of [1.0,0.88,0.76,0.65,0.55]){
+      let bestScore=Infinity;
+      for(let attempt=0;attempt<450;attempt++){
+        const angle=Math.round(Math.random()*360-180);
+        const flip=Math.random()<0.5;
+        const rx=8+Math.random()*84;
+        const ry=11+Math.random()*78;
+        const cand={id:m.id,x:rx,y:ry,size:m.size*sizeMult*(0.95+Math.random()*0.1),angle,flip};
+        const pts=stampPoints(m,cand);
+        if(!pts.length||!fits(pts,pad)) continue;
+        const dx=(rx-50)*0.65, dy=(ry-50);
+        const score=Math.hypot(dx,dy)+Math.random()*12;
+        if(score<bestScore){ bestScore=score; chosen={pos:cand,pts}; }
+      }
+      if(chosen) break;
+    }
+    if(chosen){
+      commit(chosen.pts);
+      placed.push(chosen.pos);
+    }else{
+      const fb={id:m.id,x:14+Math.random()*72,y:16+Math.random()*68,size:m.size*0.48,angle:Math.round(Math.random()*360-180),flip:Math.random()<0.5};
+      commit(stampPoints(m,fb));
+      placed.push(fb);
+    }
+  });
+
+  weaponRackPositions=placed.sort((a,c)=>a.id-c.id);
+  saveWeaponRackPositions();
+  updateRackPositionExport();
+  const buttons=[...grid.querySelectorAll(".fx-rack-weapon")];
+  buttons.forEach(btn=>{ const p=weaponRackPositions[+btn.dataset.rackWeapon]; if(p) applyRackPosition(btn,p,grid); });
+  if(typeof toast==="function") toast("🎲 Chaos pixel-accurate généré !");
+}
+
 function updateWeaponRackDevUI(){
   const edit=$("#fx-rack-edit"),dev=!!$("#devbox"),panel=$(".fx-panel.fx-weapons");
-  if(!edit) return;
-  if(panel&&edit.parentElement!==panel) panel.appendChild(edit);
+  if(!edit||!panel) return;
+  let bar=$("#fx-rack-devbar");
+  if(!bar){
+    bar=document.createElement("div");
+    bar.id="fx-rack-devbar";
+    bar.style.cssText="position:absolute;right:12px;bottom:12px;z-index:25;display:flex;gap:6px;align-items:center;background:rgba(10,8,6,.88);border:1px solid #c9953a;padding:4px 8px;border-radius:3px;font:11px monospace;color:#ffd77a";
+    bar.innerHTML=`<label style="display:flex;align-items:center;gap:4px">Boucle <input id="fx-buckle-size" type="range" min="16" max="38" step="1" value="${weaponBuckleSize}" style="width:72px"></label>`
+      + `<button type="button" id="fx-rack-chaos" class="fx-btn" style="width:auto!important;height:auto!important;min-height:0!important;padding:4px 8px!important;font-size:11px!important">🎲 Chaos</button>`;
+    panel.appendChild(bar);
+    bar.appendChild(edit);
+    edit.style.cssText="position:static!important;width:auto!important;height:auto!important;min-height:0!important;padding:4px 8px!important;font-size:11px!important";
+    bar.querySelector("#fx-buckle-size").oninput=ev=>{
+      weaponBuckleSize=Number(ev.target.value);
+      const grid=$("#fx-wrack .fx-rack-grid");
+      if(grid&&S.cur) generateWeaponRackChaos(S.cur,grid,weaponBuckleSize);
+    };
+    bar.querySelector("#fx-rack-chaos").onclick=()=>{
+      const grid=$("#fx-wrack .fx-rack-grid");
+      if(grid&&S.cur) generateWeaponRackChaos(S.cur,grid,weaponBuckleSize);
+    };
+  }
+  bar.style.display=dev?"flex":"none";
   edit.hidden=!dev;
-  edit.textContent=weaponRackEditing?"Terminer le placement":"Éditer le râtelier";
+  edit.textContent=weaponRackEditing?"Terminer":"Éditer";
   edit.onclick=()=>{
     const grid=$("#fx-wrack .fx-rack-grid");
     if(!grid) return;
     if(weaponRackEditing){ weaponRackEditing=false;renderFiche(S.cur); }
-    else{ beginWeaponRackEditing(grid);edit.textContent="Terminer le placement"; }
+    else{ beginWeaponRackEditing(grid);edit.textContent="Terminer"; }
   };
 }
 function fitWeaponRack(rack){
@@ -693,7 +882,7 @@ function renderFiche(b){
   $("#fx-pv").innerHTML=`<b>${BattleEngine.maxHp(b,bf)}</b> points de vie`;
   $("#fx-stats").innerHTML=FX.STATS.map(([k,l,ic])=>{ const bn=D.gearBonus(b,k);
     return `<button class="fx-stat" data-tip="st:${k}"><span class="fx-sl"><span>${ic} ${l}</span><span class="fx-sv">${b.stats[k]}${bn?`<i>+${bn}</i>`:""}</span></span>${seg(b.stats[k],28,k)}</button>`; }).join("");
-  $("#fx-gear").innerHTML=D.PARTS.map(p=>{ const best=b.gear.filter(g=>g.part===p.id).reduce((m,g)=>Math.max(m,g.rarity),-1);
+  if($("#fx-gear")) $("#fx-gear").innerHTML=D.PARTS.map(p=>{ const best=b.gear.filter(g=>g.part===p.id).reduce((m,g)=>Math.max(m,g.rarity),-1);
     return `<button class="fx-gslot ${best<0?"":"on"}" ${best<0?"":`style="--c:${D.RARITIES[best].color}"`} data-tip="g:${p.id}" aria-label="${p.name}">${p.icon}</button>`; }).join("");
   // Colonne 3 : 32 compétences
   const ns=D.SKILLS.filter(s=>b.skills.includes(s.id)).length;

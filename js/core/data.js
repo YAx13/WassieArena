@@ -18,6 +18,7 @@ const assetPath = {
   characterSelectBg: () => `assets/backgrounds/character-select/background.jpeg`,
   competenceBg: () => `assets/backgrounds/competence/background.jpeg`,
   equipementBg: () => `assets/backgrounds/equipement/background.jpeg`,
+  statsBg: () => `assets/backgrounds/stats/background.jpeg`,
 
 };
 

@@ -186,7 +186,7 @@ function gameTab(n){ const k={combat:"pvp",fiche:"caserne",forge:"forge",shop:"c
 /* ---------- Caserne : carrousel 2D plat en boucle infinie (PORTRAIT) ---------- */
 /* En PAYSAGE, le CSS garde les 3 colonnes côte à côte : ce code ne fait alors rien (aucune transformation CSS n'est appliquée). */
 const Caserne={
-  idx:0,N:5,prev:[],mode:"",sx:0,sy:0,st:0,dx:0,swiped:0,
+  idx:2,N:5,prev:[],mode:"",sx:0,sy:0,st:0,dx:0,swiped:0,
   portrait(){ return matchMedia("(orientation:portrait)").matches; },
   init(){
     this.body=$("#fx .fx-body"); this.cols=[...this.body.children]; this.pager=$$("#fx-pager button[data-p]");
