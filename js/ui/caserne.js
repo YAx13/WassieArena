@@ -173,16 +173,42 @@ const CaserneUI = {
     persist();
     toast("Nouvelle compétence : " + D.EL_ICON[k.el] + " " + k.name + (auto ? " (équipée)" : "") + " !");
   },
-/* ---------- 2b. CAISSES EN 1 CLIC, ÉQUIPEMENT PVP & FORGE ---------- */
-  actionCaisse(){
-    const GS = GameState;
-    if ((GS.ressources.caisses || 0) <= 0) {
-      if (!depenserRessource("or", GS.PRIX_CAISSE)) { toast("Or insuffisant (" + GS.PRIX_CAISSE + " Or requis)."); return; }
-      donnerRecompense("caisses", 1);
+/* ---------- 2b. CAISSES EN 1 CLIC & MULTI-TIRAGE, ÉQUIPEMENT PVP & FORGE ---------- */
+  actionCaisse(count = 1){
+    const GS = GameState, b = S.cur; if (!b) return;
+    const target = Math.max(1, Math.min(50, count | 0));
+    let opened = 0, gearCnt = 0, weapCnt = 0, dupGold = 0, bestRar = -1;
+    for (let i = 0; i < target; i++) {
+      if ((GS.ressources.caisses || 0) <= 0) {
+        if (!depenserRessource("or", GS.PRIX_CAISSE)) break;
+        donnerRecompense("caisses", 1);
+      }
+      if (target === 1) {
+        GS.ouvrirCaisse();
+        const resEl = this.Q("#chest-result");
+        if (resEl && resEl.innerHTML) this._lastChestHTML = resEl.innerHTML;
+        opened = 1;
+        break;
+      }
+      GS.ressources.caisses--;
+      const r = GachaShop.open(b);
+      if (!r || !r.ok) { GS.ressources.caisses++; break; }
+      opened++;
+      if (r.type === "gear") { gearCnt++; bestRar = Math.max(bestRar, r.rarity); }
+      else if (r.type === "weapon") { weapCnt++; }
+      else if (r.type === "dup") {
+        dupGold += 25;
+        const m = GS.maitriseArmes[r.w.id] || 0;
+        if (m < GS.MAITRISE_MAX) GS.maitriseArmes[r.w.id] = m + 1;
+        else GS.ressources.parchemins++;
+      }
     }
-    GS.ouvrirCaisse();
-    const resEl = this.Q("#chest-result");
-    if (resEl && resEl.innerHTML) this._lastChestHTML = resEl.innerHTML;
+    if (!opened) { toast("Or insuffisant (" + GS.PRIX_CAISSE + " Or requis)."); return; }
+    if (opened > 1) {
+      const rarTag = bestRar >= 0 ? ` · Max <b style="color:${DataEngine.RARITIES[bestRar].color}">${DataEngine.RARITIES[bestRar].name}</b>` : "";
+      this._lastChestHTML = `📦 <b>×${opened}</b> : ${gearCnt} pièce(s)${weapCnt ? `, ${weapCnt} arme(s)` : ""}${dupGold ? `, +${dupGold} Or` : ""}${rarTag}`;
+      toast(`Ouverture ×${opened} terminée !`);
+    }
     persist();
   },
   equiperPiece(sig){
@@ -323,8 +349,10 @@ const CaserneUI = {
   renderEquipementTab(){
     const root = this.Q("#cs-equip-root"), b = S.cur; if (!root || !b) return;
     const D = DataEngine, R = GameState.ressources, RAR = D.RARITIES;
-    const gs = ForgeSystem.groups(b).sort((a, c) => c.rarity - a.rarity);
-    const fusables = gs.filter(g => g.n >= 3 && g.rarity < 5).length;
+    const allGs = ForgeSystem.groups(b).sort((a, c) => c.rarity - a.rarity);
+    const filt = this._equipFilter || "all";
+    const gs = filt === "all" ? allGs : allGs.filter(g => g.part === filt);
+    const fusables = allGs.filter(g => g.n >= 3 && g.rarity < 5).length;
     const eq = D.getEquippedGear(b), eqSigs = new Set(eq.all.map(x => D.gearSig(x)));
     const activeSets = D.getActiveSetBonuses(b);
 
@@ -332,8 +360,10 @@ const CaserneUI = {
     if (cnt) cnt.textContent = (b.gear ? b.gear.length : 0) + " pièce(s)";
 
     const hasStock = (R.caisses || 0) > 0;
-    const btnTxt = hasStock ? `Ouvrir Caisse Wass-E (${R.caisses} en stock)` : `Pirater Caisse Wass-E — ${GameState.PRIX_CAISSE} Or`;
+    const lcdText = hasStock ? `STOCK ×${R.caisses}` : `${GameState.PRIX_CAISSE} OR`;
     const btnDis = !hasStock && R.or < GameState.PRIX_CAISSE ? "disabled" : "";
+    const maxOpen = Math.min(50, (R.caisses || 0) + Math.floor((R.or || 0) / GameState.PRIX_CAISSE));
+    const n10 = Math.min(10, maxOpen);
 
     const slotsDef = [
       { label: "Casque", icon: "🪖", item: eq.armors.find(g => g.part === "helmet") },
@@ -344,70 +374,87 @@ const CaserneUI = {
       { label: "Anneau II", icon: "💍", item: eq.rings[1] }
     ];
 
-    const equippedHTML = slotsDef.map(sl => {
-      if (!sl.item) return `<div class="cs-eq-slot"><span class="cs-eq-ico" style="opacity:.35">${sl.icon}</span><span class="cs-eq-lbl">${sl.label}</span><span class="cs-eq-sub" style="opacity:.5">Vide</span></div>`;
+    const bgUrl = typeof assetPath !== "undefined" && assetPath.equipementBg ? assetPath.equipementBg() : "assets/backgrounds/equipement/background.jpeg";
+
+    const equippedHTML = slotsDef.map((sl, idx) => {
+      if (!sl.item) return `<div class="cs-eq-slot" data-eq-item="slot_${idx}" title="${sl.label} : Vide"><span class="cs-eq-ico" style="opacity:.28">${sl.icon}</span><span class="cs-eq-badge">${sl.label}</span></div>`;
       const rInfo = RAR[sl.item.rarity], desc = this.describeGear(sl.item);
-      return `<div class="cs-eq-slot filled" style="--rc:${rInfo.color}" title="${desc.title} (${rInfo.name}) : ${desc.sub}">
+      return `<div class="cs-eq-slot filled" data-eq-item="slot_${idx}" style="--rc:${rInfo.color}" title="${desc.title} (${rInfo.name}) : ${desc.sub}">
         <span class="cs-eq-ico">${sl.icon}</span>
-        <span class="cs-eq-lbl" style="color:${rInfo.color}">${desc.title}</span>
-        <span class="cs-eq-sub" style="color:${desc.col}">${desc.sub}</span>
+        <span class="cs-eq-badge" style="--rc:${rInfo.color}">${desc.sub}</span>
       </div>`;
     }).join("");
 
     const setsHTML = activeSets.length
-      ? activeSets.map(sb => `<span class="cs-set-pill" style="--sc:${sb.set.col}">${sb.set.icon} <b>Set ${sb.set.name} (${sb.count}/4)</b> : ${sb.tier === 4 ? sb.set.p2 + " + " + sb.set.p4 : sb.set.p2}</span>`).join("")
-      : `<span style="opacity:.65">Aucun bonus de Set actif (équipez 2 ou 4 pièces Carnage, Cyber-Flux ou Cuve-Mutant).</span>`;
+      ? activeSets.map(sb => `<span class="cs-set-pill" style="--sc:${sb.set.col}">${sb.set.icon} <b>${sb.set.name} (${sb.count}/4)</b> · ${sb.tier === 4 ? sb.set.p2 + " + " + sb.set.p4 : sb.set.p2}</span>`).join("")
+      : `<span style="color:#d6c39c">🪙 ${R.or.toLocaleString("fr-FR")} Or · 💎 ${R.pierres} Pierres${this._lastChestHTML ? ` · Loot : ${this._lastChestHTML}` : ""}</span>`;
+
+    const filtersHTML = [["all","Tout"],["helmet","🪖"],["chest","🦺"],["boots","🥾"],["necklace","📿"],["ring","💍"]]
+      .map(([k, lbl]) => `<button type="button" class="${filt === k ? "on" : ""}" data-efilt="${k}">${lbl}</button>`).join("");
 
     const invHTML = gs.length ? gs.map(g => {
       const p = D.PARTS.find(q => q.id === g.part), rInfo = RAR[g.rarity], desc = this.describeGear(g);
       const canFuse = g.n >= 3 && g.rarity < 5, isEq = eqSigs.has(g.k);
-      return `<div class="cs-inv-item ${canFuse ? "fusable" : ""} ${isEq ? "equipped" : ""}" style="--rc:${rInfo.color}">
+      return `<div class="cs-inv-item ${canFuse ? "fusable" : ""} ${isEq ? "equipped" : ""}" style="--rc:${rInfo.color}" title="${desc.title} (${rInfo.name}) : ${desc.sub}">
         <span class="cs-inv-ico">${p.icon}</span>
         <span class="cs-inv-name" style="color:${rInfo.color}">${desc.title}</span>
-        <small style="color:${desc.col}">${desc.sub}</small>
-        <small style="opacity:.8">${rInfo.name} · <b>×${g.n}</b></small>
+        <small style="color:${desc.col}">${desc.sub} · <b>×${g.n}</b></small>
         <div class="cs-inv-acts">
-          <button type="button" data-eq="${g.k}">${isEq ? "✔ Équipé" : "Équiper"}</button>
-          ${canFuse ? `<button type="button" class="fuse-btn" data-fk="${g.k}" title="Fusionner 3 identiques">🔨 ×3</button>` : ""}
-          ${R.pierres > 0 ? `<button type="button" class="trans-btn" data-tr="${g.k}" title="Changer de Set/Élément (1 💎)">💎</button>` : ""}
+          <button type="button" data-eq="${g.k}">${isEq ? "✔" : "Équip."}</button>
+          ${canFuse ? `<button type="button" class="fuse-btn" data-fk="${g.k}" title="Fusionner ×3">🔨</button>` : ""}
+          ${R.pierres > 0 ? `<button type="button" class="trans-btn" data-tr="${g.k}" title="Transmuter (1 💎)">💎</button>` : ""}
         </div>
       </div>`;
-    }).join("") : `<p class="cs-note" style="grid-column:1/-1;padding:14px">Atelier vide. Piratez une Caisse Wass-E ci-dessus pour récupérer des pièces de Set !</p>`;
+    }).join("") : `<span style="opacity:.65;margin:auto;font:10px monospace">Cliquez sur la caisse dorée pour forger du loot !</span>`;
 
-    root.innerHTML = `<div class="cs-eq-hub">
-      <div class="cs-cargo-bay">
-        <div class="cs-crate-vis">📦</div>
-        <div class="cs-cargo-mid">
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
-            <span style="font:bold 11px monospace;color:#7ffcf4;letter-spacing:1px">TERMINAL DE FRET WASS-E</span>
-            <span class="cs-gold" id="cs-equip-gold">🪙 ${R.or.toLocaleString("fr-FR")} Or · 💎 ${R.pierres}</span>
-          </div>
-          <button id="cs-oneclick-chest" class="cs-cargo-btn" ${btnDis}>${btnTxt}</button>
-          ${this._lastChestHTML ? `<div style="font:11px monospace;color:#ffd77a">Dernier loot : ${this._lastChestHTML}</div>` : ""}
+    root.innerHTML = `<div id="cs-equip-stage" style="background-image:url('${encodeURI(bgUrl)}')">
+      <div class="cs-gold-crate-wrap" data-eq-item="cargo">
+        <button type="button" id="cs-oneclick-chest" class="cs-gold-crate" ${btnDis} title="Ouvrir 1 caisse Wass-E">
+          <span class="cs-crate-icon">📦</span>
+          <span class="cs-digital-lcd ${hasStock ? "" : "amber"}">${lcdText}</span>
+          <span class="cs-crate-sub">${hasStock ? "OUVRIR ×1" : "ACHETER ×1"}</span>
+        </button>
+        <div class="cs-crate-multi">
+          <button type="button" data-copen="${n10}" ${n10 < 2 ? "disabled" : ""}>×${n10 || 10}</button>
+          <button type="button" data-copen="${maxOpen}" ${maxOpen < 2 ? "disabled" : ""}>MAX (${maxOpen})</button>
         </div>
       </div>
-      <div class="cs-set-bar">${setsHTML}</div>
-      <div class="cs-eq-grid">${equippedHTML}</div>
-      <div class="fx-h" style="font-size:1.4em;margin-top:2px">
-        <span>Établi & Forge PvP (${gs.length} modèles)</span>
-        <button id="cs-autofuse" class="fx-mini" ${fusables ? "" : "disabled"}>🔨 Tout fusionner (${fusables})</button>
+      <div class="cs-set-bar" data-eq-item="sets">${setsHTML}</div>
+      ${equippedHTML}
+      <div class="cs-inv-dock" data-eq-item="inv">
+        <div class="cs-inv-head">
+          <div class="cs-inv-filters">${filtersHTML}</div>
+          <button id="cs-autofuse" class="fx-mini" style="padding:1px 6px;font-size:9.5px" ${fusables ? "" : "disabled"}>🔨 ×3 (${fusables})</button>
+        </div>
+        <div class="cs-inv-strip">${invHTML}</div>
       </div>
-      <div class="cs-inv-grid">${invHTML}</div>
     </div>`;
-const cb = this.Q("#cs-oneclick-chest");
-if (cb) cb.onclick = e => { e.stopPropagation(); this.actionCaisse(); };
-const af = this.Q("#cs-autofuse");
-if (af) af.onclick = e => { e.stopPropagation(); this.toutFusionner(); };
-root.querySelectorAll("[data-eq]").forEach(btn => {
-btn.onclick = e => { e.stopPropagation(); this.equiperPiece(btn.dataset.eq); };
-});
-root.querySelectorAll("[data-fk]").forEach(btn => {
-btn.onclick = e => { e.stopPropagation(); this.fusionnerGroupe(btn.dataset.fk); };
-});
-root.querySelectorAll("[data-tr]").forEach(btn => {
-btn.onclick = e => { e.stopPropagation(); this.transmuterGroupe(btn.dataset.tr); };
-});
-},/* ---------- 4. COMPAGNON : Nourriture + évolution Forme 3 (pop-up Évolutions) ---------- */
+
+    this.applyEquipLayout();
+    this.initEquipDevUI();
+    if (this._syncEquipDev) this._syncEquipDev();
+
+    const cb = this.Q("#cs-oneclick-chest");
+    if (cb) cb.onclick = e => { e.stopPropagation(); this.actionCaisse(1); };
+    root.querySelectorAll("[data-copen]").forEach(btn => {
+      btn.onclick = e => { e.stopPropagation(); this.actionCaisse(+btn.dataset.copen); };
+    });
+    const af = this.Q("#cs-autofuse");
+    if (af) af.onclick = e => { e.stopPropagation(); this.toutFusionner(); };
+    root.querySelectorAll("[data-efilt]").forEach(btn => {
+      btn.onclick = e => { e.stopPropagation(); this._equipFilter = btn.dataset.efilt; this.renderEquipementTab(); };
+    });
+    root.querySelectorAll("[data-eq]").forEach(btn => {
+      btn.onclick = e => { e.stopPropagation(); this.equiperPiece(btn.dataset.eq); };
+    });
+    root.querySelectorAll("[data-fk]").forEach(btn => {
+      btn.onclick = e => { e.stopPropagation(); this.fusionnerGroupe(btn.dataset.fk); };
+    });
+    root.querySelectorAll("[data-tr]").forEach(btn => {
+      btn.onclick = e => { e.stopPropagation(); this.transmuterGroupe(btn.dataset.tr); };
+    });
+  },
+/* ---------- 4. COMPAGNON : Nourriture + évolution Forme 3 (pop-up Évolutions) ---------- */
   nourrir(key){
     const c = S.cur && S.cur.companion;
     if (!c) { toast("Aucun compagnon actif."); return; }
@@ -481,32 +528,46 @@ btn.onclick = e => { e.stopPropagation(); this.transmuterGroupe(btn.dataset.tr);
       + ".cs-pre{display:inline-flex;gap:2px}.cs-evo{margin-top:12px;padding:10px;border:1px solid #c9953a;display:flex;flex-direction:column;gap:8px;align-items:stretch}.cs-evo-h{text-align:center}.cs-note{margin:0;font-size:12px;opacity:.8;text-align:center}"
       + ".cs-power{margin:6px 0;padding:6px;text-align:center;font:bold 14px monospace;color:#ffd77a;background:rgba(26,16,8,.88);border:1px solid #c9953a}"
       + ".cs-rank{position:absolute;top:2px;right:2px;padding:0 4px;font:bold 11px monospace;color:#1a1008;background:#ffd77a;border-radius:3px;pointer-events:none}"
-      + ".cs-eq-hub{display:flex;flex-direction:column;gap:10px;padding:4px}"
-      + ".cs-cargo-bay{position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:linear-gradient(135deg,#12161c 0%,#0b0e12 100%);border:1px solid #4ff0e6;box-shadow:inset 0 0 18px rgba(79,240,230,.14),0 4px 14px rgba(0,0,0,.8)}"
-      + ".cs-cargo-bay::before,.cs-cargo-bay::after{content:'';position:absolute;width:7px;height:7px;border:2px solid #ffb000;pointer-events:none}"
-      + ".cs-cargo-bay::before{top:-1px;left:-1px;border-right:0;border-bottom:0}.cs-cargo-bay::after{bottom:-1px;right:-1px;border-left:0;border-top:0}"
-      + ".cs-crate-vis{font-size:34px;filter:drop-shadow(0 0 10px rgba(255,176,0,.55));user-select:none}"
-      + ".cs-cargo-mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}"
-      + ".cs-cargo-btn{padding:9px 12px;background:rgba(8,22,28,.95);border:1px solid #4ff0e6;color:#7ffcf4;font:bold 12px monospace;letter-spacing:.8px;text-transform:uppercase;cursor:pointer;box-shadow:0 0 12px rgba(79,240,230,.28);transition:all .15s}"
-      + ".cs-cargo-btn:hover:not(:disabled){background:#10303c;color:#fff;box-shadow:0 0 18px rgba(79,240,230,.65)}"
-      + ".cs-cargo-btn:disabled{opacity:.42;cursor:not-allowed;box-shadow:none}"
-      + ".cs-set-bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:6px 10px;background:rgba(10,14,18,.88);border:1px solid #2b343e;font:11px monospace}"
-      + ".cs-set-pill{padding:3px 7px;border:1px solid var(--sc,#4ff0e6);background:rgba(0,0,0,.55);color:var(--sc,#fff);border-radius:2px}"
-      + ".cs-eq-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}"
-      + "@media(max-width:700px){.cs-eq-grid{grid-template-columns:repeat(3,1fr)}}"
-      + ".cs-eq-slot{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:84px;padding:8px 4px;background:repeating-linear-gradient(0deg,rgba(79,240,230,.04) 0 1px,transparent 1px 3px),rgba(7,16,20,.92);border:1px solid var(--rc,#2c4c54);box-shadow:inset 0 0 12px rgba(79,240,230,.12);text-align:center}"
-      + ".cs-eq-slot.filled{box-shadow:inset 0 0 14px color-mix(in srgb,var(--rc,#4ff0e6) 28%,transparent),0 0 8px rgba(0,0,0,.7)}"
-      + ".cs-eq-ico{font-size:22px;line-height:1.1;margin-bottom:3px;filter:drop-shadow(0 2px 3px #000)}"
-      + ".cs-eq-lbl{font:bold 10px monospace;color:#9ad8df;text-transform:uppercase}"
-      + ".cs-eq-sub{font:10px/1.2 monospace;margin-top:2px}"
-      + ".cs-inv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:7px}"
-      + ".cs-inv-item{position:relative;display:flex;flex-direction:column;align-items:center;padding:8px 6px 26px;background:linear-gradient(180deg,#161a20 0%,#0d1014 100%);border:1px solid var(--rc,#454e59);color:#e6eef8;font:11px monospace;text-align:center;transition:transform .12s,box-shadow .12s}"
-      + ".cs-inv-item.equipped{outline:1px solid #4ff0e6;box-shadow:inset 0 0 12px rgba(79,240,230,.22)}"
-      + ".cs-inv-item.fusable{box-shadow:0 0 10px rgba(155,225,93,.45)}"
-      + ".cs-inv-ico{font-size:22px;margin:2px 0}.cs-inv-name{font-weight:bold;font-size:11px}"
-      + ".cs-inv-acts{position:absolute;left:3px;right:3px;bottom:3px;display:flex;gap:3px}"
-      + ".cs-inv-acts button{flex:1;padding:2px 3px;font:bold 9px monospace;background:#1c232b;border:1px solid #4a5562;color:#fff;cursor:pointer}"
-      + ".cs-inv-acts button:hover{border-color:#ffb000;color:#ffd77a}"
+      + ".fx-equip-tab{position:relative;flex:1;min-height:0;overflow:hidden}"
+      + "#cs-equip-stage{position:relative;width:100%;aspect-ratio:1408/752;background-size:100% 100%;background-repeat:no-repeat;margin:0 auto;overflow:hidden;user-select:none}"
+      + "#cs-equip-stage.is-editing [data-eq-item]{outline:1px dashed #f2b21c !important;background:rgba(242,178,28,.16) !important;cursor:grab !important;z-index:25;touch-action:none}"
+      + "#cs-equip-stage.is-editing [data-eq-item]:active{cursor:grabbing !important}"
+      + "#cs-equip-stage.is-editing [data-eq-item]>*{pointer-events:none}"
+      + ".cs-gold-crate-wrap{display:flex;flex-direction:column;align-items:stretch;gap:3px}"
+      + ".cs-gold-crate{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:5px 7px;background:linear-gradient(180deg,#5a3b0c 0%,#2b1a04 100%);border:2px solid #ffd24d;border-radius:3px;box-shadow:0 0 22px rgba(255,196,46,.75),inset 0 0 10px rgba(255,215,90,.45),0 4px 10px #000;cursor:pointer;transition:transform .12s,box-shadow .15s}"
+      + ".cs-gold-crate::before,.cs-gold-crate::after{content:'';position:absolute;width:5px;height:5px;background:#ffe98a;box-shadow:0 0 6px #ffb000}"
+      + ".cs-gold-crate::before{top:2px;left:2px}.cs-gold-crate::after{top:2px;right:2px}"
+      + ".cs-gold-crate:hover:not(:disabled){transform:translateY(-1px) scale(1.03);box-shadow:0 0 30px rgba(255,210,70,.95),inset 0 0 14px rgba(255,230,120,.7)}"
+      + ".cs-gold-crate:active:not(:disabled){transform:scale(.96)}"
+      + ".cs-gold-crate:disabled{filter:grayscale(.85) brightness(.55);cursor:not-allowed;box-shadow:0 2px 8px #000}"
+      + ".cs-crate-icon{font-size:22px;line-height:1;filter:drop-shadow(0 0 8px rgba(255,200,50,.9))}"
+      + ".cs-digital-lcd{width:100%;padding:2px 4px;background:#070c08;border:1px solid #3c543e;color:#4dff7c;font:bold 9.5px/1.1 monospace;letter-spacing:.6px;text-align:center;text-shadow:0 0 6px rgba(77,255,124,.85);box-shadow:inset 0 0 6px rgba(0,0,0,.95)}"
+      + ".cs-digital-lcd.amber{color:#ffc83d;border-color:#5e4618;text-shadow:0 0 6px rgba(255,200,61,.85)}"
+      + ".cs-crate-sub{font:bold 8px monospace;color:#ffe699;letter-spacing:.4px;text-transform:uppercase}"
+      + ".cs-crate-multi{display:flex;gap:3px}"
+      + ".cs-crate-multi button{flex:1;padding:2px 3px;background:#120d05;border:1px solid #d99b26;color:#ffd97d;font:bold 8.5px monospace;cursor:pointer;box-shadow:0 2px 6px #000}"
+      + ".cs-crate-multi button:hover:not(:disabled){background:#3d2608;color:#fff;border-color:#ffe07d}"
+      + ".cs-crate-multi button:disabled{opacity:.38;cursor:not-allowed}"
+      + ".cs-set-bar{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;align-items:center;padding:2px 6px;background:rgba(12,9,6,.68);border:1px solid rgba(232,168,48,.35);font:9.5px monospace;text-align:center}"
+      + ".cs-set-pill{padding:1px 6px;border:1px solid var(--sc,#e8a830);background:rgba(0,0,0,.65);color:var(--sc,#fff)}"
+      + ".cs-eq-slot{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;background:transparent;border:none;text-align:center;cursor:pointer;transition:transform .12s}"
+      + ".cs-eq-slot:hover{transform:scale(1.08)}"
+      + ".cs-eq-slot.filled::after{content:'';position:absolute;inset:10%;border:1px solid var(--rc,#e8a830);box-shadow:0 0 10px var(--rc,#e8a830),inset 0 0 8px var(--rc,#e8a830);pointer-events:none;border-radius:2px}"
+      + ".cs-eq-ico{font-size:1.9em;line-height:1;filter:drop-shadow(0 2px 4px #000)}"
+      + ".cs-eq-badge{position:absolute;bottom:4px;padding:0 4px;background:rgba(10,8,6,.88);border:1px solid var(--rc,#5a4b32);font:bold 8px/1.2 monospace;color:var(--rc,#b9a88c);text-transform:uppercase;max-width:92%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}"
+      + ".cs-inv-dock{display:flex;flex-direction:column;justify-content:space-between;gap:3px;padding:4px 6px;background:rgba(12,11,10,.78);border:none;overflow:hidden}"
+      + ".cs-inv-head{display:flex;justify-content:space-between;align-items:center;gap:4px;font:bold 9.5px monospace;color:#ffd77a}"
+      + ".cs-inv-filters{display:flex;gap:2px}"
+      + ".cs-inv-filters button{padding:1px 5px;font:bold 9px monospace;background:rgba(0,0,0,.7);border:1px solid #4d3f28;color:#b8a684;cursor:pointer}"
+      + ".cs-inv-filters button.on{border-color:#ffb000;color:#ffd77a;background:#2e1f0a}"
+      + ".cs-inv-strip{display:flex;gap:5px;overflow-x:auto;align-items:stretch;flex:1;min-height:0;scrollbar-width:thin;scrollbar-color:#e8a830 #0b0e12}"
+      + ".cs-inv-item{flex:0 0 98px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:3px 4px;background:linear-gradient(180deg,rgba(28,23,18,.94) 0%,rgba(14,11,9,.96) 100%);border:1px solid var(--rc,#5c4c34);color:#f2eadc;font:9px monospace;text-align:center}"
+      + ".cs-inv-item.equipped{outline:1px solid #ffd24d;box-shadow:inset 0 0 8px rgba(255,210,77,.35)}"
+      + ".cs-inv-item.fusable{box-shadow:0 0 8px rgba(155,225,93,.6)}"
+      + ".cs-inv-ico{font-size:15px;line-height:1}.cs-inv-name{font-weight:bold;font-size:8.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}"
+      + ".cs-inv-acts{display:flex;gap:2px;width:100%}"
+      + ".cs-inv-acts button{flex:1;padding:1px 2px;font:bold 8.5px monospace;background:#211a12;border:1px solid #5c4b32;color:#f5e6c8;cursor:pointer}"
+      + ".cs-inv-acts button:hover{border-color:#ffb000;color:#fff}"
       + ".cs-inv-acts button.fuse-btn{border-color:#9be15d;color:#9be15d}"
       + ".cs-inv-acts button.trans-btn{border-color:#7fd8ff;color:#7fd8ff}"
       + ".cs-gold{align-self:flex-end;width:max-content;padding:3px 8px;color:#ffd77a;background:rgba(26,16,8,.88);border:1px solid #c9953a;font:11px monospace;white-space:nowrap}"
@@ -567,7 +628,7 @@ btn.onclick = e => { e.stopPropagation(); this.transmuterGroupe(btn.dataset.tr);
       { id: "pre_1",  x: 37.06, y: 4.0,   size: 7.4,  angle: 0 },
       { id: "pre_2",  x: 44.62, y: 4.0,   size: 7.4,  angle: 0 },
       { id: "pre_3",  x: 52.24, y: 4.0,   size: 7.4,  angle: 0 },
-      { id: "unlock", x: 31.43, y: 4.0,   size: 3.1,  angle: 0 }
+      { id: "unlock", x: 45.2,  y: 88.2,  size: 22.0, angle: 0 }
     ];
     // Grille 8 x 4 : centre exact de chaque case (mesuré sur ta capture)
     const GX0 = 16.13, GDX = 8.21;   // x de la colonne 0 + écart entre colonnes (%)
@@ -590,6 +651,7 @@ btn.onclick = e => { e.stopPropagation(); this.transmuterGroupe(btn.dataset.tr);
       const saved = JSON.parse(localStorage.getItem(this.SKILLS_LAYOUT_KEY) || "null");
       if (Array.isArray(saved)) {
         saved.forEach(s => {
+          if (s.id === "unlock" && s.size < 8) return;
           const t = def.find(d => d.id === s.id);
           if (t && Number.isFinite(s.x) && Number.isFinite(s.y)) Object.assign(t, s);
         });
@@ -623,7 +685,7 @@ btn.onclick = e => { e.stopPropagation(); this.transmuterGroupe(btn.dataset.tr);
     } else if (pos.id === "unlock") {
       el.style.width = pos.size + "%";
       el.style.height = "auto";
-      el.style.fontSize = Math.max(7, w * pos.size * 0.0042) + "px";
+      el.style.fontSize = Math.max(10, w * pos.size * 0.0052) + "px";
     } else {
       el.style.height = pos.size + "%";
       el.style.width = "auto";
@@ -729,6 +791,164 @@ btn.onclick = e => { e.stopPropagation(); this.transmuterGroupe(btn.dataset.tr);
 
     if (typeof ResizeObserver !== "undefined") {
       new ResizeObserver(() => this.applySkillsLayout()).observe(pn);
+    }
+  },
+  EQUIP_LAYOUT_KEY: "arene_equip_dev_layout_v1",
+  _equipEditing: false,
+  _equipPositions: null,
+  defaultEquipPositions(){
+    return [
+      { id: "cargo",   x: 50.0, y: 39.2, size: 13.5, angle: 0 },
+      { id: "sets",    x: 50.0, y: 69.5, size: 42.0, angle: 0 },
+      { id: "slot_0",  x: 16.4, y: 37.8, size: 7.4,  angle: 0 },
+      { id: "slot_1",  x: 16.4, y: 52.3, size: 7.4,  angle: 0 },
+      { id: "slot_2",  x: 16.4, y: 66.8, size: 7.4,  angle: 0 },
+      { id: "slot_3",  x: 92.2, y: 47.0, size: 7.4,  angle: 0 },
+      { id: "slot_4",  x: 92.2, y: 61.5, size: 7.4,  angle: 0 },
+      { id: "slot_5",  x: 92.2, y: 76.0, size: 7.4,  angle: 0 },
+      { id: "inv",     x: 50.0, y: 86.2, size: 43.5, angle: 0 }
+    ];
+  },
+  getEquipPositions(){
+    if (this._equipPositions) return this._equipPositions;
+    const def = this.defaultEquipPositions();
+    try {
+      const saved = JSON.parse(localStorage.getItem(this.EQUIP_LAYOUT_KEY) || "null");
+      if (Array.isArray(saved)) {
+        saved.forEach(s => {
+          const t = def.find(d => d.id === s.id);
+          if (t && Number.isFinite(s.x) && Number.isFinite(s.y)) Object.assign(t, s);
+        });
+      }
+    } catch (_) {}
+    this._equipPositions = def;
+    return def;
+  },
+  saveEquipPositions(){
+    if (!this._equipPositions) return;
+    const clean = this._equipPositions.map(({ id, x, y, size, angle }) => ({
+      id, x: +x.toFixed(2), y: +y.toFixed(2), size: +size.toFixed(1), angle: +(angle || 0).toFixed(1)
+    }));
+    try { localStorage.setItem(this.EQUIP_LAYOUT_KEY, JSON.stringify(clean)); } catch (_) {}
+    console.log("EQUIP_LAYOUT =", JSON.stringify(clean));
+  },
+  applyEquipItemPos(el, pos, stage){
+    const w = stage ? stage.clientWidth : 800;
+    el.style.position = "absolute";
+    el.style.left = pos.x + "%";
+    el.style.top = pos.y + "%";
+    el.style.transform = `translate(-50%,-50%) rotate(${pos.angle || 0}deg)`;
+    if (pos.id === "inv") {
+      el.style.width = pos.size + "%";
+      el.style.height = "19.5%";
+    } else if (pos.id === "sets" || pos.id === "cargo") {
+      el.style.width = pos.size + "%";
+      el.style.height = "auto";
+    } else {
+      el.style.width = pos.size + "%";
+      el.style.aspectRatio = "1 / 1";
+      el.style.fontSize = Math.max(9, w * pos.size * 0.012) + "px";
+    }
+  },
+  applyEquipLayout(){
+    const stage = this.Q("#cs-equip-stage"); if (!stage) return;
+    const list = this.getEquipPositions();
+    stage.querySelectorAll("[data-eq-item]").forEach(el => {
+      const pos = list.find(p => p.id === el.dataset.eqItem);
+      if (pos) this.applyEquipItemPos(el, pos, stage);
+    });
+  },
+  initEquipDevUI(){
+    const stage = this.Q("#cs-equip-stage"); if (!stage) return;
+    const host = stage.closest(".fx-equip-tab") || stage;
+    if (host.querySelector("#eqd-corner-bar")) return;
+    let drag = null;
+
+    const bar = document.createElement("div");
+    bar.id = "eqd-corner-bar";
+    bar.className = "csd-corner-bar";
+    bar.innerHTML = `<button type="button" id="eqd-copy" class="fx-btn csd-corner-mini" title="Copier JSON">📋</button>`
+      + `<button type="button" id="eqd-reset" class="fx-btn csd-corner-mini" title="Réinitialiser">↺</button>`
+      + `<button type="button" id="eqd-edit" class="fx-btn csd-corner-btn">ÉDITER L'ATELIER</button>`;
+    host.appendChild(bar);
+
+    const isDev = () => !!document.getElementById("devbox") || !!GameState.illimite || /[?&]dev\b/.test(location.search);
+    const setEdit = on => {
+      this._equipEditing = on;
+      stage.classList.toggle("is-editing", on);
+      const btn = bar.querySelector("#eqd-edit");
+      if (btn) btn.textContent = on ? "Terminer le placement" : "ÉDITER L'ATELIER";
+    };
+    const syncVis = () => {
+      const on = isDev();
+      bar.style.display = on ? "flex" : "none";
+      if (!on && this._equipEditing) setEdit(false);
+    };
+    syncVis();
+    this._syncEquipDev = syncVis;
+    new MutationObserver(syncVis).observe(document.body, { childList: true });
+
+    bar.querySelector("#eqd-edit").onclick = e => {
+      e.stopPropagation();
+      setEdit(!this._equipEditing);
+      if (!this._equipEditing && typeof toast === "function") toast("Placement de l'atelier enregistré !");
+    };
+    bar.querySelector("#eqd-copy").onclick = e => {
+      e.stopPropagation();
+      const clean = this.getEquipPositions().map(({ id, x, y, size, angle }) => ({
+        id, x: +x.toFixed(2), y: +y.toFixed(2), size: +size.toFixed(1), angle: +(angle || 0).toFixed(1)
+      }));
+      if (navigator.clipboard) navigator.clipboard.writeText(JSON.stringify(clean));
+      if (typeof toast === "function") toast("Coordonnées atelier copiées !");
+    };
+    bar.querySelector("#eqd-reset").onclick = e => {
+      e.stopPropagation();
+      try { localStorage.removeItem(this.EQUIP_LAYOUT_KEY); } catch (_) {}
+      this._equipPositions = null;
+      this.applyEquipLayout();
+      if (typeof toast === "function") toast("Positions par défaut restaurées.");
+    };
+
+    stage.addEventListener("pointerdown", ev => {
+      if (!this._equipEditing) return;
+      const el = ev.target.closest("[data-eq-item]"); if (!el) return;
+      ev.preventDefault(); ev.stopPropagation();
+      const pos = this.getEquipPositions().find(p => p.id === el.dataset.eqItem); if (!pos) return;
+      drag = { el, pos, pointerId: ev.pointerId };
+      el.setPointerCapture(ev.pointerId);
+    });
+    stage.addEventListener("pointermove", ev => {
+      if (!drag || ev.pointerId !== drag.pointerId) return;
+      const rect = stage.getBoundingClientRect();
+      drag.pos.x = Math.max(4, Math.min(96, ((ev.clientX - rect.left) / rect.width) * 100));
+      drag.pos.y = Math.max(4, Math.min(96, ((ev.clientY - rect.top) / rect.height) * 100));
+      this.applyEquipItemPos(drag.el, drag.pos, stage);
+    });
+    const endDrag = ev => {
+      if (!drag || ev.pointerId !== drag.pointerId) return;
+      drag = null;
+      this.saveEquipPositions();
+    };
+    stage.addEventListener("pointerup", endDrag);
+    stage.addEventListener("pointercancel", endDrag);
+    stage.addEventListener("click", ev => {
+      if (!this._equipEditing || !ev.target.closest("[data-eq-item]")) return;
+      ev.preventDefault(); ev.stopImmediatePropagation();
+    }, true);
+    stage.addEventListener("wheel", ev => {
+      if (!this._equipEditing) return;
+      const el = ev.target.closest("[data-eq-item]"); if (!el) return;
+      ev.preventDefault(); ev.stopPropagation();
+      const pos = this.getEquipPositions().find(p => p.id === el.dataset.eqItem); if (!pos) return;
+      const d = ev.deltaY || ev.deltaX;
+      if (ev.shiftKey) pos.angle = (pos.angle || 0) + (d < 0 ? 5 : -5);
+      else pos.size = Math.max(6, Math.min(98, (pos.size || 15) + (d < 0 ? 1.0 : -1.0)));
+      this.applyEquipItemPos(el, pos, stage);
+      this.saveEquipPositions();
+    }, { passive: false });
+
+    if (typeof ResizeObserver !== "undefined") {
+      new ResizeObserver(() => this.applyEquipLayout()).observe(stage);
     }
   }
 };

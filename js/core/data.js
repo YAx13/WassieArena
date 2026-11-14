@@ -17,6 +17,7 @@ const assetPath = {
   companionFg:  id => `assets/companion/${id}/foreground.png`,
   characterSelectBg: () => `assets/backgrounds/character-select/background.jpeg`,
   competenceBg: () => `assets/backgrounds/competence/background.jpeg`,
+  equipementBg: () => `assets/backgrounds/equipement/background.jpeg`,
 
 };
 

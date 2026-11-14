@@ -396,22 +396,28 @@ button{touch-action:manipulation}
 .evo-spec{margin-top:10px;text-align:center;color:var(--dim);font-style:italic;font-size:.8rem}
 /* ---------- Caserne : Mode Onglets unifié & adaptatif (PC & Mobile) ---------- */
 #g-fiche.active{align-items:stretch;justify-content:center;background:#0b0c0d}
-.fx{grid-template-rows:auto auto minmax(0,1fr);gap:.6em;padding:.8em}
-.fx-top{display:flex;justify-content:flex-end;gap:.4em .8em;align-items:center}
+.fx{grid-template-rows:auto minmax(0,1fr);gap:.45em;padding:.45em .6em}
+.fx-top{display:none !important}
 #fx-actions{height:auto;min-height:36px;display:flex;align-items:center}
 .fx-btn{height:auto;min-height:36px;padding:.35em .8em;font-size:1.5em}
 
 /* Barre des onglets */
-.fx-pager{display:grid;grid-template-columns:repeat(5,minmax(0,1fr)) .75fr;gap:.5em}
-.fx-pager button{min-width:0;min-height:38px;padding:.35em;font-family:Impact,sans-serif;font-size:clamp(.75em,2vw,1.5em);letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;
+.fx-pager{display:grid;grid-template-columns:repeat(5,minmax(0,1fr)) .75fr;gap:.45em}
+.fx-pager button{min-width:0;min-height:36px;padding:.3em;font-family:Impact,sans-serif;font-size:clamp(.75em,2vw,1.5em);letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;
   background:rgba(0,0,0,.8);border:1px solid var(--line);border-radius:.3em;color:var(--dim);cursor:pointer}
-.fx-pager .fx-close-tab{padding:.35em 0}
+.fx-pager .fx-close-tab{padding:.3em 0}
 .fx-pager button.on{color:var(--neon);border-color:var(--neon);box-shadow:0 0 .8em rgba(232,168,48,.45),inset 0 -.25em 0 var(--neon)}
 
-/* Affichage par onglet actif (zéro superposition, zéro scroll inutile) */
+/* Affichage par onglet actif (plein écran sans titres ni bandes hachurées) */
 .fx-body{display:flex;flex-direction:column;min-height:0;overflow:hidden}
-.fx-col{display:none;flex:1;min-height:0;flex-direction:column;gap:.6em;overflow-y:auto;transform:none !important;position:static !important}
+.fx-col{display:none;flex:1;min-height:0;flex-direction:column;gap:.5em;overflow-y:auto;transform:none !important;position:static !important}
 .fx-col.tab-active{display:flex}
+.fx-panel{padding:0}
+.fx-panel::before,.fx-panel>.fx-h{display:none !important}
+.fx-panel.fx-hero{padding:.7em}
+.fx-panel.fx-weapons{position:relative}
+#fx-rack-edit{position:absolute;right:12px;bottom:12px;z-index:20;width:auto !important;height:auto !important;padding:5px 10px !important;font-size:11px !important;line-height:1.2 !important}
+#cs-skills,#cs-equip-stage{height:100%;width:auto;max-width:100%;aspect-ratio:1408/752}
 
 /* Tailles adaptatives pour tout voir sans scroller */
 .fx-weapons{flex:1;min-height:0}

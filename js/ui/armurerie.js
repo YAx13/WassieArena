@@ -291,8 +291,9 @@ function attachWeaponRackEditor(grid){
   },{passive:false});
 }
 function updateWeaponRackDevUI(){
-  const edit=$("#fx-rack-edit"),dev=!!$("#devbox");
+  const edit=$("#fx-rack-edit"),dev=!!$("#devbox"),panel=$(".fx-panel.fx-weapons");
   if(!edit) return;
+  if(panel&&edit.parentElement!==panel) panel.appendChild(edit);
   edit.hidden=!dev;
   edit.textContent=weaponRackEditing?"Terminer le placement":"Éditer le râtelier";
   edit.onclick=()=>{
