@@ -143,27 +143,50 @@ document.addEventListener("click",hideTip); addEventListener("scroll",hideTip,tr
 })();
 
 /* --- Rendu de la fiche --- */
-const WEAPON_RACK_LAYOUT_KEY="arene_weapon_rack_dev_layout_v1";
-let weaponRackEditing=false, weaponRackPositions=null, weaponRackDrag=null;
-function readWeaponRackPositions(){
+const WEAPON_RACK_LAYOUT_PREFIX="arene_weapon_rack_dev_layout_v1_";
+let weaponRackEditing=false, weaponRackPositions=null, weaponRackDrag=null, weaponRackBrute="general";
+const WEAPON_RACK_FROZEN={
+  "empereur": [
+    { "id": 0, "x": 53.09, "y": 51.45, "size": 31.12, "angle": 2 },
+    { "id": 1, "x": 60.64, "y": 17.34, "size": 31.12, "angle": 0 },
+    { "id": 2, "x": 77.97, "y": 17.34, "size": 31.12, "angle": 1 },
+    { "id": 3, "x": 84.85, "y": 26.68, "size": 31.12, "angle": 3 },
+    { "id": 4, "x": 29.92, "y": 47.06, "size": 31.12, "angle": 2 },
+    { "id": 5, "x": 34.52, "y": 41.48, "size": 31.12, "angle": 2 },
+    { "id": 6, "x": 53.33, "y": 48.38, "size": 31.12, "angle": -2 },
+    { "id": 7, "x": 44.92, "y": 41.34, "size": 31.12, "angle": -1 },
+    { "id": 8, "x": 82.79, "y": 63.92, "size": 31.12, "angle": 1 },
+    { "id": 9, "x": 57.14, "y": 75.94, "size": 31.12, "angle": -3 },
+    { "id": 10, "x": 35.06, "y": 62.45, "size": 31.12, "angle": -2 },
+    { "id": 11, "x": 23.69, "y": 46.91, "size": 31.12, "angle": 3 },
+    { "id": 12, "x": 43.32, "y": 17.34, "size": 31.12, "angle": -1 },
+    { "id": 13, "x": 22.18, "y": 62.01, "size": 31.12, "angle": 3 },
+    { "id": 14, "x": 77.97, "y": 84.17, "size": 31.12, "angle": 1 },
+    { "id": 15, "x": 71.06, "y": 50.13, "size": 31.12, "angle": 1 }
+  ]
+};
+function validRackPositions(p){
+  return Array.isArray(p)&&p.length===DataEngine.WEAPONS.length&&p.every((q,i)=>q&&q.id===i&&[q.x,q.y,q.size,q.angle].every(Number.isFinite));
+}
+function readWeaponRackPositions(brute=weaponRackBrute){
   try{
-    const saved=localStorage.getItem(WEAPON_RACK_LAYOUT_KEY);
-    if(!saved) return null;
-    const positions=JSON.parse(saved);
-    if(!Array.isArray(positions)||positions.length!==DataEngine.WEAPONS.length||positions.some((p,i)=>!p||p.id!==i||![p.x,p.y,p.size,p.angle].every(Number.isFinite))){
+    const saved=localStorage.getItem(WEAPON_RACK_LAYOUT_PREFIX+brute);
+    if(saved){
+      const positions=JSON.parse(saved);
+      if(validRackPositions(positions)) return positions;
       console.error("La configuration DEV du râtelier est invalide.");
-      return null;
     }
-    return positions;
   }catch(error){
     console.error("Impossible de charger la configuration DEV du râtelier.",error);
-    return null;
   }
+  const frozen=WEAPON_RACK_FROZEN[brute];
+  return validRackPositions(frozen)?frozen.map(p=>({...p})):null;
 }
 function saveWeaponRackPositions(){
   if(!weaponRackPositions) return;
-  try{ localStorage.setItem(WEAPON_RACK_LAYOUT_KEY,JSON.stringify(weaponRackPositions)); }
+  try{ localStorage.setItem(WEAPON_RACK_LAYOUT_PREFIX+weaponRackBrute,JSON.stringify(weaponRackPositions)); }
   catch(error){ console.error("Impossible de sauvegarder la configuration DEV du râtelier.",error); }
+  console.log(`WEAPON_RACK_LAYOUT["${weaponRackBrute}"] =`,JSON.stringify(weaponRackPositions.map(({id,x,y,size,angle})=>({id,x:+x.toFixed(2),y:+y.toFixed(2),size:+size.toFixed(2),angle:+angle.toFixed(1)}))));
 }
 function rackPositionText(){
   return JSON.stringify(weaponRackPositions.map(({id,x,y,size,angle})=>({id,x:+x.toFixed(2),y:+y.toFixed(2),size:+size.toFixed(2),angle:+angle.toFixed(1)})),null,2);
@@ -316,9 +339,24 @@ const weaponRackObserver=typeof ResizeObserver==="undefined"?null:new ResizeObse
 const COMP_LAYOUT_KEY="arene_companion_dev_layout_v1";
 let compEditing=false, compPositions=null, compDrag=null;
 
+const COMP_FROZEN=[
+  { "key": "chien", "x": 16.65, "y": 21.02, "size": 10, "angle": 0, "flip": false },
+  { "key": "loup", "x": 49.81, "y": 39.25, "size": 13.5, "angle": 0, "flip": false },
+  { "key": "ours", "x": 17.67, "y": 41.89, "size": 15, "angle": 0, "flip": false },
+  { "key": "serpent", "x": 39.2, "y": 20.68, "size": 13.5, "angle": 0, "flip": false },
+  { "key": "oiseau", "x": 60.61, "y": 40.19, "size": 12.5, "angle": 0, "flip": false },
+  { "key": "arthropode", "x": 61.69, "y": 19.25, "size": 15, "angle": 0, "flip": false },
+  { "key": "felin", "x": 72.24, "y": 21.02, "size": 11, "angle": 0, "flip": false },
+  { "key": "taureau", "x": 27.96, "y": 20.13, "size": 16, "angle": 0, "flip": false },
+  { "key": "aquatique", "x": 28.4, "y": 39.61, "size": 13.5, "angle": 0, "flip": false },
+  { "key": "chimere", "x": 38.95, "y": 39.99, "size": 11, "angle": 0, "flip": false },
+  { "key": "lezard", "x": 49.68, "y": 21.42, "size": 12.5, "angle": 0, "flip": false },
+  { "key": "spectre", "x": 71.66, "y": 41.01, "size": 13.5, "angle": 0, "flip": false },
+  { "key": "tempete", "x": 83.23, "y": 21.35, "size": 11, "angle": 0, "flip": false }
+];
 function defaultCompPositions(){
   const cols=7;
-  return CompanionData.FAMILIES.map((f,i)=>({
+  const base=CompanionData.FAMILIES.map((f,i)=>({
     key:f.key,
     x:10+(i%cols)*13.2,
     y:i<cols?34:74,
@@ -326,6 +364,8 @@ function defaultCompPositions(){
     angle:0,
     flip:false
   }));
+  COMP_FROZEN.forEach(s=>{ const t=base.find(d=>d.key===s.key); if(t) Object.assign(t,s); });
+  return base;
 }
 function readCompPositions(){
   try{
@@ -345,14 +385,23 @@ function saveCompPositions(){
 const HOLO_LAYOUT_KEY="arene_comp_holo_layout_v1";
 let holoPositions=null, holoDrag=null;
 
+const HOLO_FROZEN=[
+  { "id": "st1", "x": 37.48, "y": 71.69, "size": 9.2, "angle": 0, "flip": false },
+  { "id": "ar1", "x": 43.2, "y": 75, "size": 4.5, "angle": 0, "flip": false },
+  { "id": "st2", "x": 49.74, "y": 71.59, "size": 12, "angle": 0, "flip": false },
+  { "id": "ar2", "x": 56, "y": 73, "size": 4.5, "angle": 0, "flip": false },
+  { "id": "st3", "x": 63.32, "y": 68.47, "size": 14.6, "angle": 0, "flip": false }
+];
 function defaultHoloPositions(){
-  return [
+  const base=[
     { id:"st1", x:37.5, y:75, size:14, angle:0, flip:false },
     { id:"ar1", x:43.2, y:75, size:4.5, angle:0, flip:false },
     { id:"st2", x:49.5, y:73, size:18, angle:0, flip:false },
     { id:"ar2", x:56.0, y:73, size:4.5, angle:0, flip:false },
     { id:"st3", x:63.0, y:70, size:23, angle:0, flip:false }
   ];
+  HOLO_FROZEN.forEach(s=>{ const t=base.find(d=>d.id===s.id); if(t) Object.assign(t,s); });
+  return base;
 }
 function readHoloPositions(){
   try{
@@ -466,6 +515,7 @@ function renderFiche(b){
   $("#fx-wcount").textContent=nw+"/"+D.WEAPONS.length;
   updateWeaponRackDevUI();
   const rack=$("#fx-wrack"), rackBrute=D.BRAWLERS.includes(b.sprite)?b.sprite:"general";
+  if(weaponRackBrute!==rackBrute){ weaponRackBrute=rackBrute; weaponRackPositions=null; }
   rack.style.backgroundImage=`url("${assetPath.starter(rackBrute)}"),url("${assetPath.starter("general")}")`;
   const weapons=$("#devbox")?D.WEAPONS:D.WEAPONS.filter(w=>b.weapons.includes(w.id));
   rack.innerHTML=`<div class="fx-rack-grid">${weapons.map(w=>

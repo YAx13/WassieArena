@@ -53,20 +53,33 @@ const OV={
 };
 // Délégation : bulles [data-open], boutons [data-close], clic sur le fond d'une sous-pop-up
 const AFK_MENU_LAYOUT_KEY="arene_brutes_afk_menu_layout_v1";
-const afkLayoutButtons=()=>Array.from($("#afk-menu").querySelectorAll(":scope > button")).concat($("#btn-harvest"));
+const AFK_MENU_FROZEN={
+  "afk-dest-caserne": { "x": 0.4769, "y": 0.1948 },
+  "afk-dest-pvp": { "x": 0.5174, "y": 0.2172 },
+  "afk-dest-expe": { "x": 0.435, "y": 0.2182 },
+  "afk-dest-world": { "x": 0.4091, "y": 0.2778 },
+  "afk-dest-sim": { "x": 0.5486, "y": 0.2811 },
+  "afk-menu-toggle": { "x": 0.4772, "y": 0.0959 },
+  "afk-dev-toggle": { "x": 0.5358, "y": 0.0945 },
+  "btn-harvest": { "x": 0.9146, "y": 0.9316 }
+};
+const afkLayoutButtons=()=>Array.from($("#afk-menu")?.querySelectorAll(":scope > button")||[]).concat($("#btn-harvest")||[]);
+function validAfkMenuPositions(saved){
+  const buttons=afkLayoutButtons();
+  return buttons.length>0&&saved&&typeof saved==="object"&&!Array.isArray(saved)&&buttons.every(button=>
+    button&&button.id&&saved[button.id]&&Number.isFinite(saved[button.id].x)&&Number.isFinite(saved[button.id].y)&&
+    saved[button.id].x>=0&&saved[button.id].x<=1&&saved[button.id].y>=0&&saved[button.id].y<=1);
+}
 function loadAfkMenuPositions(){
   try{
     const raw=localStorage.getItem(AFK_MENU_LAYOUT_KEY);
-    if(!raw) return null;
-    const saved=JSON.parse(raw), buttons=afkLayoutButtons();
-    if(!saved||typeof saved!=="object"||Array.isArray(saved)||!buttons.every(button=>
-      saved[button.id]&&Number.isFinite(saved[button.id].x)&&Number.isFinite(saved[button.id].y)&&
-      saved[button.id].x>=0&&saved[button.id].x<=1&&saved[button.id].y>=0&&saved[button.id].y<=1)){
+    if(raw){
+      const saved=JSON.parse(raw);
+      if(validAfkMenuPositions(saved)) return saved;
       console.warn("Disposition AFK sauvegardée invalide; les positions par défaut seront utilisées.");
-      return null;
     }
-    return saved;
-  }catch(error){ console.error("Impossible de charger la disposition des boutons AFK.",error); return null; }
+  }catch(error){ console.error("Impossible de charger la disposition des boutons AFK.",error); }
+  return validAfkMenuPositions(AFK_MENU_FROZEN)?JSON.parse(JSON.stringify(AFK_MENU_FROZEN)):null;
 }
 let afkMenuPositions=loadAfkMenuPositions(), afkButtonDrag=null, afkClickToSuppress=null, afkLastOpenTs=0, devMenuWasOpen=false;
 function setAfkMenuOpen(open){

@@ -238,32 +238,56 @@ const CaserneUI = {
       }
       
     });
-    // Slots (1 / 5 / 10)
+    // Slots (1 / 5 / 10) — icône seule sans contour
     this.Q("#cs-slots").innerHTML = this.NIV_SLOTS.map((lv, i) => {
-      if (b.level < lv) return `<div class="cs-slot lock" title="Se débloque au niveau ${lv}"><span>🔒</span><small>Niv. ${lv}</small></div>`;
+      if (b.level < lv) return `<div class="cs-slot lock" data-sk-item="slot_${i}" title="Se débloque au niveau ${lv}"><span>🔒</span></div>`;
       const id = eq[i];
-      if (id === undefined) return `<button class="cs-slot" data-slot="${i}"><span>＋</span><small>Slot ${i + 1} vide</small></button>`;
+      if (id === undefined) return `<button class="cs-slot" data-sk-item="slot_${i}" data-slot="${i}" title="Slot ${i + 1} vide — cliquer pour équiper"><span>＋</span></button>`;
       const s = D.SKILLS[id];
-      return `<button class="cs-slot on" data-slot="${i}" style="--c:${D.EL_COL[s.el]}"><span>${D.EL_ICON[s.el]}</span><small>${E(s.name)}</small></button>`;
+      return `<button class="cs-slot on" data-sk-item="slot_${i}" data-slot="${i}" title="${E(s.name)} — ${E(s.desc)}" style="--c:${D.EL_COL[s.el]}"><span>${D.EL_ICON[s.el]}</span></button>`;
     }).join("");
-    this.Q("#cs-slots").querySelectorAll("[data-slot]").forEach(x => x.onclick = e => { e.stopPropagation(); this.choisirSlot(+x.dataset.slot); });
+    this.Q("#cs-slots").querySelectorAll("[data-slot]").forEach(x => x.onclick = e => {
+      if (this._skillsEditing) return;
+      e.stopPropagation(); this.choisirSlot(+x.dataset.slot);
+    });
     const synBox = this.Q("#cs-synergies");
     if (synBox) {
+      synBox.dataset.skItem = "syn";
       const syns = DataEngine.getSynergies(eq), maxSlots = this.slotsOuverts();
-      synBox.innerHTML = syns.length
-        ? syns.map(s => `<div style="margin:6px 0;padding:6px 10px;border:1px solid ${s.col};background:rgba(15,20,28,.85);border-radius:4px;font-size:12px;color:#fff4d6"><b>${s.icon} Synergie ${s.name} (${s.count}/${maxSlots}) :</b> ${s.desc}</div>`).join("")
-        : `<div style="margin:6px 0;padding:5px 10px;border:1px dashed rgba(255,255,255,.2);border-radius:4px;font-size:11px;color:#9aa5b1">💡 Équipez 2 ou 3 compétences du même élément pour activer un bonus de synergie.</div>`;
+      if (syns.length) {
+        const s = syns[0];
+        synBox.classList.add("active");
+        synBox.style.setProperty("--syn-c", s.col);
+        synBox.innerHTML = `<b style="color:${s.col}">${s.icon} ${s.name.toUpperCase()} (${s.count}/${maxSlots})</b><span>${E(s.desc)}</span>`;
+      } else {
+        synBox.classList.remove("active");
+        synBox.style.removeProperty("--syn-c");
+        synBox.innerHTML = `<span style="opacity:.75">SYNERGIE INACTIVE<br><small>2+ même élément</small></span>`;
+      }
     }
     // Presets
-    this.Q("#cs-presets").innerHTML = [1, 2, 3].map(n => `<span class="cs-pre"><button class="fx-mini" data-pl="${n}" ${GS.presets[n] ? "" : "disabled"}>📂 Preset ${n}</button><button class="fx-mini" data-ps="${n}" title="Sauvegarder le build actuel dans le Preset ${n}">💾</button></span>`).join("");
-    this.Q("#cs-presets").querySelectorAll("[data-pl]").forEach(x => x.onclick = e => { e.stopPropagation(); this.preset(+x.dataset.pl, "load"); });
-    this.Q("#cs-presets").querySelectorAll("[data-ps]").forEach(x => x.onclick = e => { e.stopPropagation(); this.preset(+x.dataset.ps, "save"); });
+    this.Q("#cs-presets").innerHTML = [1, 2, 3].map(n => `<span class="cs-pre" data-sk-item="pre_${n}"><button class="fx-mini" data-pl="${n}" ${GS.presets[n] ? "" : "disabled"}>P${n}</button><button class="fx-mini" data-ps="${n}" title="Sauvegarder le build dans P${n}">💾</button></span>`).join("");
+    this.Q("#cs-presets").querySelectorAll("[data-pl]").forEach(x => x.onclick = e => {
+      if (this._skillsEditing) return;
+      e.stopPropagation(); this.preset(+x.dataset.pl, "load");
+    });
+    this.Q("#cs-presets").querySelectorAll("[data-ps]").forEach(x => x.onclick = e => {
+      if (this._skillsEditing) return;
+      e.stopPropagation(); this.preset(+x.dataset.ps, "save");
+    });
     // Parchemins
-    const u = this.Q("#cs-unlock"), c = this.coutParchemin(), tout = b.skills.length >= D.SKILLS.length;
-    u.textContent = tout ? "Toutes les compétences débloquées" : "📜 Débloquer Compétence — " + c + " Parchemin" + (c > 1 ? "s" : "") + " (vous : " + R.parchemins + ")";
-    u.disabled = tout || R.parchemins < c;
-        this.renderEquipementTab();
-
+    const u = this.Q("#cs-unlock");
+    u.dataset.skItem = "unlock";
+    this.majUnlock();
+    this.Q("#fx-sgrid").querySelectorAll(".fx-s").forEach((el, idx) => { el.dataset.skItem = "sk_" + idx; });
+    this.applySkillsLayout();
+    if (this._syncSkillsDev) this._syncSkillsDev();    this.renderEquipementTab();
+  },
+    majUnlock(){
+    const u = this.Q("#cs-unlock"), b = S.cur; if (!u || !b) return;
+    const c = this.coutParchemin(), tout = b.skills.length >= DataEngine.SKILLS.length, R = GameState.ressources;
+    u.textContent = tout ? "✔ 32/32 DÉBLOQUÉES" : `📜 TIRAGE (${c} 📜 · stock: ${R.parchemins})`;
+    u.disabled = !this._skillsEditing && (tout || R.parchemins < c);   // un bouton disabled ne peut pas être glissé
   },
     renderEquipementTab(){
     const root = this.Q("#cs-equip-root"), b = S.cur; if (!root || !b) return;
@@ -395,10 +419,33 @@ const CaserneUI = {
       + ".cs-rank{position:absolute;top:2px;right:2px;padding:0 4px;font:bold 11px monospace;color:#1a1008;background:#ffd77a;border-radius:3px;pointer-events:none}"
       + ".cs-eq-slot{display:flex;flex-direction:column;align-items:center;padding:8px 4px;background:rgba(0,0,0,.6);border:1px solid #3a3f46;border-radius:4px;text-align:center}"
       + ".cs-inv-item{display:flex;flex-direction:column;align-items:center;padding:8px 6px;background:rgba(15,17,20,.9);border:1px solid #555;border-radius:4px;cursor:pointer;text-align:center}"
-      + ".cs-inv-item.fusable{box-shadow:0 0 8px rgba(57,255,20,.45)}.cs-inv-ico{font-size:2em}.cs-inv-name{font-weight:bold;margin:2px 0}";
+      + ".cs-inv-item.fusable{box-shadow:0 0 8px rgba(57,255,20,.45)}.cs-inv-ico{font-size:2em}.cs-inv-name{font-weight:bold;margin:2px 0}"
+      + ".cs-gold{align-self:flex-end;width:max-content;padding:3px 8px;color:#ffd77a;background:rgba(26,16,8,.88);border:1px solid #c9953a;font:11px monospace;white-space:nowrap}"
+      + "#cs-skills{position:relative;width:100%;aspect-ratio:1408/752;background-size:100% 100%;background-repeat:no-repeat;margin:0 auto;overflow:hidden;user-select:none}"
+      + "#cs-skills .cs-syn-screen{position:absolute;padding:3px 6px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;font:clamp(8px,.8vw,10px)/1.15 monospace;color:#8ef6ff;text-shadow:0 0 6px rgba(79,240,230,.8);overflow:hidden}"
+      + "#cs-skills .cs-syn-screen.active{color:#fff;box-shadow:inset 0 0 12px var(--syn-c,#4ff0e6)}"
+      + "#cs-skills .cs-slots,#cs-skills .cs-ctrl-right,#cs-skills .cs-pres,#cs-skills #fx-sgrid{position:static;display:contents}"
+      + "#cs-skills .cs-slot{position:absolute;min-height:0;background:transparent !important;border:none !important;box-shadow:none !important;padding:0;box-sizing:border-box;display:flex;align-items:center;justify-content:center;transition:filter .14s}"
+      + "#cs-skills .cs-slot:hover:not(.lock){filter:drop-shadow(0 0 6px #7ffcf4)}"
+      + "#cs-skills .cs-slot span{font-size:inherit;line-height:1;filter:drop-shadow(0 2px 4px #000)}"
+      + "#cs-skills .cs-slot small{display:none}"
+      + "#cs-skills .cs-pre{position:absolute;display:flex;gap:2px;margin:0;box-sizing:border-box}"
+      + "#cs-skills .cs-pre button:first-child{flex:1;padding:2px 3px;font-size:inherit;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}"
+      + "#cs-skills .cs-pre button:last-child{padding:2px 4px;font-size:inherit}"
+      + ".fx-panel.fx-skills{flex:1;min-height:0;overflow:hidden}"
+      + "#cs-skills #cs-unlock{position:absolute;min-height:0 !important;height:auto !important;margin:0;padding:4px 6px !important;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:rgba(10,22,28,.92);border:1px solid #4ff0e6;color:#7ffcf4;box-shadow:0 0 8px rgba(79,240,230,.35)}"
+      + "#cs-skills #cs-unlock:disabled{opacity:.45;box-shadow:none}"
+      + "#cs-skills #fx-sgrid>*{position:absolute;min-height:0;margin:0;padding:0;background:transparent !important;border:none !important;box-shadow:none !important;display:flex;align-items:center;justify-content:center;box-sizing:border-box}"
+      + "#cs-skills #fx-sgrid>*:hover{filter:drop-shadow(0 0 6px #7ffcf4)}"
+      + "#cs-skills.is-editing [data-sk-item]{outline:1px dashed #f2b21c !important;background:rgba(242,178,28,.08) !important;cursor:grab !important;z-index:20;touch-action:none}"
+      + "#cs-skills.is-editing [data-sk-item]:active{cursor:grabbing !important}"
+      + "#cs-skills.is-editing [data-sk-item]>*{pointer-events:none}"
+      + ".fx-panel.fx-skills{position:relative}"
+      + ".fx-panel.fx-skills .csd-corner-bar{position:absolute;right:12px;bottom:12px;z-index:30;display:flex;gap:5px;align-items:center}"
+      + ".fx-panel.fx-skills .csd-corner-btn{width:auto !important;height:auto !important;min-height:0 !important;padding:5px 10px !important;font-size:11px !important;line-height:1.2 !important}"
+      + ".fx-panel.fx-skills .csd-corner-mini{width:auto !important;height:auto !important;min-height:0 !important;padding:5px 8px !important;font-size:11px !important;line-height:1.2 !important}";
 
     document.head.appendChild(st);
-    st.textContent += ".cs-gold{align-self:flex-end;width:max-content;padding:3px 8px;color:#ffd77a;background:rgba(26,16,8,.88);border:1px solid #c9953a;font:11px monospace;white-space:nowrap}";
     // Bouton d'entraînement sous les stats (onglet Stats)
     const tb = document.createElement("button"); tb.id = "cs-train"; tb.className = "fx-btn cs-btn"; tb.onclick = e => { e.stopPropagation(); this.entrainer(); };
     this.Q("#fx-stats").after(tb);
@@ -406,12 +453,194 @@ const CaserneUI = {
     this.Q("#fx-stats").after(gold);
     // Puissance en haut de l'onglet Stats
     const pw = document.createElement("div"); pw.id = "cs-power"; pw.className = "cs-power"; this.Q("#fx-stats").before(pw);
-    // Slots + presets + parchemins au-dessus de la grille des compétences
-    const pn = document.createElement("div"); pn.id = "cs-skills";
-    pn.innerHTML = '<div id="cs-slots" class="cs-slots"></div><div id="cs-synergies"></div><div id="cs-presets" class="cs-pres"></div><button id="cs-unlock" class="fx-btn cs-btn"></button>';
-    this.Q("#fx-sgrid").before(pn);
+    // Console holo-cyan des compétences (décor assets/backgrounds/competence/background.jpeg)
+    const sg = this.Q("#fx-sgrid"), pn = document.createElement("div");
+    pn.id = "cs-skills";
+    const bgUrl = typeof assetPath !== "undefined" && assetPath.competenceBg ? assetPath.competenceBg() : "assets/backgrounds/competence/background.jpeg";
+    pn.style.backgroundImage = `url("${encodeURI(bgUrl)}")`;
+    pn.innerHTML = '<div id="cs-synergies" class="cs-syn-screen"></div><div id="cs-slots" class="cs-slots"></div><div class="cs-ctrl-right"><div id="cs-presets" class="cs-pres"></div><button id="cs-unlock" class="fx-btn cs-btn"></button></div>';
+    sg.before(pn);
+    pn.appendChild(sg);
     this.Q("#cs-unlock").onclick = e => { e.stopPropagation(); this.debloquerCompetence(); };
     this.Q("#btn-fuse").onclick = () => this.fusionner();                    // Forge
+    this.applySkillsLayout();
+    this.initSkillsDevUI();
+  },
+  SKILLS_LAYOUT_KEY: "arene_skills_dev_layout_v1",
+  _skillsEditing: false,
+  _skillsPositions: null,
+  defaultSkillsPositions(){
+    const items = [
+      { id: "syn",    x: 20.18, y: 23.95, size: 18.2, angle: 0 },
+      { id: "slot_0", x: 36.21, y: 22.95, size: 7.8,  angle: 0 },
+      { id: "slot_1", x: 44.68, y: 21.95, size: 9.0,  angle: 0 },
+      { id: "slot_2", x: 53.51, y: 22.52, size: 9.0,  angle: 0 },
+      { id: "pre_1",  x: 37.06, y: 4.0,   size: 7.4,  angle: 0 },
+      { id: "pre_2",  x: 44.62, y: 4.0,   size: 7.4,  angle: 0 },
+      { id: "pre_3",  x: 52.24, y: 4.0,   size: 7.4,  angle: 0 },
+      { id: "unlock", x: 31.43, y: 4.0,   size: 3.1,  angle: 0 }
+    ];
+    // Grille 8 x 4 : centre exact de chaque case (mesuré sur ta capture)
+    const GX0 = 16.13, GDX = 8.21;   // x de la colonne 0 + écart entre colonnes (%)
+    const GY0 = 49.15, GDY = 9.80;   // y de la ligne 0 + écart entre lignes (%)
+    for (let i = 0; i < 32; i++) {
+      const col = i % 8, row = Math.floor(i / 8);
+      items.push({
+        id: "sk_" + i,
+        x: +(GX0 + col * GDX).toFixed(2),
+        y: +(GY0 + row * GDY).toFixed(2),
+        size: 6.7,
+        angle: 0
+      });
+    }
+    return items;
+  },  getSkillsPositions(){
+    if (this._skillsPositions) return this._skillsPositions;
+    const def = this.defaultSkillsPositions();
+    try {
+      const saved = JSON.parse(localStorage.getItem(this.SKILLS_LAYOUT_KEY) || "null");
+      if (Array.isArray(saved)) {
+        saved.forEach(s => {
+          const t = def.find(d => d.id === s.id);
+          if (t && Number.isFinite(s.x) && Number.isFinite(s.y)) Object.assign(t, s);
+        });
+      }
+    } catch (_) {}
+    this._skillsPositions = def;
+    return def;
+  },
+  saveSkillsPositions(){
+    if (!this._skillsPositions) return;
+    const clean = this._skillsPositions.map(({ id, x, y, size, angle }) => ({
+      id, x: +x.toFixed(2), y: +y.toFixed(2), size: +size.toFixed(1), angle: +(angle || 0).toFixed(1)
+    }));
+    try { localStorage.setItem(this.SKILLS_LAYOUT_KEY, JSON.stringify(clean)); } catch (_) {}
+    console.log("SKILLS_LAYOUT =", JSON.stringify(clean));
+  },
+  applySkillItemPos(el, pos, stage){
+    const w = stage ? stage.clientWidth : 800;
+    el.style.position = "absolute";
+    el.style.left = pos.x + "%";
+    el.style.top = pos.y + "%";
+    el.style.transform = `translate(-50%,-50%) rotate(${pos.angle || 0}deg)`;
+    if (pos.id === "syn") {
+      el.style.width = pos.size + "%";
+      el.style.height = (pos.size * 0.65) + "%";
+      el.style.fontSize = Math.max(7, w * pos.size * 0.0055) + "px";
+    } else if (pos.id.startsWith("pre_")) {
+      el.style.width = pos.size + "%";
+      el.style.height = "auto";
+      el.style.fontSize = Math.max(8, w * pos.size * 0.0014) + "px";
+    } else if (pos.id === "unlock") {
+      el.style.width = pos.size + "%";
+      el.style.height = "auto";
+      el.style.fontSize = Math.max(7, w * pos.size * 0.0042) + "px";
+    } else {
+      el.style.height = pos.size + "%";
+      el.style.width = "auto";
+      el.style.aspectRatio = "1 / 1";
+      el.style.fontSize = Math.max(12, w * pos.size * 0.0046) + "px";
+    }
+  },
+  applySkillsLayout(){
+    const pn = this.Q("#cs-skills"); if (!pn) return;
+    const list = this.getSkillsPositions();
+    pn.querySelectorAll("[data-sk-item]").forEach(el => {
+      const pos = list.find(p => p.id === el.dataset.skItem);
+      if (pos) this.applySkillItemPos(el, pos, pn);
+    });
+  },
+  initSkillsDevUI(){
+    const pn = this.Q("#cs-skills"); if (!pn) return;
+    const host = pn.closest(".fx-panel.fx-skills") || pn;
+    if (host.querySelector("#csd-corner-bar")) return;
+    let drag = null;
+
+    const bar = document.createElement("div");
+    bar.id = "csd-corner-bar";
+    bar.className = "csd-corner-bar";
+    bar.innerHTML = `<button type="button" id="csd-copy" class="fx-btn csd-corner-mini" title="Copier les coordonnées JSON">📋</button>`
+      + `<button type="button" id="csd-reset" class="fx-btn csd-corner-mini" title="Réinitialiser les positions">↺</button>`
+      + `<button type="button" id="csd-edit" class="fx-btn csd-corner-btn">ÉDITER LES COMPÉTENCES</button>`;
+    host.appendChild(bar);
+
+    const isDev = () => !!document.getElementById("devbox") || !!GameState.illimite || /[?&]dev\b/.test(location.search);
+    const setEdit = on => {
+      this._skillsEditing = on;
+      pn.classList.toggle("is-editing", on);
+      const btn = bar.querySelector("#csd-edit");
+      if (btn) btn.textContent = on ? "Terminer le placement" : "ÉDITER LES COMPÉTENCES";
+      this.majUnlock();   // le bouton Tirage doit rester déplaçable même grisé
+    };
+    const syncVis = () => {
+      const on = isDev();
+      bar.style.display = on ? "flex" : "none";
+      if (!on && this._skillsEditing) setEdit(false);
+    };
+    syncVis();
+    this._syncSkillsDev = syncVis;   // rappelé à chaque render()
+    new MutationObserver(syncVis).observe(document.body, { childList: true });
+    bar.querySelector("#csd-edit").onclick = e => {
+      e.stopPropagation();
+      setEdit(!this._skillsEditing);
+      if (!this._skillsEditing && typeof toast === "function") toast("Placement des compétences enregistré !");
+    };
+    bar.querySelector("#csd-copy").onclick = e => {
+      e.stopPropagation();
+      const clean = this.getSkillsPositions().map(({ id, x, y, size, angle }) => ({
+        id, x: +x.toFixed(2), y: +y.toFixed(2), size: +size.toFixed(1), angle: +(angle || 0).toFixed(1)
+      }));
+      if (navigator.clipboard) navigator.clipboard.writeText(JSON.stringify(clean));
+      if (typeof toast === "function") toast("Coordonnées copiées dans le presse-papiers !");
+    };
+    bar.querySelector("#csd-reset").onclick = e => {
+      e.stopPropagation();
+      try { localStorage.removeItem(this.SKILLS_LAYOUT_KEY); } catch (_) {}
+      this._skillsPositions = null;
+      this.applySkillsLayout();
+      if (typeof toast === "function") toast("Positions par défaut restaurées.");
+    };
+
+    pn.addEventListener("pointerdown", ev => {
+      if (!this._skillsEditing) return;
+      const el = ev.target.closest("[data-sk-item]"); if (!el) return;
+      ev.preventDefault(); ev.stopPropagation();
+      const pos = this.getSkillsPositions().find(p => p.id === el.dataset.skItem); if (!pos) return;
+      drag = { el, pos, pointerId: ev.pointerId };
+      el.setPointerCapture(ev.pointerId);
+    });
+    pn.addEventListener("pointermove", ev => {
+      if (!drag || ev.pointerId !== drag.pointerId) return;
+      const rect = pn.getBoundingClientRect();
+      drag.pos.x = Math.max(2, Math.min(98, ((ev.clientX - rect.left) / rect.width) * 100));
+      drag.pos.y = Math.max(4, Math.min(96, ((ev.clientY - rect.top) / rect.height) * 100));
+      this.applySkillItemPos(drag.el, drag.pos, pn);
+    });
+    const endDrag = ev => {
+      if (!drag || ev.pointerId !== drag.pointerId) return;
+      drag = null;
+      this.saveSkillsPositions();
+    };
+    pn.addEventListener("pointerup", endDrag);
+    pn.addEventListener("pointercancel", endDrag);
+    // En mode édition : un glisser ne doit JAMAIS déclencher le clic (tirage, slots, presets, compétences)
+    pn.addEventListener("click", ev => {
+      if (!this._skillsEditing || !ev.target.closest("[data-sk-item]")) return;
+      ev.preventDefault(); ev.stopImmediatePropagation();
+    }, true);    pn.addEventListener("wheel", ev => {
+      if (!this._skillsEditing) return;
+      const el = ev.target.closest("[data-sk-item]"); if (!el) return;
+      ev.preventDefault(); ev.stopPropagation();
+      const pos = this.getSkillsPositions().find(p => p.id === el.dataset.skItem); if (!pos) return;
+      const d = ev.deltaY || ev.deltaX;   // Maj + molette = deltaX sur Windows/Chrome
+      if (ev.shiftKey) pos.angle = (pos.angle || 0) + (d < 0 ? 5 : -5);
+      else pos.size = Math.max(3, Math.min(50, (pos.size || 8.5) + (d < 0 ? 0.6 : -0.6)));      this.applySkillItemPos(el, pos, pn);
+      this.saveSkillsPositions();
+    }, { passive: false });
+
+    if (typeof ResizeObserver !== "undefined") {
+      new ResizeObserver(() => this.applySkillsLayout()).observe(pn);
+    }
   }
 };
 
