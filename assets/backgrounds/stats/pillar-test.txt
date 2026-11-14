@@ -1,0 +1,1 @@
+document.querySelector("#cs-stats-stage").style.backgroundImage = `url("assets/backgrounds/stats/greybox-pilier.jpg")`;

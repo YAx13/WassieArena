@@ -45,11 +45,49 @@ class CanvasRenderer {
       salto:{s:"base",r:2,fps:8,loop:1},
       taunt:{s:"base",r:0,fps:8,loop:1},
       victory:{s:"base",r:0,fps:8,loop:1}
+    },
+    weaponBoss:{
+      idle:{s:"base",r:0,fps:6,loop:1},
+      dash:{s:"base",r:1,fps:12,loop:1},
+      dodge:{s:"base",r:1,fps:12,loop:1},
+      hit:{s:"base",r:2,fps:8,loop:1},
+      death:{s:"base",r:3,fps:8,loop:1},
+      punch:{s:"base",r:2,fps:8,loop:1},
+      thrust:{s:"base",r:2,fps:8,loop:1},
+      overhead:{s:"base",r:2,fps:8,loop:1},
+      throw:{s:"base",r:2,fps:8,loop:1},
+      uppercut:{s:"base",r:2,fps:8,loop:1},
+      pierce:{s:"base",r:2,fps:8,loop:1},
+      meteor:{s:"base",r:2,fps:8,loop:1},
+      salto:{s:"base",r:2,fps:8,loop:1},
+      taunt:{s:"base",r:0,fps:8,loop:1},
+      victory:{s:"base",r:0,fps:8,loop:1}
+    },
+    petBoss:{
+      idle:{s:"base",r:0,fps:6,loop:1},
+      dash:{s:"base",r:1,fps:12,loop:1},
+      dodge:{s:"base",r:1,fps:12,loop:1},
+      hit:{s:"base",r:2,fps:8,loop:1},
+      death:{s:"base",r:3,fps:8,loop:1},
+      punch:{s:"base",r:2,fps:8,loop:1},
+      thrust:{s:"base",r:2,fps:8,loop:1},
+      overhead:{s:"base",r:2,fps:8,loop:1},
+      throw:{s:"base",r:2,fps:8,loop:1},
+      uppercut:{s:"base",r:2,fps:8,loop:1},
+      pierce:{s:"base",r:2,fps:8,loop:1},
+      meteor:{s:"base",r:2,fps:8,loop:1},
+      salto:{s:"base",r:2,fps:8,loop:1},
+      taunt:{s:"base",r:0,fps:8,loop:1},
+      victory:{s:"base",r:0,fps:8,loop:1}
     }
   };
   static PET={ idle:{r:0,fps:6,loop:1}, run:{r:1,fps:14,loop:1}, bite:{r:2,fps:12}, hit:{f:[12],fps:8}, fall:{f:[13],fps:8}, death:{f:[13,14,15],fps:6} };
   // Point d'ancrage de la main (px dans la case 64x64, rotation en rad) par frame ; null = arme absente (lâchée). Calibrez selon vos dessins.
   static ANCHORS={
+    idle:[[26,38,-.4],[26,39,-.4],[26,38,-.4],[26,37,-.4]],
+    dash:[[24,36,-.8],[22,35,-.9],[24,36,-.8],[26,37,-.7]],
+    hit:[[22,40,.3],[20,42,.5],[22,40,.3],[24,39,.1]],
+    dodge:[[24,34,-.6],[22,32,-.7],[24,34,-.6],[26,36,-.5]],
     thrust:[[30,38,-.3],[38,37,-.1],[50,36,0],[54,36,0]],
     overhead:[[34,12,-2.3],[36,8,-1.7],[47,30,.5],[50,40,1.3]],
     throw:[[30,30,-1],[36,26,-.6],[48,30,0],null],
@@ -177,12 +215,12 @@ class CanvasRenderer {
     ctx.save(); ctx.translate(Math.round(f.x),Math.round(f.y-hop)); const fp=f.flip&&!f.win; if(fp) ctx.scale(-1,1);
     const R=CanvasRenderer, SC=R.SPR/64, OY=-(R.SPR-R.PAD); ctx.drawImage(this.off,-R.SPR/2,OY,R.SPR,R.SPR);
     const an_=!f.pet&&f.wpn&&CanvasRenderer.ANCHORS[an];   // Layering : arme collée au pivot de la main selon l'anim et la frame
-    if(an_){ const A=CanvasRenderer.ANIMS[an], h=an_[A.loop?n%4:Math.min(n,3)];
-      if(h){ ctx.translate(-R.SPR/2+h[0]*SC,OY+h[1]*SC); ctx.rotate(h[2]);
+    if(an_){ const A=CanvasRenderer.ANIMS[an]||CanvasRenderer.ANIMS.idle, h=an_[A.loop?n%4:Math.min(n,3)];
+      if(h){ ctx.translate(-R.SPR/2+h[0]*SC,OY+h[1]*SC); ctx.rotate(h[2]+Math.PI/4);
         const wi=this.loadImg(DataEngine.WEAPON_IMGS[f.wpn.id]), skin=this.weaponSprite(f.b,f.wpn.id);
-        if(wi) ctx.drawImage(wi,-12,-12,24,24);
-        else if(skin) ctx.drawImage(skin.sheet,skin.x,skin.y,skin.size,skin.size,-12,-12,24,24);
-        else { if(fp) ctx.scale(-1,1); ctx.font="20px serif"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText(f.wpn.ic,0,0); } } }
+        if(wi) ctx.drawImage(wi,-4,-22,26,26);
+        else if(skin) ctx.drawImage(skin.sheet,skin.x,skin.y,skin.width,skin.height,-4,-22,26,26);
+        else { if(fp) ctx.scale(-1,1); ctx.font="20px serif"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText(f.wpn.ic,0,-8); } } }
     ctx.restore();
   }
   drawArena(ctx,A,c){
@@ -259,7 +297,7 @@ class CanvasRenderer {
         }
       }
     });
-    const pj=A.proj; if(pj&&c>=pj.t0&&c<=pj.t1){ const k=(c-pj.t0)/(pj.t1-pj.t0); ctx.save(); ctx.translate(pj.x0+(pj.x1-pj.x0)*k,pj.y0+(pj.y1-pj.y0)*k-Math.sin(Math.PI*k)*18); ctx.rotate(c/45); ctx.font="19px serif"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText(pj.ic,0,0); ctx.restore(); }
+    const pj=A.proj; if(pj&&c>=pj.t0&&c<=pj.t1){ const k=(c-pj.t0)/(pj.t1-pj.t0); ctx.save(); ctx.translate(pj.x0+(pj.x1-pj.x0)*k,pj.y0+(pj.y1-pj.y0)*k-Math.sin(Math.PI*k)*18); ctx.rotate(c/45); const skin=pj.b&&Number.isInteger(pj.id)?this.weaponSprite(pj.b,pj.id):null; if(skin){ ctx.drawImage(skin.sheet,skin.x,skin.y,skin.width,skin.height,-13,-13,26,26); } else { ctx.font="19px serif"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText(pj.ic,0,0); } ctx.restore(); }
     ctx.textAlign="center";
     A.fl.forEach(t=>{                                   // nombres flottants
       const age=c-t.c0; if(age<0||age>1000) return;

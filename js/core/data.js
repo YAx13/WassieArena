@@ -18,7 +18,7 @@ const assetPath = {
   characterSelectBg: () => `assets/backgrounds/character-select/background.jpeg`,
   competenceBg: () => `assets/backgrounds/competence/background.jpeg`,
   equipementBg: () => `assets/backgrounds/equipement/background.jpeg`,
-  statsBg: () => `assets/backgrounds/stats/background.jpeg`,
+  statsBg: id => `assets/backgrounds/stats/${id}/background.jpg`,
 
 };
 
@@ -144,14 +144,7 @@ class DataEngine {
     { el: 6, p2: "+15 % Dégâts d'Air",         p3: "+30 % Dégâts d'Air & +10 % Esquive",       dmg: [1.15, 1.30], dodge: [5, 10] }
   ];
   static getSynergies(skillIds = []){
-    const counts = {};
-    (skillIds || []).forEach(id => { const s = this.SKILLS[id]; if (s) counts[s.el] = (counts[s.el] || 0) + 1; });
-    return Object.entries(counts)
-      .filter(([, n]) => n >= 2)
-      .map(([el, n]) => {
-        const tier = n >= 3 ? 3 : 2, idx = tier - 2, def = this.EL_SYNERGIES[+el];
-        return { el: +el, count: n, tier, icon: this.EL_ICON[+el], name: this.ELEMENTS[+el], col: this.EL_COL[+el], desc: tier === 3 ? def.p3 : def.p2, def, idx };
-      });
+    return this.getAllSynergies(null, skillIds);
   }
   static pickSkills(n){ const a=[...Array(32).keys()]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]} return a.slice(0,n); }
   static SYL_A = ["Gor","Bru","Thor","Ska","Ma","Dra","Ur","Kra","Bal","Vor","Mor","Ras","Tor","Gru"];
@@ -171,7 +164,7 @@ class DataEngine {
   static WEAPON_IMGS = {};   // id d'arme -> image 32x32 optionnelle
   // Nombre de skins d'arme présents dans assets/characters/<id>/weapons/ (weapon-1.jpeg … weapon-N.jpeg)
   static WEAPON_COUNT = { empereur:1, frankenstein:1, general:4, hazmat:3, human:3, inversebrah:4, momie:3, samourai:3, zeus:3 };
-  static WEAPON_SKINS = Object.fromEntries(Object.entries(DataEngine.WEAPON_COUNT).map(([k, n]) =>
+  static WEAPON_SKINS = Object.fromEntries(Object.entries(this.WEAPON_COUNT).map(([k, n]) =>
     [k, Array.from({ length: n }, (_, i) => assetPath.weapon(k, i + 1))]));
   // Style d'attaque par arme : estoc (P2 L1), overhead (P2 L2, saut), throw (P2 L3, jet)
   static WEAPON_STYLE = ["estoc","estoc","estoc","overhead","overhead","throw","estoc","estoc","throw","overhead","overhead","estoc","overhead","throw","estoc","overhead"];
@@ -353,11 +346,6 @@ class ProfileManager {
   static remove(i){ const d=this.load(); d.slots[i]=null; this.save(d); }
 }
 
-// Lignées de compagnons (Canidés / Ursidés / Rapaces)
-CompanionData.SPECIES.chien_friche.forms[1].name="Loup cybernétique"; CompanionData.SPECIES.chien_friche.forms[2].name="Cerbère Radioactif";
-CompanionData.SPECIES.ours_decharge={base:"Ourson de décharge",forms:[{form:1,minLevel:1,name:"Ourson de décharge"},{form:2,minLevel:10,name:"Grizzly des ruines"},{form:3,minLevel:20,name:"Béhémoth Blindé",legendary:true}]};
-CompanionData.SPECIES.aigle_veille={base:"Aigle de surveillance",forms:[{form:1,minLevel:1,name:"Aigle de surveillance"},{form:2,minLevel:10,name:"Aigle Géant des Friches"},{form:3,minLevel:20,name:"Phénix de Plasma",legendary:true}]};
-
 // Bestiaire : 13 familles × 3 stades (Base → Milieu → Légende). "species" relie une famille aux espèces déjà codées dans SPECIES.
 // spec = spécialité de combat affichée sur la fiche (modifiable) ; legend = bonus réel du stade Légende, si déjà implémenté.
 CompanionData.EVO_LEVELS=[1,10,20];
@@ -396,13 +384,30 @@ CompanionData.family=function(c){ return this.FAMILIES.find(f=>f.species===c.spe
 class ForgeSystem {
   static key(g){ return DataEngine.gearSig(g); }
   static autoFuse(b){
-    let n=0,div=0;
-    for(;;){
-      const gs=this.groups(b).filter(g=>g.n>=3&&g.rarity<5);
-      if(!gs.length) break;
-      const x=this.fuse(b,gs[0].k); if(!x.ok) break;
-      n++; if(x.rarity===5) div++;
+    let n=0, div=0;
+    const map=new Map();
+    (b.gear||[]).forEach(raw=>{
+      const item=Object.assign({},DataEngine.normGearItem(raw));
+      const k=this.key(item);
+      if(!map.has(k)) map.set(k,{sample:item,count:0});
+      map.get(k).count++;
+    });
+    for(let rar=0;rar<5;rar++){
+      for(const [k,entry] of [...map.entries()]){
+        if(entry.sample.rarity!==rar||entry.count<3) continue;
+        const fusions=Math.floor(entry.count/3);
+        entry.count%=3;
+        n+=fusions;
+        if(rar+1===5) div+=fusions;
+        const nextItem=Object.assign({},entry.sample,{rarity:rar+1});
+        const nk=this.key(nextItem);
+        if(!map.has(nk)) map.set(nk,{sample:nextItem,count:0});
+        map.get(nk).count+=fusions;
+      }
     }
+    const rebuilt=[];
+    map.forEach(entry=>{ for(let i=0;i<entry.count;i++) rebuilt.push(Object.assign({},entry.sample)); });
+    b.gear=rebuilt;
     return {n,div};
   }
   static groups(brute){

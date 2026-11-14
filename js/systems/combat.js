@@ -26,7 +26,7 @@ class BattleEngine {
       const hpMult=sets.some(s=>s.set.id==="mutant")?1.15:1;
       const spdMult=sets.some(s=>s.set.id==="cyber")?1.10:1;
       const mx=Math.round(BattleEngine.maxHp(br,bf)*hpMult);
-      return {br,el:BattleEngine.elOf(br),name:br.name,max:mx,hp:mx,str:BattleEngine.eff(br,"str",bf),agi:BattleEngine.eff(br,"agi",bf),spd:Math.max(1,Math.round(BattleEngine.eff(br,"spd",bf)*spdMult)),next:0,st:{stun:0,slow:0,spdUp:0,rage:0,accD:null,dr:null,dodge:null,reflect:null,dot:[],shield:0,block:0}};
+      return {br,el:BattleEngine.elOf(br),name:br.name,max:mx,hp:mx,str:BattleEngine.eff(br,"str",bf),agi:BattleEngine.eff(br,"agi",bf),spd:Math.max(1,Math.round(BattleEngine.eff(br,"spd",bf)*spdMult)),next:0,bag:[...(br.weapons||[])],held:null,st:{stun:0,slow:0,spdUp:0,rage:0,accD:null,dr:null,dodge:null,reflect:null,dot:[],shield:0,block:0}};
     });
     this.f.forEach(x=>x.next=(100/x.spd)*(.5+Math.random()*.5));
     this.h={}; this.round=0; this.over=false; this.winner=null;
@@ -88,20 +88,31 @@ class BattleEngine {
       }
       sk = { name: c.name, pet: c, el, t: "A", pw, fx, desc: "" };
     }
-    // Recours à l'arme : si aucune compétence ce tour-ci, chance de sortir une arme débloquée (Estoc)
-    if(!sk && A.br.weapons && A.br.weapons.length && Math.random()<BattleEngine.WEAPON_CHANCE){
-      wp=DataEngine.WEAPONS[DataEngine.pick(A.br.weapons)];
-      // Maîtrise d'Arme (joueur uniquement) : +10 % de puissance et +1 % de critique par niveau de maîtrise
-      const m=(i===0&&GameState.maitriseArmes&&GameState.maitriseArmes[wp.id])||0;
-      wl=wp.name+(m>0?" +"+m:"");
-      sk={name:wl,weapon:wp,t:"A",pw:(.8+wp.dmg*.08)*(1+m*.10),fx:{acc:(wp.prec-5)*3,crit:(wp.crit-5)*.012+m*.01},desc:""};
-      A.next-=(100/A.spd)*(wp.spd-5)*.03;    // l'arme influe légèrement sur la cadence
+    // Recours à l'arme : dégainage persistant façon La Brute
+    let drewWpn=false;
+    if(!sk){
+      if(A.held!==null && A.bag.length>0 && Math.random()<0.12) A.held=null;
+      if(A.held===null && A.bag.length>0 && Math.random()<0.38){
+        const pid=DataEngine.pick(A.bag);
+        A.bag=A.bag.filter(id=>id!==pid);
+        A.held=pid; drewWpn=true;
+      }
+      if(A.held!==null){
+        wp=DataEngine.WEAPONS[A.held];
+        const m=(i===0&&GameState.maitriseArmes&&GameState.maitriseArmes[wp.id])||0;
+        wl=wp.name+(m>0?" +"+m:"");
+        sk={name:wl,weapon:wp,t:"A",pw:(.8+wp.dmg*.08)*(1+m*.10),fx:{acc:(wp.prec-5)*3,crit:(wp.crit-5)*.012+m*.01},desc:""};
+        A.next-=(100/A.spd)*(wp.spd-5)*.03;
+        if((DataEngine.WEAPON_STYLE[wp.id]||"estoc")==="throw") A.held=null;
+      }
     }
     let dot=0; S.dot.forEach(d=>{dot+=d.dmg; d.n--}); S.dot=S.dot.filter(d=>d.n>0);
     if(dot){ A.hp=Math.max(0,A.hp-dot); out.push({type:"on_dot",i,j,dmg:dot,hpA:A.hp,msg:A.name+" subit "+dot+" dégâts d’altération."}); }
     const stunned=A.hp>0&&S.stun>0, dead=A.hp<=0;
     if(stunned) S.stun--;
-    this.emit("on_attack",{i,j,round:this.round,self:!!(stunned||dead||(sk&&sk.pw===0)),skill:sk&&!wp?sk.name:null,weapon:wp?{name:wl,icon:wp.icon,id:wp.id}:null,pet:sk&&sk.pet?{name:sk.pet.name,species:sk.pet.species,form:sk.pet.form||1}:null,msg:dead?A.name+" vacille…":stunned?A.name+" est étourdi et perd son tour.":sk&&sk.pet?A.name+" siffle : "+sk.pet.name+" passe à l’attaque !":wp?A.name+" sort "+wp.icon+" "+wl+" et porte un estoc !":sk?A.name+" utilise "+sk.name+" !":A.name+" fonce en avant !"});
+    const wpnVerb={estoc:"porte un estoc avec",overhead:"abat",throw:"lance"}[wp?DataEngine.WEAPON_STYLE[wp.id]||"estoc":"estoc"];
+    const wpnMsg=wp?(drewWpn?A.name+" dégaine "+wp.icon+" "+wl+" et "+wpnVerb+" son arme !":A.name+" "+wpnVerb+" "+wp.icon+" "+wl+" !"):"";
+    this.emit("on_attack",{i,j,round:this.round,self:!!(stunned||dead||(sk&&sk.pw===0)),skill:sk&&!wp?sk.name:null,weapon:wp?{name:wl,icon:wp.icon,id:wp.id}:null,pet:sk&&sk.pet?{name:sk.pet.name,species:sk.pet.species,form:sk.pet.form||1}:null,msg:dead?A.name+" vacille…":stunned?A.name+" est étourdi et perd son tour.":sk&&sk.pet?A.name+" siffle : "+sk.pet.name+" passe à l’attaque !":wp?wpnMsg:sk?A.name+" utilise "+sk.name+" !":A.name+" fonce en avant !"});
     out.forEach(e=>this.emit(e.type,e));
     if(dead){ this.over=true; this.winner=j; this.emit("on_death",{i,j,dead:i,msg:A.name+" succombe à ses blessures."}); }
     else if(!stunned){
@@ -115,18 +126,28 @@ class BattleEngine {
         if(sb.set.id==="mutant"&&sb.tier===4){ A.hp=Math.min(A.max,A.hp+Math.max(1,Math.round(A.max*0.05))); }
       });
       ringsA.forEach(r=>{ if(r.kind==="el"&&sk&&sk.el===r.el) pw*=1+(DataEngine.RING_EL_BONUS[r.rarity]||0.10); });
+      let synSpdMult=1;
       DataEngine.getAllSynergies(A.br,A.br.skills||[]).forEach(syn=>{
         if(sk&&sk.el===syn.el&&syn.def.dmg) pw*=syn.def.dmg[syn.idx];
         if(syn.def.crit) fx.crit=(fx.crit||0)+syn.def.crit[syn.idx];
         if(syn.def.heal&&fx.heal) fx.heal*=syn.def.heal[syn.idx];
+        if(syn.def.spd) synSpdMult*=1-syn.def.spd[syn.idx];
+        if(syn.def.ctrl){ if(fx.stun) fx.stun=Math.min(1,fx.stun+syn.def.ctrl[syn.idx]); if(fx.slow) fx.slow+=1; }
+      });
+      if(synSpdMult!==1) A.next-=(100/A.spd)*(1-synSpdMult);
+      let defSynDr=0, defSynDodge=0;
+      DataEngine.getAllSynergies(D.br,D.br.skills||[]).forEach(syn=>{
+        if(syn.def.dr) defSynDr+=syn.def.dr[syn.idx];
+        if(syn.def.dodge) defSynDodge+=syn.def.dodge[syn.idx];
       });
       if(pw>0){
-        const defDodgeBonus=setsD.some(sb=>sb.set.id==="mutant")?10:0;
+        const defDodgeBonus=(setsD.some(sb=>sb.set.id==="mutant")?10:0)+defSynDodge;
         const acc=Math.max(15,Math.min(95,75+(A.agi-D.agi)*1.5+(fx.acc||0)-(S.accD?S.accD.v:0)-(D.st.dodge?D.st.dodge.v:0)-defDodgeBonus));
         if(D.st.block){ D.st.block=0; this.emit("on_dodge",{i,j,msg:D.name+" bloque le coup derrière un mur de gravats !"}); }
         else if(fx.sure||Math.random()*100<acc){
           const crit=Math.random()<.08+A.agi*.003+(fx.crit||0);
-          const m=pw*BattleEngine.elMult(sk?sk.el||0:0,D.el)*(crit?critDmgMult:1)*(S.rage?1+(1-A.hp/A.max)*.8:1)*(D.st.dr?1-D.st.dr.v:1);
+          const drMult=Math.max(0.2,(D.st.dr?1-D.st.dr.v:1)*(1-defSynDr));
+          const m=pw*BattleEngine.elMult(sk?sk.el||0:0,D.el)*(crit?critDmgMult:1)*(S.rage?1+(1-A.hp/A.max)*.8:1)*drMult;
           const pierceVal=Math.min(1,fx.pierce||0);
           let dmg=Math.max(1,Math.round((A.str*.95+1+Math.random()*4-D.br.stats.hp*.03*(1-pierceVal))*m));
           if(D.st.shield>0){ const x=Math.min(D.st.shield,dmg); D.st.shield-=x; dmg-=x; if(x) fl.push("le bouclier absorbe "+x); }
@@ -262,7 +283,7 @@ const Combat={
   spawn(c,first){
     const ent=this.file[this.idx], en=ent.brute, E=this.eng=new BattleEngine(this.pv,en,ProfileManager.getBuffs());
     if(first){
-      DataEngine.getSynergies(this.pv.skills||[]).forEach(syn=>{
+      DataEngine.getAllSynergies(this.pv,this.pv.skills||[]).forEach(syn=>{
         this.lg(`Synergie ${syn.icon} ${syn.name} (${syn.count}) : ${syn.desc}`,"crit");
       });
     }
@@ -312,9 +333,12 @@ const Combat={
     else if(at.weapon) kind=crit?{estoc:"pierce",overhead:"meteor",throw:"salto"}[DataEngine.WEAPON_STYLE[at.weapon.id]||"estoc"]:(DataEngine.WEAPON_STYLE[at.weapon.id]||"estoc");
     else kind=crit?"uppercut":"punch";
     const K=this.K[kind]||this.K.idle;
-    this.ph={k:"act",kind,K,t0:c,i:at.i,j:at.j,ev,hit:0,wicon:at.weapon&&at.weapon.icon,
+    const heldId=this.eng.f[at.i].held;
+    this.ph={k:"act",kind,K,t0:c,i:at.i,j:at.j,ev,hit:0,wicon:at.weapon&&at.weapon.icon,wid:at.weapon&&at.weapon.id,
       tx:K.ranged||at.self||kind==="pet"?(kind==="pet"?bx+(at.i?42:-42):A.bx):K.through?bx-dir*60:bx+(at.i?46:-46)};
-    this.amp=K.amp||5; A.wpn=at.weapon&&!at.pet?{ic:at.weapon.icon,id:at.weapon.id}:null;
+    this.amp=K.amp||5;
+    if(at.weapon&&!at.pet) A.wpn={ic:at.weapon.icon,id:at.weapon.id};
+    else A.wpn=heldId!==null?{ic:DataEngine.WEAPONS[heldId].icon,id:heldId}:null;
     if(kind==="pet"){ this.ph.pt=this.P.find(p=>p.i===at.i); }
     this.lg(at.msg);
   },
@@ -350,11 +374,11 @@ const Combat={
     if(p.kind==="pet"){ this.tickPet(p,c,e,a); return; }
     const K=p.K, T=K.T, d=this.V[p.j];
     if(!p.hit&&e>=K.h){ p.hit=1; this.impact(p,c); }
-    if(K.rel&&e>=K.rel&&e<K.h){ a.wpn=null; if(!this.proj&&p.wicon) this.proj={ic:p.wicon,x0:a.bx+(p.i?-28:28),y0:a.y-48,x1:d.bx,y1:d.y-42,t0:p.t0+K.rel,t1:p.t0+K.h}; }
+    if(K.rel&&e>=K.rel&&e<K.h){ a.wpn=null; if(!this.proj&&p.wicon) this.proj={ic:p.wicon,id:p.wid,b:a.b,x0:a.bx+(p.i?-28:28),y0:a.y-48,x1:d.bx,y1:d.y-42,t0:p.t0+K.rel,t1:p.t0+K.h}; }
     if(e<T[0]){ const k=e/T[0]; a.x=a.bx+(p.tx-a.bx)*k; a.air=K.jump?Math.sin(Math.PI*k)*K.jump:0; a.flip=a.flip0; this.setA(a,"dash",p.t0); }
     else if(e<T[1]){ a.x=p.tx; a.air=0; a.flip=a.flip0; this.setA(a,K.a,p.t0+T[0]); }
-    else if(e<T[2]){ a.wpn=null; a.x=p.tx+(a.bx-p.tx)*(e-T[1])/(T[2]-T[1]); a.flip=!a.flip0; this.setA(a,"dash",p.t0+T[1]); }
-    else { a.wpn=null; a.air=0; a.x=a.bx; a.flip=a.flip0; this.setA(a,"idle",c);
+    else if(e<T[2]){ a.x=p.tx+(a.bx-p.tx)*(e-T[1])/(T[2]-T[1]); a.flip=!a.flip0; this.setA(a,"dash",p.t0+T[1]); }
+    else { const heldId=this.eng.f[p.i].held; a.wpn=heldId!==null?{ic:DataEngine.WEAPONS[heldId].icon,id:heldId}:null; a.air=0; a.x=a.bx; a.flip=a.flip0; this.setA(a,"idle",c);
       if(p.prop!=null){ this.ph={k:"prop",t0:c,j:p.prop,sw:0}; return; }
       this.after(c); }
   },
@@ -470,7 +494,7 @@ const Combat={
     this.arTriptyque=renderer.ar;                                            // triptyque d'origine (decors/arene-1..3.jpg)
     renderer.arena=this; renderer.arenaCv=$("#cv-arena"); renderer.tick=c=>this.tick(c);
     this.patchRenderer();
-    OV.reg.combat={pane:"g-combat",onOpen(){ $("#g-combat").classList.remove("pvp-screen"); },onClose(){ $("#g-combat").classList.remove("pvp-screen"); Combat.stop(); }};   // écran de combat pour vagues / endurance
+    OV.reg.combat={pane:"g-combat",onOpen(){ $("#g-combat").classList.remove("pvp-screen"); },onClose(){ $("#g-combat").classList.remove("pvp-screen"); if(typeof Raids!=="undefined") Raids.fermerClassement(); Combat.stop(); }};   // écran de combat pour vagues / endurance
     $$(".speed [data-spd]").forEach(btn=>btn.onclick=()=>{
       if(+btn.dataset.spd===4&&!GameState.illimite){ toast("Vitesse x4 réservée au Pass VIP !"); return; }   // x4 = VIP ou mode dev
       renderer.setSpeed(+btn.dataset.spd); ProfileManager.setSpeed(+btn.dataset.spd); $$(".speed [data-spd]").forEach(x=>x.classList.toggle("active",x===btn)); });   // x1 / x2 / x4

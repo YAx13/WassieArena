@@ -102,7 +102,8 @@ function toggleDevMode(){
       b.skills=DataEngine.SKILLS.map(s=>s.id);
       DataEngine.WEAPONS.forEach(w=>{ GameState.maitriseArmes[w.id]=GameState.MAITRISE_MAX; });
       Object.assign(GameState.ressources,{or:999999,parchemins:999,nourriture:999,pierres:999,caisses:99});
-      if(b.companion){ b.companion.level=CompanionData.LEVEL_CAP; b.companion.form=3; }
+      if(!b.companion) b.companion=CompanionData.create("chien_friche");
+      b.companion.level=CompanionData.LEVEL_CAP; b.companion.form=3;
       ["helmet","chest","boots","necklace"].forEach(part=>["carnage","cyber","mutant"].forEach(set=>b.gear.push({part,rarity:5,set})));
       for(let el=0;el<7;el++) b.gear.push({part:"ring",rarity:5,kind:"el",el});
       ["hp","str","agi","spd"].forEach(stat=>b.gear.push({part:"ring",rarity:5,kind:"stat",stat}));

@@ -275,22 +275,6 @@ const GameState = {
     );
     return true;
   },
-  /* ---- Presets de compétences (1/2/3) ---- */
-  sauverPreset(n){
-    n = +n; if (![1, 2, 3].includes(n) || !this.brute) return false;
-    this.presets[n] = { competences: this.competencesEquipees.slice() }; this.presets.actif = n; this.save(); return true;
-  },
-  chargerPreset(n){
-    n = +n; const p = this.presets[n]; if (!p || !this.brute) return false;
-    this.competencesEquipees = p.competences.filter(id => this.brute.skills.includes(id)).slice(0, this.brute.slotsCompetences);
-    this.presets.actif = n; this.save(); this.rafraichir(); return true;
-  },
-
-  /* ---- Boss : palier atteint par mode ---- */
-  validerPalier(mode, n){
-    if (!(mode in this.boss)) return false;
-    this.boss[mode] = Math.max(this.boss[mode], Math.min(this.PALIERS, this._n(n))); this.save(); return true;
-  },
 
   /* ---- Cargos Wass-E : acheter (GachaShop.PRICE Or → +1 caisse) puis ouvrir ---- */
   brancherCargos(){

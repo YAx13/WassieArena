@@ -5,6 +5,7 @@
 <meta name="theme-color" content="#121315">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Arène des Brutes</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://w3.org' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚔️</text></svg>">
 <link rel="stylesheet" href="css/styles.css">
 <link rel="stylesheet" href="css/character-select.css">
 <link rel="stylesheet" href="css/game-frame.css">
@@ -211,14 +212,6 @@
     </div>
   </div>
 
-  <!-- ===== SOUS-POP-UP : frise d'évolution d'un compagnon (3 formes) ===== -->
-  <div class="pane ov ov-sub" id="g-evo">
-    <div class="ov-box">
-      <div class="ov-bar"><span class="termbar" id="evo-title">Évolutions</span><button class="btn ov-close" data-close>✕ Fermer</button></div>
-      <div id="evo-body"></div>
-    </div>
-  </div>
-
   <!-- ===== OVERLAY GÉNÉRIQUE DES BOSS (Armes / Parchemins / Familier / Mondial) =====
        Le fond dépend de la classe .mode-xxx et de l'image définie dans BossModes. -->
   <div class="pane ov" id="g-boss">
@@ -243,6 +236,7 @@
 <script src="js/systems/combat.js"></script>
 <script src="js/ui/devlayout.js"></script>
 <script src="js/ui/caserne.js"></script>
+<script src="js/ui/stats.js"></script>
 <script src="js/systems/pvp.js"></script>
 <script src="js/systems/raids.js"></script>
 <script src="js/ui/renderer.js"></script>

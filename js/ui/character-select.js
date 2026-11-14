@@ -118,13 +118,6 @@ const CharacterSelect = (() => {
     for (let i = 0; i < n; i++) h += `<i class="${i < f ? "on" : ""}"></i>`;
     return h + "</div>";
   }
-  function skillBlock(b){
-    const D = DataEngine;
-    return `<div class="skills">` + b.skills.slice(0, 1).map(id => {
-      const k = D.SKILLS[id], c = D.EL_COL[k.el];
-      return `<span class="sk" style="--c:${c}" title="${k.desc}"><i>${D.EL_ICON[k.el]}</i>${k.name}<small>${D.ELEMENTS[k.el]} · ${{ A: "Attaque", C: "Contrôle", S: "Soutien" }[k.t]} — ${k.desc}</small></span>`;
-    }).join("") + `</div>`;
-  }
   function statBlock(stats){
     return [["HP", "hp"], ["Force", "str"], ["Agilité", "agi"], ["Vitesse", "spd"]].map(([l, k]) =>
       `<div class="stat"><div class="row"><span class="lbl">${l}</span>${seg(stats[k], 10, k)}</div></div>`
@@ -150,7 +143,7 @@ function rollLoot(b){
 
   /* ---------- Affichage ---------- */
   function redrawAvatars(){
-    QA("#avatars canvas").forEach((cv, i) => { if (st.cands[i]) renderer.drawBrute(cv.getContext("2d"), st.cands[i], 0); });
+    showCand();
   }
   function flickerSigns(){
     QA("#screen-select .neon-sign").forEach(el => {

@@ -4,7 +4,6 @@ C:.
 |   .gitattributes
 |   help.webm
 |   index.html
-|   index.txt
 |   Structure-update.cmd
 |   
 +---assets
@@ -85,6 +84,9 @@ C:.
 |   |   +---competence
 |   |   |       background.jpeg
 |   |   |       
+|   |   +---equipement
+|   |   |       background.jpeg
+|   |   |       
 |   |   +---pvp
 |   |   |   |   nuclear-1.jpeg
 |   |   |   |   nuclear-2.jpeg
@@ -119,6 +121,50 @@ C:.
 |   |   |   |       
 |   |   |   \---zeus
 |   |   |           pvpPreview.jpeg
+|   |   |           
+|   |   +---stats
+|   |   |   |   greybox-pilier.jpg
+|   |   |   |   greybox.jpg
+|   |   |   |   pillar-test.txt
+|   |   |   |   prompt-add-pillar.txt
+|   |   |   |   prompt-indoor.txt
+|   |   |   |   prompt-outdoor.txt
+|   |   |   |   
+|   |   |   +---empereur
+|   |   |   |       background.jpeg
+|   |   |   |       background.jpg
+|   |   |   |       
+|   |   |   +---frankenstein
+|   |   |   |       background.jpeg
+|   |   |   |       background.jpg
+|   |   |   |       
+|   |   |   +---general
+|   |   |   |       background.jpeg
+|   |   |   |       background.jpg
+|   |   |   |       
+|   |   |   +---hazmat
+|   |   |   |       background.jpeg
+|   |   |   |       background.jpg
+|   |   |   |       
+|   |   |   +---human
+|   |   |   |       background.jpeg
+|   |   |   |       background.jpg
+|   |   |   |       
+|   |   |   +---inversebrah
+|   |   |   |       background.jpeg
+|   |   |   |       background.jpg
+|   |   |   |       
+|   |   |   +---momie
+|   |   |   |       background.jpeg
+|   |   |   |       background.jpg
+|   |   |   |       
+|   |   |   +---samourai
+|   |   |   |       background.jpeg
+|   |   |   |       background.jpg
+|   |   |   |       
+|   |   |   \---zeus
+|   |   |           background.jpeg
+|   |   |           background.jpg
 |   |   |           
 |   |   \---train
 |   |       +---empereur
@@ -431,6 +477,12 @@ C:.
 |       |       compagnon cell.txt
 |       |       image_ff637b67.jpg
 |       |       
+|       +---prompt background stats
+|       |       image (26).jpg
+|       |       image (27).jpg
+|       |       image (28).jpg
+|       |       image (29).jpg
+|       |       
 |       \---spritesheet
 |           |   prompt boss.txt
 |           |   prompt PLANCHE 1.txt
@@ -471,13 +523,22 @@ C:.
 |           
 \---raw
     |   A UTILISER.jpeg
+    |   background.jpeg
     |   background.jpg
     |   dog.jpeg
     |   equipement.jpeg
+    |   ezfzf.jpg
     |   fond.txt
     |   image_207d3a66.jpeg
+    |   image_303c4f80.jpeg
     |   image_3488da6e.jpeg
+    |   image_3b249ba7.jpeg
+    |   image_45046913.jpeg
+    |   image_4b74f55c.jpeg
+    |   image_4bb68da9.jpeg
+    |   image_5c838f96.jpeg
     |   image_6d6b5f1a.jpeg
+    |   image_a3678038.jpeg
     |   ours-3.jpeg
     |   starter.jpeg
     |   

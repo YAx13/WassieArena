@@ -115,9 +115,9 @@ const TRAIN={
     this.pickDecor(0);
 
     document.addEventListener("keydown",e=>{
-      const cv=$("#cv-train"); if(!cv||!cv.offsetParent) return; if(/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName)&&e.key!==" ") return;
+      const cv=$("#g-train #cv-train"); if(!cv||!cv.offsetParent) return; if(/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName)&&e.key!==" ") return;
       if(e.key==="ArrowLeft"){ e.preventDefault(); this.pick(this.idx-1); } else if(e.key==="ArrowRight"){ e.preventDefault(); this.pick(this.idx+1); } else if(e.key===" "){ e.preventDefault(); this.play(this.cur); } });
-    this.cv=$("#cv-train"); this.cv.getContext("2d").imageSmoothingEnabled=false;
+    this.cv=$("#g-train #cv-train"); this.cv.getContext("2d").imageSmoothingEnabled=false;
     requestAnimationFrame(t=>this.tick(t));
   },
   open(){
@@ -139,9 +139,22 @@ const TRAIN={
     this.D.b.sprite=k; this.D.b.name=this.D.name=this.keyName(k);
     this.A.V=on?[this.F,this.D]:[this.F];
   },
-  setWpn(){ const i=+$("#tr-wpn").value; this.F.wpn=i<0?null:{id:i,ic:DataEngine.WEAPONS[i].icon}; this.F.b.weapons=i<0?[]:[i]; },
+  setWpn(){
+    const i=+$("#tr-wpn").value;
+    this.F.wpn=i<0?null:{id:i,ic:DataEngine.WEAPONS[i].icon};
+    this.F.b.weapons=i<0?[]:[i];
+    this.A.proj=null;
+    const style=i>=0?(DataEngine.WEAPON_STYLE[i]||"estoc"):"punch";
+    const map={estoc:"thrust",overhead:"overhead",throw:"throw"};
+    $$("#tr-anims .tr-a").forEach(btn=>{
+      const an=btn.dataset.a, isAtk=["punch","thrust","overhead","throw"].includes(an);
+      btn.style.opacity=(i>=0&&isAtk&&an!==map[style])?"0.35":"1";
+    });
+    if(i>=0) this.play(map[style]);
+  },
   play(a){
-    this.cur=a; const F=this.F; F.anim=a; F.t0=this.clock; F.hp=a==="death"?0:F.max; if(a==="hit") F.flash0=this.clock;
+    this.cur=a; const F=this.F; F.anim=a; F.t0=this.clock; F.x=F.bx; F.air=0; F.flip=F.flip0; F.hp=a==="death"?0:F.max; if(a==="hit") F.flash0=this.clock;
+    const wi=+$("#tr-wpn").value; F.wpn=wi<0?null:{id:wi,ic:DataEngine.WEAPONS[wi].icon}; this.A.proj=null;
   },
   pickDecor(i){
     const n = this.decorList.length;
@@ -161,9 +174,6 @@ const TRAIN={
         if (this.A) {
           this.A.pan = 0;
           this.A.customBg = img;
-        }
-        if (typeof renderer !== "undefined") {
-          renderer.ar = [img, img, img];
         }
       };
 
@@ -196,15 +206,29 @@ const TRAIN={
     const cv=this.cv;
     if(cv&&cv.offsetParent){
       if(!this.paused) this.clock+=dt*this.mult;
-      const F=this.F, A=CanvasRenderer.ANIMS[F.anim]||CanvasRenderer.ANIMS.idle, L=A.f?A.f.length:4, dur=L/A.fps*1000;
-      if($("#tr-auto").checked && !A.loop && F.anim!=="idle" && this.clock-F.t0>dur+500) this.play(this.cur);
+      const F=this.F, D=this.D, el=this.clock-F.t0, isMelee=["punch","thrust","overhead","uppercut","pierce","meteor"].includes(this.cur), isThrow=["throw","salto"].includes(this.cur);
+      if(isMelee && $("#tr-dummy").checked){
+        const tx=F.flip0?D.bx+46:D.bx-46;
+        if(el<260){ const k=el/260; F.x=F.bx+(tx-F.bx)*k; F.air=["overhead","meteor"].includes(this.cur)?Math.sin(Math.PI*k)*24:0; F.anim="dash"; F.flip=F.flip0; }
+        else if(el<780){ F.x=tx; F.air=0; F.flip=F.flip0; if(F.anim!==this.cur){ F.anim=this.cur; F.t0=this.clock; } }
+        else if(el<1040){ const k=(el-780)/260; F.x=tx+(F.bx-tx)*k; F.anim="dash"; F.flip=!F.flip0; }
+        else { F.x=F.bx; F.air=0; F.flip=F.flip0; F.anim="idle"; if($("#tr-auto").checked && el>1450) this.play(this.cur); }
+      } else if(isThrow && $("#tr-dummy").checked){
+        F.x=F.bx; F.flip=F.flip0;
+        if(el<550){ if(F.anim!==this.cur){ F.anim=this.cur; F.t0=this.clock; } if(el>=220&&F.wpn){ this.A.proj={ic:F.wpn.ic,id:F.wpn.id,b:F.b,x0:F.bx+(F.flip0?-28:28),y0:F.y-48,x1:D.bx,y1:D.y-42,t0:this.clock,t1:this.clock+300}; F.wpn=null; } }
+        else { F.anim="idle"; if(el>950){ const wi=+$("#tr-wpn").value; if(wi>=0) F.wpn={id:wi,ic:DataEngine.WEAPONS[wi].icon}; this.A.proj=null; if($("#tr-auto").checked) this.play(this.cur); } }
+      } else {
+        F.x=F.bx; F.air=0; F.flip=F.flip0;
+        const A=CanvasRenderer.ANIMS[F.anim]||CanvasRenderer.ANIMS.idle, L=A.f?A.f.length:4, dur=L/A.fps*1000;
+        if($("#tr-auto").checked && !A.loop && F.anim!=="idle" && el>dur+500) this.play(this.cur);
+      }
+      const A=CanvasRenderer.ANIMS[F.anim]||CanvasRenderer.ANIMS.idle, L=A.f?A.f.length:4;
       const nRaw=Math.floor((this.clock-F.t0)*A.fps/1000), fr=A.loop?nRaw%L:Math.min(nRaw,L-1);
       const fin=!A.loop&&F.anim!=="death"&&nRaw>=L;
       const sh=A.s, ok=this.hasSheet(this.keys[this.idx],sh);
       $("#tr-info").textContent=this.keyName(this.keys[this.idx])+" · "+this.cur+" · planche "+(sh==="base"?"base (P1)":sh+(ok?" (dédiée)":" (absente → P1)"))+" · image "+(fin?"—":(fr+1)+"/"+L)+(this.paused?" · PAUSE":"");$$("#tr-anims .tr-a").forEach(b=>b.classList.toggle("on",b.dataset.a===this.cur));
-// Lance le rendu graphique officiel avec les données de map synchronisées
-renderer.drawArena(cv.getContext("2d"),this.A,this.clock);
-}
-requestAnimationFrame(t2=>this.tick(t2));
-}
+      renderer.drawArena(cv.getContext("2d"),this.A,this.clock);
+    }
+    requestAnimationFrame(t2=>this.tick(t2));
+  }
 };

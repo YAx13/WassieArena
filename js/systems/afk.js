@@ -80,10 +80,11 @@ const AFKMode={
     this._bgKey=k;
 
     const tryExt=(exts)=>{
-    if(!exts.length){ this.stage.style.setProperty("--afk-bg-img",AFK_ASSETS.BG_IMAGE?"url('"+new URL(encodeURI(AFK_ASSETS.BG_IMAGE),document.baseURI).href+"')":"none"); this.bgWidth=1376; this.bgHeight=768; this.fitStage(); return; }
+      if(this._bgKey!==k) return;
+      if(!exts.length){ this.stage.style.setProperty("--afk-bg-img",AFK_ASSETS.BG_IMAGE?"url('"+new URL(encodeURI(AFK_ASSETS.BG_IMAGE),document.baseURI).href+"')":"none"); this.bgWidth=1376; this.bgHeight=768; this.fitStage(); return; }
       const p = assetPath.afk(k, 1, exts[0]);
       const im=new Image();
-      im.onload=()=>{ this.stage.style.setProperty("--afk-bg-img","url('"+im.src+"')"); this.bgWidth=im.naturalWidth; this.bgHeight=im.naturalHeight; this.fitStage(); };
+      im.onload=()=>{ if(this._bgKey!==k) return; this.stage.style.setProperty("--afk-bg-img","url('"+im.src+"')"); this.bgWidth=im.naturalWidth; this.bgHeight=im.naturalHeight; this.fitStage(); };
       im.onerror=()=>tryExt(exts.slice(1));
       im.src=p;
     };
@@ -185,8 +186,7 @@ const AFKMode={
     Object.assign(e.style,{position:"absolute",left:x+"px",top:y+"px",pointerEvents:"none",zIndex:"9999",
       transition:"all "+(ms/1000)+"s steps(4)"},css);
     parent.appendChild(e);
-    void e.offsetWidth;                                      // force le reflow : sans ça la transition peut ne jamais démarrer
-    Object.assign(e.style,to);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{ if(e.isConnected) Object.assign(e.style,to); }));
     setTimeout(()=>e.remove(),ms+30);
   },
   step(dt){

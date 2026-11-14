@@ -773,13 +773,15 @@ function renderFiche(b){
       `<span class="holo-arrow" data-holo="ar1">➜</span>`,
       `<div class="holo-step st2 ${unlockedForm>1?"owned":"locked"}" data-holo="st2"><canvas class="comp-cv" width="64" height="64" data-art="${E(DataEngine.getCompanionArt(key,2))}"></canvas><span class="holo-lbl">${E(f.stages[1])}<small>Niv. ${CompanionData.EVO_LEVELS[1]}</small></span></div>`,
       `<span class="holo-arrow" data-holo="ar2">➜</span>`,
-      `<div class="holo-step st3 ${unlockedForm>2?"owned":"locked"}" data-holo="st3"><canvas class="comp-cv" width="64" height="64" data-art="${E(DataEngine.getCompanionArt(key,3))}"></canvas><span class="holo-lbl">${E(f.stages[2])}<small>Niv. ${CompanionData.EVO_LEVELS[2]}</small></span></div>`
+      `<div class="holo-step st3 ${unlockedForm>2?"owned":"locked"}" data-holo="st3"><canvas class="comp-cv" width="64" height="64" data-art="${E(DataEngine.getCompanionArt(key,3))}"></canvas><span class="holo-lbl">${E(f.stages[2])}<small>Niv. ${CompanionData.EVO_LEVELS[2]}</small></span></div>`,
+      `<div id="evo-body" style="position:absolute;left:50%;bottom:10px;transform:translateX(-50%);width:min(360px,92%);z-index:10;pointer-events:auto;background:rgba(10,8,6,.88);border-radius:4px"></div>`
     ].join("");
     holo.classList.remove("hidden");
     holo.querySelectorAll("[data-holo]").forEach(el=>{
       const pos=holoPositions.find(p=>p.id===el.dataset.holo);
       if(pos) applyHoloItemPos(el,pos);
     });
+    if(typeof CaserneUI!=="undefined") CaserneUI.attacherEvo(key);
   };
   if(compPanel&&!holo){
     holo=document.createElement("div");
@@ -838,7 +840,9 @@ function renderFiche(b){
   if(holo){
     holo.classList.toggle("is-editing",compEditing);
     if(compEditing){ showHolo(holo.dataset.fam||CompanionData.FAMILIES[0].key); }
-    else if(!holo.dataset.fam){ holo.classList.add("hidden"); }
+    else if(holo.dataset.fam){ showHolo(holo.dataset.fam); }
+    else if(cf){ showHolo(cf.key); }
+    else { holo.classList.add("hidden"); }
   }
   if(!window._compIdleLoop){
     window._compIdleLoop=true;

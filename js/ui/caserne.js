@@ -10,136 +10,11 @@
    ===================================================================== */
 const CaserneUI = {
   NIV_SLOTS: [1, 5, 10],        // niveau requis pour les slots 1, 2, 3
-  STAT_CAP: 250,                // plafond des stats de base
-  MAX_ACHATS_STATS: 100,        // nombre maximum d'entraînements mutagènes
   ARME_SELECTOR: "[data-arme],[data-weapon],[data-weapon-id]",  // éléments de l'UI représentant une arme possédée (id lu dans data-arme / data-weapon / data-weapon-id)
   _ok: false,
     _lastChestHTML: "",
   Q(s){ return document.querySelector(s); },
   esc(s){ return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); },
-
-  /* ---------- 1. ENTRAÎNEMENT MUTAGÈNE ---------- */
-  coutEntrainement(){ return Math.floor(40 * Math.pow(1.08, GameState.achatsStats)); },
-  entrainementMax(){ return GameState.achatsStats >= this.MAX_ACHATS_STATS; },
-  entrainer(){
-    const b = S.cur; if (!b) return;
-    if (this.entrainementMax()) { toast("Entraînement maximum atteint (" + this.MAX_ACHATS_STATS + " achats)."); return; }
-    const ouvertes = ["hp", "str", "agi", "spd"].filter(k => b.stats[k] < this.STAT_CAP);
-    if (!ouvertes.length) { toast("Toutes les stats sont au maximum (" + this.STAT_CAP + ")."); return; }
-    const cout = this.coutEntrainement();
-    if (!depenserRessource("or", cout)) { toast("Or insuffisant (" + cout + " requis)."); return; }
-    const k = DataEngine.pick(ouvertes), nom = { hp: "Vie", str: "Force", agi: "Agilité", spd: "Rapidité" }[k];
-    b.stats[k]++; GameState.achatsStats++;
-    this.lancerAnimTrain(k);
-    persist(); toast("Entraînement : +1 " + nom + " !");
-  },
-  initTrainRoom(t, b){
-    if (!t.dataset.ready) {
-      t.dataset.ready = "1";
-      t.innerHTML = `<canvas id="cv-train" width="520" height="150"></canvas><button type="button" class="train-sign" title="Entraînement mutagène (+1 stat aléatoire)"></button>`;
-      t.querySelector(".train-sign").onclick = e => { e.stopPropagation(); if (!this._statsEditing) this.entrainer(); };
-      this._trainQ = []; this._trainRun = null; this._trainHit = null;
-      const loop = now => {
-        const cv = this.Q("#cv-train");
-        if (cv && cv.offsetParent && S.cur) this.drawTrainRoom(cv.getContext("2d"), S.cur, now);
-        requestAnimationFrame(loop);
-      };
-      requestAnimationFrame(loop);
-    }
-  },
-  lancerAnimTrain(stat){
-    if (!this._trainQ) this._trainQ = [];
-    this._trainQ.push(stat);
-  },
-  drawTrainRoom(ctx, b, now){
-    const W = 520, H = 150, FLOOR_Y = 128;
-    ctx.clearRect(0, 0, W, H);
-    ctx.imageSmoothingEnabled = false;
-
-    // 4 bornes d'entraînement holographiques sur le tapis (Force, Vie, Agilité, Rapidité)
-    const STATIONS = [
-      { key: "str", x: 195, icon: "💪", col: "#ff6b6b" },
-      { key: "hp",  x: 280, icon: "❤️", col: "#ff922b" },
-      { key: "agi", x: 365, icon: "🌀", col: "#4ff0e6" },
-      { key: "spd", x: 450, icon: "⚡", col: "#ffe066" }
-    ];
-    const DUMMY_X = { str: 195, hp: 280, agi: 365, spd: 450 }, HOME_X = 68, REACH = 38;
-
-    STATIONS.forEach(st => {
-      const hitNow = this._trainHit && this._trainHit.st === st.key && (now - this._trainHit.t0 < 320);
-      const wobble = hitNow ? Math.sin((now - this._trainHit.t0) * 0.06) * 5 : 0;
-      ctx.save();
-      ctx.translate(st.x + wobble, FLOOR_Y);
-      // Socle & poteau
-      ctx.fillStyle = "rgba(0,0,0,0.55)";
-      ctx.fillRect(-16, -4, 32, 6);
-      ctx.fillStyle = "#3a4552";
-      ctx.fillRect(-3, -44, 6, 40);
-      // Cible lumineuse
-      ctx.fillStyle = "rgba(8,18,24,0.88)";
-      ctx.strokeStyle = hitNow ? "#fff" : st.col;
-      ctx.lineWidth = 2;
-      ctx.fillRect(-14, -68, 28, 26);
-      ctx.strokeRect(-14, -68, 28, 26);
-      ctx.font = "15px sans-serif";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText(st.icon, 0, -55);
-      ctx.restore();
-    });
-
-    let r = this._trainRun;
-    if (!r && this._trainQ && this._trainQ.length) {
-      const st = this._trainQ.shift();
-      r = this._trainRun = { st, phase: "to", x: HOME_X, tx: DUMMY_X[st] || 280, t0: now };
-    }
-    let px = HOME_X, flip = false, anim = "idle";
-    if (r) {
-      const dt = Math.min(50, now - (r.last || now)); r.last = now;
-      if (r.phase === "to") {
-        anim = "run"; flip = false; r.x += dt * 0.34;
-        if (r.x >= r.tx - REACH) { r.x = r.tx - REACH; r.phase = "hit"; r.t0 = now; this._trainHit = { st: r.st, x: r.tx, t0: now }; }
-      } else if (r.phase === "hit") {
-        anim = "atk"; flip = false;
-        if (now - r.t0 > 260) {
-          if (this._trainQ.length) {
-            const st = this._trainQ.shift();
-            r.st = st; r.tx = DUMMY_X[st] || 280; r.phase = r.x <= r.tx - REACH ? "to" : "back";
-          } else { r.phase = "back"; }
-        }
-      } else if (r.phase === "back") {
-        anim = "run"; flip = true; r.x -= dt * 0.34;
-        if (r.x <= HOME_X) { this._trainRun = null; r = null; }
-      }
-      if (r) px = r.x;
-    }
-
-    // Dessin du mini-brawler qui court sur le tapis
-    if (typeof renderer !== "undefined" && renderer.drawBrute) {
-      const off = this._trainOff || (this._trainOff = Object.assign(document.createElement("canvas"), { width: 64, height: 64 }));
-      renderer.drawBrute(off.getContext("2d"), b, now, anim);
-      ctx.save();
-      ctx.translate(Math.round(px - 36), FLOOR_Y - 70);
-      if (flip) { ctx.translate(72, 0); ctx.scale(-1, 1); }
-      ctx.drawImage(off, 0, 0, 64, 64, 0, 0, 72, 72);
-      ctx.restore();
-    }
-
-    // Impact + "+1" flottant au-dessus de la borne frappée
-    if (this._trainHit && now - this._trainHit.t0 < 750) {
-      const p = (now - this._trainHit.t0) / 750;
-      const nom = { str: "+1 FORCE", hp: "+1 VIE", agi: "+1 AGILITÉ", spd: "+1 RAPIDITÉ" }[this._trainHit.st] || "+1";
-      ctx.save();
-      ctx.globalAlpha = 1 - p;
-      ctx.font = "bold 13px monospace";
-      ctx.textAlign = "center";
-      ctx.strokeStyle = "#000"; ctx.lineWidth = 3;
-      ctx.strokeText(nom, this._trainHit.x, 42 - p * 22);
-      ctx.fillStyle = "#7ffcf4";
-      ctx.fillText(nom, this._trainHit.x, 42 - p * 22);
-      ctx.restore();
-    }
-  },
 
   /* ---------- 3. COMPÉTENCES : slots, presets, parchemins ---------- */
   slotsOuverts(){ return S.cur.slotsCompetences; },                       // 1 / 2 / 3 selon le niveau (state.js)
@@ -271,25 +146,8 @@ const CaserneUI = {
 
   /* ---------- Rendu des ajouts dans la Caserne (appelé après chaque renderFiche) ---------- */
   render(){
-    const b = S.cur; if (!b || !this.Q("#cs-train")) return;
+    const b = S.cur; if (!b || !this.Q("#cs-skills")) return;
     const D = DataEngine, GS = GameState, eq = this.equipees(), R = GS.ressources, E = this.esc;
-    // Entraînement (salle interactive)
-    const cout = this.coutEntrainement(), t = this.Q("#cs-train"), maxA = this.entrainementMax();
-    this.initTrainRoom(t, b);
-    const sign = t.querySelector(".train-sign");
-    if (sign) {
-      sign.innerHTML = maxA
-        ? `<span class="train-max">MAX (${GS.achatsStats}/${this.MAX_ACHATS_STATS})</span>`
-        : `<span class="train-price">💰 ${cout.toLocaleString("fr-FR")}</span><span class="train-cnt">${GS.achatsStats}/${this.MAX_ACHATS_STATS}</span>`;
-      sign.classList.toggle("disabled", maxA || R.or < cout);
-    }
-    const statsGold = this.Q("#cs-stats-gold");
-    if (statsGold) statsGold.textContent = "🪙 " + R.or.toLocaleString("fr-FR") + " Or";
-    // Puissance (haut de l'onglet Stats)
-    const pw = this.Q("#cs-power");
-    if (pw) pw.textContent = `⚔️ ${(typeof calculerPuissance === "function" ? calculerPuissance() : 0).toLocaleString("fr-FR")}`;
-    this.applyStatsLayout();
-    if (this._syncStatsDev) this._syncStatsDev();
     // Rang de maîtrise (+1, +2…) sur les armes possédées
     const maitrise = GS.maitriseArmes || {};
     document.querySelectorAll(this.ARME_SELECTOR).forEach(el => {
@@ -486,9 +344,9 @@ const CaserneUI = {
     const res = CompanionData.gainXp(c, 50);
     persist();
     toast(res.evolved ? `✨ ${c.name} évolue en Forme ${res.form} !` : res.levels > 0 ? `🐾 ${c.name} passe niveau ${c.level} !` : `🍖 +50 XP (${c.xp}/${c.xpMax})`);
-    openEvo(key);
+    renderGame();
   },
-  peutForme3(c){ return c && c.form === 2 && c.level >= CompanionData.EVO_LEVELS[2] && GameState.ressources.pierres >= 1; },
+  peutForme3(c){ return c && c.form === 2 && c.level >= CompanionData.EVO_LEVELS && GameState.ressources.pierres >= 1; },
   evoluerForme3(key){
     const c = S.cur && S.cur.companion;
     if (!c) { toast("Aucun compagnon actif."); return; }
@@ -498,19 +356,20 @@ const CaserneUI = {
     CompanionData.transmute(c);
     persist();
     toast(`💎 Transmutation réussie : ${c.name} (Forme Légendaire) !`);
-    openEvo(key);
+    renderGame();
   },
   attacherEvo(key){                                                           // ajoute le panneau sous la frise existante
     const f = CompanionData.FAMILIES.find(x => x.key === key), c = S.cur && S.cur.companion, body = this.Q("#evo-body");
     if (!f || !c || CompanionData.family(c) !== f || !body) return;
-    const R = GameState.ressources, max = CompanionData.LEVEL_CAP, nivReq = CompanionData.EVO_LEVELS[2], form = c.form || 1;
+    const R = GameState.ressources, max = CompanionData.LEVEL_CAP, nivReq = CompanionData.EVO_LEVELS, form = c.form || 1;
     const box = document.createElement("div"); box.className = "cs-evo";
     let h = `<div class="cs-evo-h"><b>${this.esc(c.name)}</b> · Forme ${form} · niv. ${c.level}/${max}${c.level < max ? " · XP " + c.xp + "/" + c.xpMax : ""}</div>`;
-    h += `<button class="btn" id="cs-feed" ${c.level >= max || R.nourriture < 1 ? "disabled" : ""}>🍖 Nourrir : +1 niveau (1 Nourriture · vous : ${R.nourriture})</button>`;
-    if (form >= 3) h += `<p class="cs-note">✔ Forme finale atteinte.</p>`;
-    else {
+    h += `<button class="btn" id="cs-feed" ${c.level >= max || R.nourriture < 1 ? "disabled" : ""}>🍖 Nourrir : +50 XP (1 Nourriture · vous : ${R.nourriture})</button>`;
+    if (form === 3) {
+      h += `<p class="cs-note">✨ Forme Légendaire atteinte !</p>`;
+    } else {
       const ok = this.peutForme3(c);
-      h += `<button class="btn gold" id="cs-f3" ${ok ? "" : "disabled"}>🔮 Évolution finale : Forme 3 (1 Pierre de Transmutation · vous : ${R.pierres})</button>`;
+      h += `<button class="btn gold" id="cs-f3" ${ok ? "" : "disabled"}>💎 Évolution finale (Forme 3)</button>`;
       if (!ok) h += `<p class="cs-note">Conditions : niveau ${nivReq} (actuel ${c.level}) et 1 Pierre de Transmutation (vous : ${R.pierres}).</p>`;
     }
     box.innerHTML = h; body.appendChild(box);
@@ -563,46 +422,9 @@ const CaserneUI = {
       + "#cs-equip-stage.is-editing [data-eq-item]{outline:1px dashed #f2b21c !important;background:rgba(242,178,28,.16) !important;cursor:grab !important;z-index:25;touch-action:none}"
       + "#cs-equip-stage.is-editing [data-eq-item]:active{cursor:grabbing !important}"
       + "#cs-equip-stage.is-editing [data-eq-item]>*{pointer-events:none}"
-      + ".fx-panel.fx-hero{position:relative;flex:1;min-height:0;padding:0 !important;overflow:hidden;background:transparent !important;border:none !important;display:flex;align-items:center;justify-content:center}"
-      + "#cs-stats-stage{position:relative;height:100%;width:auto;max-width:100%;aspect-ratio:1408/752;background-size:100% 100%;background-repeat:no-repeat;margin:0 auto;overflow:hidden;user-select:none}"
-      + "#cs-stats-stage.is-editing [data-st-item]{outline:1px dashed #f2b21c !important;background:rgba(242,178,28,.12) !important;cursor:grab !important;z-index:25;touch-action:none}"
-      + "#cs-stats-stage.is-editing [data-st-item]:active{cursor:grabbing !important}"
-      + "#cs-stats-stage.is-editing [data-st-item]>*{pointer-events:none}"
-      + "#cs-stats-stage .fx-avatar{width:auto;height:auto;background:transparent !important;border:none !important;box-shadow:none !important;display:flex !important;align-items:center;justify-content:center}"
-      + "#cs-stats-stage .fx-avatar::after{content:'';position:absolute;inset:8% 14%;border-radius:50%;background:repeating-linear-gradient(0deg,rgba(79,240,230,.12) 0 1px,transparent 1px 4px);mix-blend-mode:screen;pointer-events:none;opacity:.55}"
-      + "#cs-stats-stage .fx-avatar canvas{width:100% !important;height:100% !important;image-rendering:pixelated;filter:contrast(1.06) saturate(.94) drop-shadow(0 8px 6px rgba(0,0,0,.9)) drop-shadow(0 0 10px rgba(79,240,230,.45))}"
-      + "#cs-hero-plate{display:flex !important;flex-direction:column;align-items:center;gap:2px;padding:3px 10px;background:rgba(5,16,20,.85);border:1px solid rgba(79,240,230,.48);border-radius:2px;box-shadow:0 0 12px rgba(79,240,230,.25),inset 0 0 8px rgba(0,0,0,.9);text-align:center;z-index:12}"
-      + "#cs-hero-plate #fx-name-row{display:flex !important;align-items:center;justify-content:center;gap:5px;margin:0 !important}"
-      + "#cs-hero-plate #fx-name{display:block !important;font:bold clamp(11px,1.2vw,16px)/1.1 Impact,sans-serif !important;color:#fff !important;text-shadow:0 0 8px rgba(79,240,230,.85);letter-spacing:.7px;white-space:nowrap}"
-      + "#cs-hero-plate #fx-rename{width:auto !important;height:auto !important;min-width:0 !important;min-height:0 !important;padding:1px 4px !important;font-size:10px !important;line-height:1 !important;background:rgba(79,240,230,.15) !important;border:1px solid #4ff0e6 !important;color:#7ffcf4 !important}"
-      + "#cs-hero-plate #fx-tag{display:block !important;margin:0 !important;font:bold clamp(8px,0.75vw,10px)/1.1 monospace !important;color:#7ffcf4 !important;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap}"
-      + "#cs-stats-stage .fx-hero-actions{position:absolute;display:flex !important;gap:5px;z-index:18}"
-      + "#cs-stats-stage .fx-hero-actions button{width:auto !important;height:auto !important;min-height:0 !important;padding:4px 7px !important;font-size:13px !important;line-height:1 !important}"
-      + "#cs-stats-crt{display:flex !important;flex-direction:column;justify-content:space-between;gap:5px;padding:8px 10px;box-sizing:border-box;background:repeating-linear-gradient(0deg,rgba(79,240,230,.04) 0 1px,transparent 1px 3px);color:#9cf9ff;font:11px/1.2 monospace !important;overflow:hidden;z-index:10}"
-      + ".cs-crt-top{display:flex !important;justify-content:space-between;align-items:center;gap:6px;border-bottom:1px solid rgba(79,240,230,.28);padding-bottom:3px}"
-      + ".cs-crt-power{font:bold clamp(10px,0.95vw,13px)/1.1 monospace !important;color:#ffd77a !important;text-shadow:0 0 6px rgba(255,190,40,.75);white-space:nowrap}"
-      + ".cs-crt-gold{color:#7ffcf4 !important;font:bold clamp(10px,0.9vw,12px)/1.1 monospace !important;white-space:nowrap}"
-      + "#cs-stats-crt .fx-vitals{display:flex !important;align-items:center;justify-content:space-between;gap:8px;margin:0 !important;padding:4px 6px;background:rgba(4,16,20,.82);border:1px solid rgba(79,240,230,.35)}"
-      + "#cs-stats-crt .fx-lv{flex:1;display:flex !important;align-items:center;gap:6px;margin:0 !important}"
-      + "#cs-stats-crt .fx-lvt{font:bold 10px/1.1 monospace !important;color:#7ffcf4 !important;white-space:nowrap}"
-      + "#cs-stats-crt .fx-xp{position:relative;flex:1;height:11px !important;background:#061014;border:1px solid #356570}"
-      + "#cs-stats-crt .fx-xp i{display:block;height:100%;background:linear-gradient(90deg,#25b8c4,#7ffcf4);box-shadow:0 0 6px #4ff0e6}"
-      + "#cs-stats-crt .fx-xp span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8.5px !important;color:#fff;text-shadow:0 1px 2px #000}"
-      + "#cs-stats-crt .fx-pv{margin:0 !important;font-size:10px !important;color:#ff8a8a !important;white-space:nowrap}"
-      + "#cs-stats-crt .fx-stats{display:grid !important;grid-template-columns:1fr 1fr;gap:5px 8px;margin:0 !important;flex:1;min-height:0}"
-      + "#cs-stats-crt .fx-stat{display:flex !important;flex-direction:column;justify-content:center;padding:4px 7px !important;min-height:0 !important;background:rgba(4,16,20,.85) !important;border:1px solid rgba(79,240,230,.35) !important;border-radius:2px}"
-      + "#cs-stats-crt .fx-stat:hover{border-color:#7ffcf4}"
-      + "#cs-stats-crt .fx-sl{display:flex !important;justify-content:space-between;font-size:10px !important;margin-bottom:3px}"
-      + "#cs-stats-crt .seg{display:flex !important;gap:2px;height:7px !important}"
-      + "#cs-stats-crt .seg{display:flex !important;gap:2px;height:7px !important}"
-      + ".cs-train-track{position:relative;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;background:rgba(8,10,12,.68)}"
-      + ".cs-train-track canvas{width:100% !important;height:100% !important;display:block;image-rendering:pixelated}"
-      + ".cs-train-track .train-sign{position:absolute;top:6px;left:8px;width:auto !important;height:auto !important;min-height:0 !important;padding:3px 8px !important;background:rgba(12,9,6,.92);border:1px solid #ffb000;color:#ffe27a;font:bold 10px monospace !important;cursor:pointer;box-shadow:0 0 10px rgba(255,176,0,.45);z-index:5}"
-      + ".cs-train-track .train-sign:hover:not(.disabled){background:#382208;color:#fff;box-shadow:0 0 16px rgba(255,176,0,.85)}"
-      + ".cs-train-track .train-sign.disabled{opacity:.48;cursor:not-allowed;box-shadow:none}"
-      + ".fx-equip-tab .csd-corner-bar,.fx-panel.fx-hero .csd-corner-bar{position:absolute;right:12px;bottom:12px;z-index:30;display:flex;gap:5px;align-items:center}"
-      + ".fx-equip-tab .csd-corner-btn,.fx-panel.fx-hero .csd-corner-btn{width:auto !important;height:auto !important;min-height:0 !important;padding:5px 10px !important;font-size:11px !important;line-height:1.2 !important}"
-      + ".fx-equip-tab .csd-corner-mini,.fx-panel.fx-hero .csd-corner-mini{width:auto !important;height:auto !important;min-height:0 !important;padding:5px 8px !important;font-size:11px !important;line-height:1.2 !important}"
+      + ".fx-equip-tab .csd-corner-bar{position:absolute;right:12px;bottom:12px;z-index:30;display:flex;gap:5px;align-items:center}"
+      + ".fx-equip-tab .csd-corner-btn{width:auto !important;height:auto !important;min-height:0 !important;padding:5px 10px !important;font-size:11px !important;line-height:1.2 !important}"
+      + ".fx-equip-tab .csd-corner-mini{width:auto !important;height:auto !important;min-height:0 !important;padding:5px 8px !important;font-size:11px !important;line-height:1.2 !important}"
       + ".cs-gold-crate-wrap{display:flex;flex-direction:column;align-items:stretch;gap:3px}"
       + ".cs-gold-crate{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:5px 7px;background:linear-gradient(180deg,#9c6b14 0%,#4a2e05 100%);border:2px solid #ffe066;border-radius:3px;box-shadow:0 0 26px rgba(255,210,60,.9),inset 0 0 12px rgba(255,235,130,.65),0 4px 10px #000;cursor:pointer;transition:transform .12s,box-shadow .15s}"
       + ".cs-gold-crate::before,.cs-gold-crate::after{content:'';position:absolute;width:5px;height:5px;background:#ffe98a;box-shadow:0 0 6px #ffb000}"
@@ -669,54 +491,7 @@ const CaserneUI = {
       + ".fx-panel.fx-skills .csd-corner-mini{width:auto !important;height:auto !important;min-height:0 !important;padding:5px 8px !important;font-size:11px !important;line-height:1.2 !important}";
 
     document.head.appendChild(st);
-    // Scène 16:9 Bio-Scanner & Labo d'Entraînement (onglet Stats)
-    const hero = this.Q(".fx-panel.fx-hero");
-    if (hero) {
-      const statsBgUrl = typeof assetPath !== "undefined" && assetPath.statsBg ? assetPath.statsBg() : "assets/backgrounds/stats/background.jpeg";
-      const stStage = document.createElement("div");
-      stStage.id = "cs-stats-stage";
-      stStage.style.backgroundImage = `url("${encodeURI(statsBgUrl)}")`;
-
-      const av = hero.querySelector(".fx-avatar");
-      if (av) { av.dataset.stItem = "avatar"; stStage.appendChild(av); }
-
-      const acts = hero.querySelector(".fx-hero-actions");
-      if (acts) { acts.dataset.stItem = "actions"; stStage.appendChild(acts); }
-
-      const nameRow = hero.querySelector("#fx-name-row"), tagEl = hero.querySelector("#fx-tag");
-      const plate = document.createElement("div");
-      plate.id = "cs-hero-plate";
-      plate.dataset.stItem = "plate";
-      if (nameRow) plate.appendChild(nameRow);
-      if (tagEl) plate.appendChild(tagEl);
-      stStage.appendChild(plate);
-
-      const crt = document.createElement("div");
-      crt.id = "cs-stats-crt";
-      crt.dataset.stItem = "crt";
-      const vitals = hero.querySelector(".fx-vitals"), statsBox = this.Q("#fx-stats");
-      const pw = document.createElement("div"); pw.id = "cs-power"; pw.className = "cs-crt-power";
-      const gold = document.createElement("span"); gold.id = "cs-stats-gold"; gold.className = "cs-crt-gold"; gold.setAttribute("aria-live", "polite");
-      const topRow = document.createElement("div"); topRow.className = "cs-crt-top";
-      topRow.appendChild(pw);
-      topRow.appendChild(gold);
-      crt.appendChild(topRow);
-      if (vitals) crt.appendChild(vitals);
-      if (statsBox) crt.appendChild(statsBox);
-      stStage.appendChild(crt);
-
-      const tb = document.createElement("div");
-      tb.id = "cs-train";
-      tb.className = "cs-train-track";
-      tb.dataset.stItem = "train";
-      tb.onclick = e => { e.stopPropagation(); if (!this._statsEditing) this.entrainer(); };
-      stStage.appendChild(tb);
-
-      hero.innerHTML = '<div id="fx-gear" hidden></div>';
-      hero.appendChild(stStage);
-      this.applyStatsLayout();
-      this.initStatsDevUI();
-    }
+    if (typeof StatsUI !== "undefined") StatsUI.init();
     // Console holo-cyan des compétences (décor assets/backgrounds/competence/background.jpeg)
     const sg = this.Q("#fx-sgrid"), pn = document.createElement("div");
     pn.id = "cs-skills";
@@ -1074,170 +849,6 @@ const CaserneUI = {
 
     if (typeof ResizeObserver !== "undefined") {
       new ResizeObserver(() => this.applyEquipLayout()).observe(stage);
-    }
-  },
-  STATS_LAYOUT_KEY: "arene_stats_dev_layout_v1",
-  _statsEditing: false,
-  _statsPositions: null,
-  defaultStatsPositions(){
-    return [
-      { id: "avatar",  x: 27.2, y: 54.0, size: 22.0, angle: 0 },
-      { id: "plate",   x: 27.2, y: 23.8, size: 23.0, angle: 0 },
-      { id: "actions", x: 93.5, y: 6.0,  size: 10.0, angle: 0 },
-      { id: "crt",     x: 72.8, y: 31.2, size: 33.8, angle: 0 },
-      { id: "train",   x: 72.8, y: 74.2, size: 42.2, angle: 0 }
-    ];
-  },
-  getStatsPositions(){
-    if (this._statsPositions) return this._statsPositions;
-    const def = this.defaultStatsPositions();
-    try {
-      const saved = JSON.parse(localStorage.getItem(this.STATS_LAYOUT_KEY) || "null");
-      if (Array.isArray(saved)) {
-        saved.forEach(s => {
-          const t = def.find(d => d.id === s.id);
-          if (t && Number.isFinite(s.x) && Number.isFinite(s.y)) Object.assign(t, s);
-        });
-      }
-    } catch (_) {}
-    this._statsPositions = def;
-    return def;
-  },
-  saveStatsPositions(){
-    if (!this._statsPositions) return;
-    const clean = this._statsPositions.map(({ id, x, y, size, angle }) => ({
-      id, x: +x.toFixed(2), y: +y.toFixed(2), size: +size.toFixed(1), angle: +(angle || 0).toFixed(1)
-    }));
-    try { localStorage.setItem(this.STATS_LAYOUT_KEY, JSON.stringify(clean)); } catch (_) {}
-    console.log("STATS_LAYOUT =", JSON.stringify(clean));
-  },
-  applyStatsItemPos(el, pos, stage){
-    const w = (stage && stage.clientWidth) || 800;
-    el.style.position = "absolute";
-    el.style.left = pos.x + "%";
-    el.style.top = pos.y + "%";
-    el.style.transform = `translate(-50%,-50%) rotate(${pos.angle || 0}deg)`;
-    if (pos.id === "avatar") {
-      el.style.width = pos.size + "%";
-      el.style.aspectRatio = "1 / 1";
-      el.style.height = "auto";
-    } else if (pos.id === "plate") {
-      el.style.width = pos.size + "%";
-      el.style.height = "auto";
-    } else if (pos.id === "crt") {
-      el.style.width = pos.size + "%";
-      el.style.height = (pos.size * 0.94) + "%";
-    } else if (pos.id === "train") {
-      el.style.width = pos.size + "%";
-      el.style.height = (pos.size * 0.34) + "%";
-    } else {
-      el.style.width = "auto";
-      el.style.height = "auto";
-    }
-  },
-  applyStatsLayout(){
-    const stage = this.Q("#cs-stats-stage"); if (!stage) return;
-    const list = this.getStatsPositions();
-    stage.querySelectorAll("[data-st-item]").forEach(el => {
-      const pos = list.find(p => p.id === el.dataset.stItem);
-      if (pos) this.applyStatsItemPos(el, pos, stage);
-    });
-  },
-  initStatsDevUI(){
-    const stage = this.Q("#cs-stats-stage"); if (!stage) return;
-    const host = stage.closest(".fx-panel.fx-hero") || stage;
-    const isDev = () => !!document.getElementById("devbox") || !!GameState.illimite || /[?&]dev\b/.test(location.search);
-    const setEdit = on => {
-      this._statsEditing = on;
-      stage.classList.toggle("is-editing", on);
-      const btn = host.querySelector("#std-edit");
-      if (btn) btn.textContent = on ? "Terminer le placement" : "ÉDITER LES STATS";
-    };
-
-    if (!host.querySelector("#std-corner-bar")) {
-      const bar = document.createElement("div");
-      bar.id = "std-corner-bar";
-      bar.className = "csd-corner-bar";
-      bar.innerHTML = `<button type="button" id="std-copy" class="fx-btn csd-corner-mini" title="Copier JSON">📋</button>`
-        + `<button type="button" id="std-reset" class="fx-btn csd-corner-mini" title="Réinitialiser">↺</button>`
-        + `<button type="button" id="std-edit" class="fx-btn csd-corner-btn">ÉDITER LES STATS</button>`;
-      host.appendChild(bar);
-
-      const syncVis = () => {
-        const on = isDev();
-        bar.style.display = on ? "flex" : "none";
-        if (!on && this._statsEditing) setEdit(false);
-      };
-      syncVis();
-      this._syncStatsDev = syncVis;
-      new MutationObserver(syncVis).observe(document.body, { childList: true, subtree: true });
-
-      bar.querySelector("#std-edit").onclick = e => {
-        e.stopPropagation();
-        setEdit(!this._statsEditing);
-        if (!this._statsEditing && typeof toast === "function") toast("Placement des stats enregistré !");
-      };
-      bar.querySelector("#std-copy").onclick = e => {
-        e.stopPropagation();
-        const clean = this.getStatsPositions().map(({ id, x, y, size, angle }) => ({
-          id, x: +x.toFixed(2), y: +y.toFixed(2), size: +size.toFixed(1), angle: +(angle || 0).toFixed(1)
-        }));
-        if (navigator.clipboard) navigator.clipboard.writeText(JSON.stringify(clean));
-        if (typeof toast === "function") toast("Coordonnées stats copiées !");
-      };
-      bar.querySelector("#std-reset").onclick = e => {
-        e.stopPropagation();
-        try { localStorage.removeItem(this.STATS_LAYOUT_KEY); } catch (_) {}
-        this._statsPositions = null;
-        this.applyStatsLayout();
-        if (typeof toast === "function") toast("Positions par défaut restaurées.");
-      };
-    }
-
-    if (stage.dataset.devBound) return;
-    stage.dataset.devBound = "1";
-    let drag = null;
-
-    stage.addEventListener("pointerdown", ev => {
-      if (!this._statsEditing) return;
-      const el = ev.target.closest("[data-st-item]"); if (!el) return;
-      ev.preventDefault(); ev.stopPropagation();
-      const pos = this.getStatsPositions().find(p => p.id === el.dataset.stItem); if (!pos) return;
-      drag = { el, pos, pointerId: ev.pointerId };
-      try { el.setPointerCapture(ev.pointerId); } catch (_) {}
-    }, true);
-    stage.addEventListener("pointermove", ev => {
-      if (!drag || ev.pointerId !== drag.pointerId) return;
-      const rect = stage.getBoundingClientRect();
-      drag.pos.x = Math.max(2, Math.min(98, ((ev.clientX - rect.left) / rect.width) * 100));
-      drag.pos.y = Math.max(2, Math.min(98, ((ev.clientY - rect.top) / rect.height) * 100));
-      this.applyStatsItemPos(drag.el, drag.pos, stage);
-    }, true);
-    const endDrag = ev => {
-      if (!drag || ev.pointerId !== drag.pointerId) return;
-      drag = null;
-      this.saveStatsPositions();
-    };
-    stage.addEventListener("pointerup", endDrag, true);
-    stage.addEventListener("pointercancel", endDrag, true);
-    stage.addEventListener("click", ev => {
-      if (!this._statsEditing || !ev.target.closest("[data-st-item]")) return;
-      ev.preventDefault(); ev.stopImmediatePropagation();
-    }, true);
-    stage.addEventListener("wheel", ev => {
-      if (!this._statsEditing) return;
-      const el = ev.target.closest("[data-st-item]"); if (!el) return;
-      ev.preventDefault(); ev.stopPropagation();
-      const pos = this.getStatsPositions().find(p => p.id === el.dataset.stItem); if (!pos) return;
-      const d = ev.deltaY || ev.deltaX;
-      if (ev.shiftKey) pos.angle = (pos.angle || 0) + (d < 0 ? 5 : -5);
-      else pos.size = Math.max(6, Math.min(95, (pos.size || 20) + (d < 0 ? 1.0 : -1.0)));
-      this.applyStatsItemPos(el, pos, stage);
-      this.saveStatsPositions();
-    }, { passive: false, capture: true });
-
-    if (typeof ResizeObserver !== "undefined") {
-      new ResizeObserver(() => this.applyStatsLayout()).observe(stage);
     }
   }
 };

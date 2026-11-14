@@ -16,7 +16,7 @@ const PvP = {
   K: 32,                             // facteur K du calcul Elo
   TICKETS_MAX: 5,                    // tickets PvP quotidiens
   OR_VICTOIRE: 60, OR_DEFAITE: 25,   // Or par niveau de la brute
-  RECOMPENSE_PIERRE: "pierres_transmutation",   // clé passée à donnerRecompense() (à adapter si ton inventaire utilise un autre nom)
+  RECOMPENSE_PIERRE: "pierres",                 // clé passée à donnerRecompense() (à adapter si ton inventaire utilise un autre nom)
   /* min/max = bornes d'Elo · rar = rareté d'équipement de base des bots (0 Commun … 5 Divin)
      armes / comp = nb d'armes / de compétences des bots · or / caisses / pierres = récompense de fin de saison */
   GRADES: [
@@ -63,11 +63,13 @@ const PvP = {
     });
     e.weapons = []; while (e.weapons.length < g.armes) { const id = D.pick(D.WEAPONS).id; if (!e.weapons.includes(id)) e.weapons.push(id); }
     e.skills = D.pickSkills(g.comp);
-    if (diff.familier) {                                                             // le bot Difficile arrive avec un familier
-      const liste = D.PETS || D.FAMILIERS || D.FAMILIARS;
-      e.familier = e.pet = liste && liste.length ? D.pick(liste) : true;
-      if (e.familier && e.familier.id) e.petId = e.familier.id;
-    } else { e.familier = e.pet = null; e.petId = null; }
+    if (diff.familier && typeof CompanionData !== "undefined" && CompanionData.FAMILIES.length) {
+      const fam = D.pick(CompanionData.FAMILIES);
+      e.companion = CompanionData.create(fam.species || fam.key);
+      e.companion.level = Math.min(CompanionData.LEVEL_CAP, e.level);
+      e.companion.form = CompanionData.formFor(e.companion);
+      if (e.companion.level >= CompanionData.LEVEL_CAP) CompanionData.transmute(e.companion);
+    } else { e.companion = null; }
     return e;
   },
   tirerCibles(){

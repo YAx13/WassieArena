@@ -64,7 +64,9 @@ const Raids = {
     if (p > this.palierMax(mode)) { toast("Palier verrouillé : gagnez le palier précédent."); return; }
     if (!depenserRessource("energie", 1)) { toast("Énergie insuffisante (1 ⚡ requise)."); return; }
     const s = this.statsPalier(p);
+    const mult = +(Math.pow(1.16, p - 1) * (this.mur(p) ? 1.25 : 1)).toFixed(2);
     lancerCombat({ mode: "vagues", raid: true, cleanUI: true, fond: c.fond, fondSecours: c.fondSecours, boss: this.bossPalier(mode, p), palier: p,
+      puissance: mult, puissanceSbires: +(mult * 0.55).toFixed(2),
       ptsSbires: s.sbires, statsSbires: s.sbires, ptsBoss: s.boss, statsBoss: s.boss,
       onFin: r => this.finExpe(mode, p, r) });
     this.updateExpeEndActions(mode, p, false);
