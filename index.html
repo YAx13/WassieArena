@@ -172,31 +172,63 @@
   </div>
 
   <div class="pane ov" id="g-train">
-    <div class="ov-bar"><span class="termbar">Simulateur</span><button class="btn ov-close" data-close>✕ Fermer</button></div>
-    <div class="plank panel">
-      <div class="termbar">Mode entraînement : testez les animations de chaque brute</div>
-      <div class="tr-brutes" id="tr-brutes"></div>
-      <div class="arena-top">
-        <div class="tr-info" id="tr-info">—</div>
-        <div class="speed" id="tr-speed">
-          <button class="btn" data-ts="0.25">x0.25</button><button class="btn" data-ts="0.5">x0.5</button><button class="btn active" data-ts="1">x1</button>
+    <div class="tr-shell">
+      <div class="tr-topbar">
+        <div class="tr-slot tr-char-slot">
+          <div class="tr-avatars">
+            <button type="button" class="tr-av on" id="tr-av-hero"><canvas width="48" height="48"></canvas></button>
+            <button type="button" class="tr-av" id="tr-av-dummy"><canvas width="48" height="48"></canvas></button>
+          </div>
+          <button type="button" class="tr-arrow" id="tr-prev">◀</button>
+          <span class="tr-val" id="tr-char-name">Momie</span>
+          <button type="button" class="tr-arrow" id="tr-next">▶</button>
+        </div>
+        <div class="tr-slot tr-wpn-slot">
+          <select id="tr-wpn" aria-label="Arme"></select>
+        </div>
+        <div class="tr-slot tr-bg-slot">
+          <button type="button" class="tr-arrow" id="tr-bg-prev">◀</button>
+          <select id="tr-select-decor" aria-label="Decor"></select>
+          <button type="button" class="tr-arrow" id="tr-bg-next">▶</button>
+        </div>
+        <button type="button" class="tr-close" data-close aria-label="Fermer">✕</button>
+      </div>
+
+      <div class="tr-stage">
+        <canvas id="cv-train" width="800" height="450"></canvas>
+      </div>
+
+      <div class="tr-dock">
+        <div class="tr-dock-row tr-dock-top">
+          <button type="button" class="tr-key" id="tr-replay" title="Rejouer">↻</button>
+          <button type="button" class="tr-key" id="tr-pause" title="Pause">❚❚</button>
+          <button type="button" class="tr-key" id="tr-step" title="Image suivante">▶▶+1</button>
+          <div class="tr-spd" id="tr-speed">
+            <button type="button" class="tr-key active" data-ts="1">x1</button>
+            <button type="button" class="tr-key" data-ts="2">x2</button>
+            <button type="button" class="tr-key" data-ts="4">x4</button>
+          </div>
+          <label class="tr-chk"><input type="checkbox" id="tr-dummy" checked> Mannequin</label>
+          <label class="tr-chk"><input type="checkbox" id="tr-auto"> Boucle</label>
+          <label class="tr-chk"><input type="checkbox" id="tr-flip"> Inverser</label>
+        </div>
+        <div class="tr-dock-row tr-dock-bot" id="tr-anims">
+          <button type="button" class="tr-pose on" data-a="idle">Repos</button>
+          <button type="button" class="tr-pose" data-a="dash">Dash</button>
+          <button type="button" class="tr-pose" data-a="dodge">Esquive</button>
+          <button type="button" class="tr-pose" data-a="death">Mort</button>
+          <button type="button" class="tr-gold" id="tr-btn-atk">⚔ ATTAQUE</button>
+          <button type="button" class="tr-gold" id="tr-btn-crit">✸ CRITIQUE</button>
+          <select id="tr-emote" class="tr-emote" aria-label="Emote">
+            <option value="">Emote...</option>
+            <option value="hit">Touché</option>
+            <option value="whistle">Sifflet</option>
+            <option value="surprise">Surprise</option>
+            <option value="taunt">Provoc</option>
+            <option value="victory">Victoire</option>
+          </select>
         </div>
       </div>
-      <div class="arenawrap"><canvas id="cv-train" width="800" height="450"></canvas></div>
-      <div class="tr-ctrl">
-        <button class="btn" id="tr-prev" title="Brute précédente (←)">◀ Brute</button>
-        <button class="btn" id="tr-next" title="Brute suivante (→)">Brute ▶</button>
-        <button class="btn" id="tr-replay" title="Rejouer (Espace)">↻ Rejouer</button>
-        <button class="btn" id="tr-pause">⏸ Pause</button>
-        <button class="btn" id="tr-step" title="Avance d'une image (en pause)">⏭ Image</button>
-        <label class="tr-opt"><input type="checkbox" id="tr-auto"> Boucle auto</label>
-        <label class="tr-opt"><input type="checkbox" id="tr-flip"> Retourner</label>
-        <label class="tr-opt"><input type="checkbox" id="tr-dummy" checked> Adversaire</label>
-        <button class="btn" id="tr-bg">🖼 Décor</button>
-        <select id="tr-wpn" title="Arme collée à la main (anims d'attaque)"></select>
-      </div>
-      <div class="tr-anims" id="tr-anims"></div>
-      <p class="hint">Astuce : ← → changent de brute, Espace rejoue l’animation. ⚠ = planche absente, poses simulées avec la planche 1.</p>
     </div>
   </div>
 

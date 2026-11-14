@@ -88,7 +88,7 @@ class BattleEngine {
       }
       sk = { name: c.name, pet: c, el, t: "A", pw, fx, desc: "" };
     }
-    // Recours à l'arme : dégainage persistant façon La Brute
+    // Recours à l'arme : dégainage persistant (light / heavy) et lancer à distance (throw)
     let drewWpn=false;
     if(!sk){
       if(A.held!==null && A.bag.length>0 && Math.random()<0.12) A.held=null;
@@ -101,16 +101,18 @@ class BattleEngine {
         wp=DataEngine.WEAPONS[A.held];
         const m=(i===0&&GameState.maitriseArmes&&GameState.maitriseArmes[wp.id])||0;
         wl=wp.name+(m>0?" +"+m:"");
-        sk={name:wl,weapon:wp,t:"A",pw:(.8+wp.dmg*.08)*(1+m*.10),fx:{acc:(wp.prec-5)*3,crit:(wp.crit-5)*.012+m*.01},desc:""};
+        const wfx=Object.assign({acc:(wp.prec-5)*3,crit:(wp.crit-5)*.012+m*.01},wp.fx||{});
+        if(wp.fx&&wp.fx.crit) wfx.crit=(wp.crit-5)*.012+m*.01+wp.fx.crit;
+        sk={name:wl,weapon:wp,t:"A",pw:(.8+wp.dmg*.08)*(1+m*.10),fx:wfx,desc:""};
         A.next-=(100/A.spd)*(wp.spd-5)*.03;
-        if((DataEngine.WEAPON_STYLE[wp.id]||"estoc")==="throw") A.held=null;
+        if(wp.type==="throw") A.held=null;
       }
     }
     let dot=0; S.dot.forEach(d=>{dot+=d.dmg; d.n--}); S.dot=S.dot.filter(d=>d.n>0);
     if(dot){ A.hp=Math.max(0,A.hp-dot); out.push({type:"on_dot",i,j,dmg:dot,hpA:A.hp,msg:A.name+" subit "+dot+" dégâts d’altération."}); }
     const stunned=A.hp>0&&S.stun>0, dead=A.hp<=0;
     if(stunned) S.stun--;
-    const wpnVerb={estoc:"porte un estoc avec",overhead:"abat",throw:"lance"}[wp?DataEngine.WEAPON_STYLE[wp.id]||"estoc":"estoc"];
+    const wpnVerb={light:"frappe vivement avec",heavy:"abat lourdement",throw:"lance"}[wp?wp.type||"light":"light"];
     const wpnMsg=wp?(drewWpn?A.name+" dégaine "+wp.icon+" "+wl+" et "+wpnVerb+" son arme !":A.name+" "+wpnVerb+" "+wp.icon+" "+wl+" !"):"";
     this.emit("on_attack",{i,j,round:this.round,self:!!(stunned||dead||(sk&&sk.pw===0)),skill:sk&&!wp?sk.name:null,weapon:wp?{name:wl,icon:wp.icon,id:wp.id}:null,pet:sk&&sk.pet?{name:sk.pet.name,species:sk.pet.species,form:sk.pet.form||1}:null,msg:dead?A.name+" vacille…":stunned?A.name+" est étourdi et perd son tour.":sk&&sk.pet?A.name+" siffle : "+sk.pet.name+" passe à l’attaque !":wp?wpnMsg:sk?A.name+" utilise "+sk.name+" !":A.name+" fonce en avant !"});
     out.forEach(e=>this.emit(e.type,e));
@@ -330,7 +332,7 @@ const Combat={
     const at=this.q[0], ev=this.q.slice(1), ht=ev.find(e=>e.type==="on_hit"), crit=!!(ht&&ht.crit), A=this.V[at.i], bx=this.V[at.j].bx, dir=at.i?-1:1;
     let kind;
     if(at.pet) kind="pet"; else if(at.self) kind=at.skill?"self":"idle";
-    else if(at.weapon) kind=crit?{estoc:"pierce",overhead:"meteor",throw:"salto"}[DataEngine.WEAPON_STYLE[at.weapon.id]||"estoc"]:(DataEngine.WEAPON_STYLE[at.weapon.id]||"estoc");
+    else if(at.weapon){ const wt=(DataEngine.WEAPONS[at.weapon.id]&&DataEngine.WEAPONS[at.weapon.id].type)||"light"; kind=crit?{light:"pierce",heavy:"meteor",throw:"salto"}[wt]:{light:"estoc",heavy:"overhead",throw:"throw"}[wt]; }
     else kind=crit?"uppercut":"punch";
     const K=this.K[kind]||this.K.idle;
     const heldId=this.eng.f[at.i].held;
@@ -538,9 +540,9 @@ const Combat={
       blit.call(this,ctx,f,c);
       ctx.restore();
     };
-    P.drawBrute=function(ctx,b,t,anim="idle",fi=null){
+    P.drawBrute=function(ctx,b,t,anim="idle",fi=null,wt=null){
       if(b&&b.placeholder&&!DataEngine.spriteBase(b.sprite)) return placeholderEnnemi(ctx,b,t,anim,fi);
-      return drawBrute.call(this,ctx,b,t,anim,fi); };
+      return drawBrute.call(this,ctx,b,t,anim,fi,wt); };
   },
   initDevGroupUI(){
     const KEY="dev_combat_group";

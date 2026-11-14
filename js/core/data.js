@@ -5,6 +5,8 @@ const assetPath = {
   portrait: id => `assets/characters/${id}/portrait.png`,
   sprite: id => `assets/characters/${id}/sprite.png`,
   sheet: (id, n) => `assets/characters/${id}/sheets/sheet-${n}.png`,
+  weaponSheet: (id, wid) => `assets/characters/${id}/sheets/wpn-${wid}.png`,
+  pillar: () => `assets/pillar.png`,
   starter: id => `assets/characters/${id}/starter.jpeg`,
   weapon: (id, n) => `assets/characters/${id}/weapons/weapon-${n}-transparent.png`,
   afk: (id, n, ext) => `assets/backgrounds/afk/${id}/afk-${n}.${ext}`,
@@ -29,8 +31,14 @@ class DataEngine {
   // Rempli juste après la classe (boucle sur BRAWLERS)
   static SPRITES = {};
 
-  static spriteBase(k){ const s=this.SPRITES[k]; return s ? (s.planches[0]||s.sprite||"") : ""; }
-  static spriteSheet(k,sh){ const s=this.SPRITES[k]; return s ? (s.planches[{atk:1,crit:2,trn:3}[sh]]||"") : ""; }
+  static spriteBase(k,wid=null){
+    if(Number.isInteger(wid)&&wid>=0&&wid<8) return assetPath.weaponSheet(k,wid);
+    const s=this.SPRITES[k]; return s ? ((Array.isArray(s.planches)?s.planches[0]:s.planches)||s.sprite||"") : "";
+  }
+  static spriteSheet(k,sh,wid=null){
+    if(Number.isInteger(wid)&&wid>=0&&wid<8&&(sh==="atk"||sh==="crit")) return assetPath.weaponSheet(k,wid);
+    const s=this.SPRITES[k]; return s ? (s.planches[{atk:1,crit:2,trn:3}[sh]]||"") : "";
+  }
   static portrait(k){ const s=this.SPRITES[k]; return s ? (s.portrait||"") : ""; }
   static hasImages(k){ return !!this.spriteBase(k); }
   static readyKeys(){ const r=this.BRAWLERS.filter(k=>this.hasImages(k)); return r.length?r:this.BRAWLERS.filter(k=>this.SPRITES[k]); }
@@ -55,23 +63,22 @@ class DataEngine {
     {id:"ring",name:"Anneau",icon:"💍",statLabel:"Stat / Élément"}
   ];
   static WEAPONS = [
-["Épée", "⚔️", 7, 5, 6, 5,
-"Lame de récup, bien équilibrée."],
-["Dague", "🗡️", 4, 9, 7, 8, "Rapide, vise les failles."],
-["Couteau", "🔪", 3, 8, 6, 6, "Un classique des décharges."],
-["Hache", "🪓", 9, 3, 4, 6, "Fend l'acier comme les crânes."],
-["Marteau", "🔨", 10, 2, 4, 5, "Lourd, brutal, bruyant."],
-["Arc", "🏹", 6, 5, 8, 7, "Cordes en câble électrique."],
-["Trident", "🔱", 7, 5, 7, 6, "Piques soudées sur un tuyau."],
-["Baguette", "🪄", 5, 7, 8, 4, "Un tuyau qui grésille."],
-["Boomerang", "🪃", 5, 6, 6, 7, "Il revient. Parfois."],
-["Pioche", "⛏️", 8, 3, 5, 6, "Outil de mineur reconverti."],
-["Scie", "🪚", 6, 6, 5, 9, "Disque de scie circulaire."],
-["Crochet", "🪝", 5, 7, 6, 7, "Accroche et arrache."],
-["Os", "🦴", 3, 7, 5, 4, "Tibia de mutant, très solide."],
-["Canne", "🎣", 4, 6, 9, 3, "Pêche aux débris et aux ennuis."],
-["Fourche", "🍴", 5, 6, 7, 5, "Fourchette de cantine Wass-E."],
-["Bouclier", "🛡️", 2, 4, 5, 2, "Couvercle de cuve blindé."]].map((w,i)=>({id:i,name:w[0],icon:w[1],dmg:w[2],spd:w[3],prec:w[4],crit:w[5],desc:w[6]}));
+    { id: 0,  name: "Épée",      icon: "⚔️", type: "light", dmg: 6,  spd: 7, prec: 7, crit: 6, desc: "Lame de récup, vive et équilibrée.", fx: {} },
+    { id: 1,  name: "Dague",     icon: "🗡️", type: "light", dmg: 4,  spd: 9, prec: 8, crit: 8, desc: "Rapide, vise les failles.", fx: { crit: 0.12 } },
+    { id: 2,  name: "Couteau",   icon: "🔪", type: "light", dmg: 4,  spd: 9, prec: 7, crit: 7, desc: "Un classique des décharges.", fx: {} },
+    { id: 3,  name: "Scie",      icon: "🪚", type: "light", dmg: 6,  spd: 6, prec: 6, crit: 9, desc: "Scie à métaux dentelée, taillade les armures.", fx: { crit: 0.18 } },
+    { id: 4,  name: "Hache",     icon: "🪓", type: "heavy", dmg: 9,  spd: 3, prec: 5, crit: 6, desc: "Fend l'acier comme les crânes.", fx: { pierce: 0.25 } },
+    { id: 5,  name: "Marteau",   icon: "🔨", type: "heavy", dmg: 10, spd: 2, prec: 4, crit: 5, desc: "Lourd, brutal, bruyant.", fx: { stun: 0.30 } },
+    { id: 6,  name: "Pioche",    icon: "⛏️", type: "heavy", dmg: 8,  spd: 3, prec: 5, crit: 6, desc: "Perce les blindages épais.", fx: { pierce: 0.40 } },
+    { id: 7,  name: "Os",        icon: "🦴", type: "heavy", dmg: 8,  spd: 4, prec: 5, crit: 4, desc: "Fémur de mutant, très lourd.", fx: { stun: 0.25 } },
+    { id: 8,  name: "Boomerang", icon: "🪃", type: "throw", dmg: 5,  spd: 7, prec: 7, crit: 7, desc: "Il revient. Parfois.", fx: {} },
+    { id: 9,  name: "Arc",       icon: "🏹", type: "throw", dmg: 6,  spd: 6, prec: 9, crit: 7, desc: "Cordes en câble électrique.", fx: { sure: 1 } },
+    { id: 10, name: "Trident",   icon: "🔱", type: "throw", dmg: 8,  spd: 5, prec: 7, crit: 6, desc: "Piques soudées sur un tuyau.", fx: { pierce: 0.20 } },
+    { id: 11, name: "Pilier",    icon: "🏛️", type: "throw", dmg: 11, spd: 2, prec: 5, crit: 5, desc: "Bloc de béton arraché du sol.", fx: { stun: 0.40, push: 1 } },
+    { id: 12, name: "Shuriken",  icon: "💠", type: "throw", dmg: 4,  spd: 9, prec: 9, crit: 9, desc: "Étoile d'acier lancée à haute vitesse.", fx: { crit: 0.15 } },
+    { id: 13, name: "Grenade",   icon: "💣", type: "throw", dmg: 10, spd: 4, prec: 6, crit: 6, desc: "Explose à l'impact et sonne la cible.", fx: { stun: 0.35 } },
+    { id: 14, name: "Molotov",   icon: "🔥", type: "throw", dmg: 6,  spd: 6, prec: 7, crit: 5, desc: "Embrase l'adversaire pendant 2 tours.", fx: { dot: [0.35, 2, "brûlure"] } }
+  ];
 
   static COMPANION_ART_FILES = {
     chien: "dog", loup: "wolf", ours: "ours", serpent: "snake",
@@ -163,12 +170,13 @@ class DataEngine {
   static PET_SHEETS = { "chien_friche:1":"", "chien_friche:2":"", "chien_friche:3":"", "ours_decharge:1":"", "ours_decharge:2":"", "ours_decharge:3":"", "aigle_veille:1":"", "aigle_veille:2":"", "aigle_veille:3":"" };
   static WEAPON_IMGS = {};   // id d'arme -> image 32x32 optionnelle
   // Nombre de skins d'arme présents dans assets/characters/<id>/weapons/ (weapon-1.jpeg … weapon-N.jpeg)
-  static WEAPON_COUNT = { empereur:1, frankenstein:1, general:4, hazmat:3, human:3, inversebrah:4, momie:3, samourai:3, zeus:3 };
+  static WEAPON_COUNT = {}; // Restaurer { empereur:1, frankenstein:1, general:4, hazmat:3, human:3, inversebrah:4, momie:3, samourai:3, zeus:3 } une fois les planches par perso générées
   static WEAPON_SKINS = Object.fromEntries(Object.entries(this.WEAPON_COUNT).map(([k, n]) =>
     [k, Array.from({ length: n }, (_, i) => assetPath.weapon(k, i + 1))]));
-  // Style d'attaque par arme : estoc (P2 L1), overhead (P2 L2, saut), throw (P2 L3, jet)
-  static WEAPON_STYLE = ["estoc","estoc","estoc","overhead","overhead","throw","estoc","estoc","throw","overhead","overhead","estoc","overhead","throw","estoc","overhead"];
-  static WEAPON_CELLS = [0,12,13,4,5,9,1,7,14,6,11,15,10,2,3,8];
+  // Style d'attaque par arme : light (légère), heavy (lourde), throw (jet)
+  static WEAPON_STYLE = ["light","light","light","light","heavy","heavy","heavy","heavy","throw","throw","throw","throw","throw","throw","throw"];
+  static WEAPON_CELLS = Array.from({length: 15}, (_, i) => i);
+  static GREYBOX_WEAPONS = "assets/greybox-weapons.png";
   // Équipement : 4 armures (Casque=HP, Plastron=AGI, Bottes=SPD, Collier=STR) + 2 Anneaux (Stat ou Élément)
   static GEAR_BONUS=[1,3,6,10,15,20];
   static RING_STAT_BONUS=[2,5,9,14,20,28];

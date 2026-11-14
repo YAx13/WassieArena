@@ -82,19 +82,6 @@ class CanvasRenderer {
     }
   };
   static PET={ idle:{r:0,fps:6,loop:1}, run:{r:1,fps:14,loop:1}, bite:{r:2,fps:12}, hit:{f:[12],fps:8}, fall:{f:[13],fps:8}, death:{f:[13,14,15],fps:6} };
-  // Point d'ancrage de la main (px dans la case 64x64, rotation en rad) par frame ; null = arme absente (lâchée). Calibrez selon vos dessins.
-  static ANCHORS={
-    idle:[[26,38,-.4],[26,39,-.4],[26,38,-.4],[26,37,-.4]],
-    dash:[[24,36,-.8],[22,35,-.9],[24,36,-.8],[26,37,-.7]],
-    hit:[[22,40,.3],[20,42,.5],[22,40,.3],[24,39,.1]],
-    dodge:[[24,34,-.6],[22,32,-.7],[24,34,-.6],[26,36,-.5]],
-    thrust:[[30,38,-.3],[38,37,-.1],[50,36,0],[54,36,0]],
-    overhead:[[34,12,-2.3],[36,8,-1.7],[47,30,.5],[50,40,1.3]],
-    throw:[[30,30,-1],[36,26,-.6],[48,30,0],null],
-    pierce:[[30,38,-.3],[44,36,0],[54,36,0],[54,36,0]],
-    meteor:[[34,10,-2.3],[36,6,-1.8],[46,34,.6],[50,42,1.3]],
-    salto:[[30,36,-.6],[34,30,-1],[44,30,-.4],null]
-  };
   static SKY=[[10,22,18],[40,14,30],[70,30,12],[120,16,24],[160,26,16],[250,20,28],[290,34,14],[350,30,22]];
   constructor(){
     this.targets=[]; this.imgs={}; this.weaponSheets={}; this.weaponBounds={}; this.speed=1; this.clock=0; this.last=0; this.arena=null; this.tick=null;
@@ -104,15 +91,23 @@ class CanvasRenderer {
   bind(canvas,getBrute){ canvas.getContext("2d").imageSmoothingEnabled=false; this.targets.push({canvas,getBrute}); }
   setSpeed(s){ this.speed=[1,2,4].includes(s)?s:1; }
   skip(){ if(this.arena) this.arena.skip(); }
-  sprite(key,allowEnemy=false){
+  sprite(key,allowEnemy=false,wid=null){
     if(!DataEngine.SPRITES[key]||(!allowEnemy&&!DataEngine.BRAWLERS.includes(key))){const ks=DataEngine.readyKeys();key=ks[[...String(key)].reduce((a,c)=>a+c.charCodeAt(0),0)%ks.length]}
+    if(Number.isInteger(wid)&&wid>=0&&wid<8){
+      const wImg=this.loadImg(DataEngine.spriteBase(key,wid));
+      if(wImg) return wImg;
+    }
     const src=DataEngine.spriteBase(key); if(!src) return null;
     return this.loadImg(src);
   }
-  drawBrute(ctx,b,t,anim="idle",fi=null){
-    const set=b&&CanvasRenderer.ANIM_SETS[b.animationSet], A=(set&&set[anim])||CanvasRenderer.ANIMS[anim]||CanvasRenderer.ANIMS.idle, row=[0,1,2,3].map(i=>A.r*4+i);
-    let img, F;   // planche dédiée si elle existe, sinon pose simulée avec les frames P1
-    if(A.s==="base"){ img=this.sprite(b.sprite,!!(b&&b.animationSet)); F=A.f||row; }
+  drawBrute(ctx,b,t,anim="idle",fi=null,wid=null){
+    const cols=[0,1,2,3], set=b&&CanvasRenderer.ANIM_SETS[b.animationSet], A=(set&&set[anim])||CanvasRenderer.ANIMS[anim]||CanvasRenderer.ANIMS.idle, row=cols.map(i=>A.r*4+i);
+    const wId=Number.isInteger(wid)&&wid>=0&&wid<8?wid:null;
+    const wImg=wId!==null?this.loadImg(DataEngine.spriteBase(b.sprite,wId)):null;
+    const wRow={idle:0,dash:1,punch:2,thrust:2,overhead:2,uppercut:3,pierce:3,meteor:3}[anim];
+    let img, F;
+    if(wImg&&wRow!==undefined){ img=wImg; F=cols.map(i=>wRow*4+i); }
+    else if(A.s==="base"){ img=this.sprite(b.sprite,!!(b&&b.animationSet)); F=A.f||row; }
     else{ img=this.sheet(b.sprite,A.s); if(img) F=row; else { img=this.sprite(b.sprite); F=A.fb; } }
     const n=fi!==null?fi:Math.floor(t*A.fps/1000), k=A.loop?n%F.length:Math.min(n,F.length-1), fr=F[k];
     ctx.clearRect(0,0,64,64); ctx.imageSmoothingEnabled=false;
@@ -135,10 +130,14 @@ class CanvasRenderer {
     ctx.restore();
   }
   loadImg(src){ if(!src) return null; const k="u|"+src; if(!this.imgs[k]){ const i=new Image(); i.onerror=()=>{i.failed=true}; i.src=encodeURI(src); this.imgs[k]=i; } const i=this.imgs[k]; return i.complete&&i.naturalWidth&&!i.failed?i:null; }
-  pvpPreviewImg(){ const b=GameState.brute, k=b&&b.sprite; return this.loadImg(assetPath.pvpPreview(k||"general"))||this.loadImg(assetPath.pvpPreview("general")); }  weaponSprite(b,id,onload=null){
-    const skins=DataEngine.WEAPON_SKINS[b&&b.sprite]; if(!skins||!skins.length) return null;
-    const key=String(b.id||b.sprite), hash=[...key].reduce((n,c)=>(n*31+c.charCodeAt(0))>>>0,7);
-    const src=skins[hash%skins.length], cacheKey="keyed|"+src;
+  pvpPreviewImg(){ const b=GameState.brute, k=b&&b.sprite; return this.loadImg(assetPath.pvpPreview(k||"general"))||this.loadImg(assetPath.pvpPreview("general")); }
+  weaponSprite(b,id,onload=null){
+    const skins=DataEngine.WEAPON_SKINS[b&&b.sprite];
+    const key=String((b&&(b.id||b.sprite))||"general"), hash=[...key].reduce((n,c)=>(n*31+c.charCodeAt(0))>>>0,7);
+    let src=(skins&&skins.length)?skins[hash%skins.length]:DataEngine.GREYBOX_WEAPONS;
+    if(src&&!this.loadImg(src)&&DataEngine.GREYBOX_WEAPONS&&this.loadImg(DataEngine.GREYBOX_WEAPONS)) src=DataEngine.GREYBOX_WEAPONS;
+    if(!src) return null;
+    const cacheKey="keyed|"+src;
     if(!this.weaponSheets[cacheKey]){
       const source=this.loadImg(src);
       if(!source){
@@ -160,25 +159,28 @@ class CanvasRenderer {
           if(keep<1) pixels[i+1]=Math.min(g,Math.round(Math.max(r,blue)+dominance*keep));
         }
       }
-      ctx.putImageData(image,0,0); }catch(e){ /* ouverture en file:// : fond vert non retiré, à faire à la main dans les images */ } this.weaponSheets[cacheKey]=canvas;
+      ctx.putImageData(image,0,0); }catch(e){} this.weaponSheets[cacheKey]=canvas;
     }
     const sheet=this.weaponSheets[cacheKey], tile=sheet.width/4, cell=DataEngine.WEAPON_CELLS[id];
     if(sheet.width!==sheet.height||!Number.isInteger(tile)||!Number.isInteger(cell)) return null;
-    const boundsKey=cacheKey+"|"+cell;
+    const hit=onload&&!this._wReady?.has(cacheKey);
+    if(hit){ if(!this._wReady) this._wReady=new Set(); this._wReady.add(cacheKey); onload(); }
+    const boundsKey=cacheKey+"|"+id;
     if(!this.weaponBounds[boundsKey]){
-      const x=(cell%4)*tile,y=Math.floor(cell/4)*tile;
-      let pixels=null; try{ pixels=sheet.getContext("2d").getImageData(x,y,tile,tile).data; }catch(e){}
-      if(!pixels){ this.weaponBounds[boundsKey]={x,y,width:tile,height:tile}; return {sheet,...this.weaponBounds[boundsKey]}; }
-      let left=tile,top=tile,right=-1,bottom=-1;
+      const x=id===11?3*tile:(cell%4)*tile, y=id===11?2*tile:Math.floor(cell/4)*tile;
+      const cw=tile, ch=id===11?tile*2:tile;
+      let pixels=null; try{ pixels=sheet.getContext("2d").getImageData(x,y,cw,ch).data; }catch(e){}
+      if(!pixels){ this.weaponBounds[boundsKey]={x,y,width:cw,height:ch}; return {sheet,...this.weaponBounds[boundsKey]}; }
+      let left=cw,top=ch,right=-1,bottom=-1;
       for(let i=3;i<pixels.length;i+=4){
         if(pixels[i]<=24) continue;
-        const pixel=(i-3)/4,px=pixel%tile,py=Math.floor(pixel/tile);
+        const pixel=(i-3)/4,px=pixel%cw,py=Math.floor(pixel/cw);
         left=Math.min(left,px);top=Math.min(top,py);right=Math.max(right,px);bottom=Math.max(bottom,py);
       }
       if(right<left||bottom<top) return null;
       const padding=Math.ceil(tile*.035);
       left=Math.max(0,left-padding);top=Math.max(0,top-padding);
-      right=Math.min(tile-1,right+padding);bottom=Math.min(tile-1,bottom+padding);
+      right=Math.min(cw-1,right+padding);bottom=Math.min(ch-1,bottom+padding);
       this.weaponBounds[boundsKey]={x:x+left,y:y+top,width:right-left+1,height:bottom-top+1};
     }
     return {sheet,...this.weaponBounds[boundsKey]};
@@ -190,7 +192,7 @@ class CanvasRenderer {
     ctx.drawImage(img,bounds.x,bounds.y,bounds.w,bounds.h,(size-w)/2,(size-h)/2,w,h);
     ctx.restore();
   }
-  sheet(spr,s){ return this.loadImg(DataEngine.spriteSheet(spr,s)); }
+  sheet(spr,s,wt=null){ return this.loadImg(DataEngine.spriteSheet(spr,s,wt)); }
   // Familier : grille 4x4 (Row 1: idle, Row 2: run, Row 3: attack, Row 4: hit/fall/2x KO)
   drawPet(ctx,f,an,n){
     const A=CanvasRenderer.PET[an]||CanvasRenderer.PET.idle, L=A.f?A.f.length:4, k=A.loop?n%L:Math.min(n,L-1);
@@ -208,19 +210,13 @@ class CanvasRenderer {
     return [f.anim,n];
   }
   blit(ctx,f,c){
-    const [an,n]=this.animFrame(f,c), o=this.octx; f.pet?this.drawPet(o,f,an,n):this.drawBrute(o,f.b,c,an,n);
+    const [an,n]=this.animFrame(f,c), o=this.octx, wid=!f.pet&&f.wpn&&Number.isInteger(f.wpn.id)?f.wpn.id:null;
+    f.pet?this.drawPet(o,f,an,n):this.drawBrute(o,f.b,c,an,n,wid);
     const fl=Math.max(0,1-(c-f.flash0)/180);            // flash blanc à l'impact
     if(fl>0){ o.globalCompositeOperation="source-atop"; o.fillStyle=`rgba(255,255,255,${fl})`; o.fillRect(0,0,64,64); o.globalCompositeOperation="source-over"; }
     const hop=(f.win?Math.abs(Math.sin(c/180))*8:0)+(f.air||0);
     ctx.save(); ctx.translate(Math.round(f.x),Math.round(f.y-hop)); const fp=f.flip&&!f.win; if(fp) ctx.scale(-1,1);
-    const R=CanvasRenderer, SC=R.SPR/64, OY=-(R.SPR-R.PAD); ctx.drawImage(this.off,-R.SPR/2,OY,R.SPR,R.SPR);
-    const an_=!f.pet&&f.wpn&&CanvasRenderer.ANCHORS[an];   // Layering : arme collée au pivot de la main selon l'anim et la frame
-    if(an_){ const A=CanvasRenderer.ANIMS[an]||CanvasRenderer.ANIMS.idle, h=an_[A.loop?n%4:Math.min(n,3)];
-      if(h){ ctx.translate(-R.SPR/2+h[0]*SC,OY+h[1]*SC); ctx.rotate(h[2]+Math.PI/4);
-        const wi=this.loadImg(DataEngine.WEAPON_IMGS[f.wpn.id]), skin=this.weaponSprite(f.b,f.wpn.id);
-        if(wi) ctx.drawImage(wi,-4,-22,26,26);
-        else if(skin) ctx.drawImage(skin.sheet,skin.x,skin.y,skin.width,skin.height,-4,-22,26,26);
-        else { if(fp) ctx.scale(-1,1); ctx.font="20px serif"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText(f.wpn.ic,0,-8); } } }
+    const R=CanvasRenderer, OY=-(R.SPR-R.PAD); ctx.drawImage(this.off,-R.SPR/2,OY,R.SPR,R.SPR);
     ctx.restore();
   }
   drawArena(ctx,A,c){
@@ -297,7 +293,7 @@ class CanvasRenderer {
         }
       }
     });
-    const pj=A.proj; if(pj&&c>=pj.t0&&c<=pj.t1){ const k=(c-pj.t0)/(pj.t1-pj.t0); ctx.save(); ctx.translate(pj.x0+(pj.x1-pj.x0)*k,pj.y0+(pj.y1-pj.y0)*k-Math.sin(Math.PI*k)*18); ctx.rotate(c/45); const skin=pj.b&&Number.isInteger(pj.id)?this.weaponSprite(pj.b,pj.id):null; if(skin){ ctx.drawImage(skin.sheet,skin.x,skin.y,skin.width,skin.height,-13,-13,26,26); } else { ctx.font="19px serif"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText(pj.ic,0,0); } ctx.restore(); }
+    const pj=A.proj; if(pj&&c>=pj.t0&&c<=pj.t1){ const k=(c-pj.t0)/(pj.t1-pj.t0), sz=pj.id===11?36:26; ctx.save(); ctx.translate(pj.x0+(pj.x1-pj.x0)*k,pj.y0+(pj.y1-pj.y0)*k-Math.sin(Math.PI*k)*(pj.id===11?24:18)); ctx.rotate(c/(pj.id===11?90:45)); const skin=pj.b&&Number.isInteger(pj.id)?this.weaponSprite(pj.b,pj.id):null; if(skin){ ctx.drawImage(skin.sheet,skin.x,skin.y,skin.width,skin.height,-sz/2,-sz/2,sz,sz); } else { ctx.font=(pj.id===11?"28px":"19px")+" serif"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText(pj.ic,0,0); } ctx.restore(); }
     ctx.textAlign="center";
     A.fl.forEach(t=>{                                   // nombres flottants
       const age=c-t.c0; if(age<0||age>1000) return;

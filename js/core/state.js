@@ -86,6 +86,7 @@ const GameState = {
     b.hasBeenRenamed = b.hasBeenRenamed === true;
     b.xpMax = this.xpMaxPour(b.level);
     ["weapons", "gear", "skills"].forEach(k => { if (!Array.isArray(b[k])) b[k] = []; });
+    b.weapons = b.weapons.filter(id => Number.isInteger(id) && id >= 0 && id < DataEngine.WEAPONS.length);
     if (!Number.isFinite(b.afkTs) || b.afkTs > Date.now()) b.afkTs = Date.now();
     return b;
   },
@@ -115,7 +116,7 @@ const GameState = {
     ["achatsStats", "tentativesParchemins", "reputation", "ticketsPvp", "skipsGratuits"].forEach(k => this[k] = this._n(d[k], v[k]));
     this.boss = {}; Object.keys(v.boss).forEach(k => this.boss[k] = Math.min(this.PALIERS, this._n(d.boss && d.boss[k])));
     this.queteCompagnon = d.queteCompagnon === true;
-    this.maitriseArmes = {}; Object.keys(d.maitriseArmes || {}).forEach(k => this.maitriseArmes[k] = Math.min(this.MAITRISE_MAX, this._n(d.maitriseArmes[k])));
+    this.maitriseArmes = {}; Object.keys(d.maitriseArmes || {}).forEach(k => { if (+k >= 0 && +k < DataEngine.WEAPONS.length) this.maitriseArmes[k] = Math.min(this.MAITRISE_MAX, this._n(d.maitriseArmes[k])); });
     this.presets = Object.assign(v.presets, d.presets);
     this.monde = Object.assign(v.monde, d.monde); this.monde.cles = this._n(this.monde.cles, 2); this.monde.record = this._n(this.monde.record);
     this.brute = this.attach(this._normBrute(d.brute));

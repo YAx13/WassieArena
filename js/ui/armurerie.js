@@ -27,7 +27,7 @@ const FX={
     agi:"Améliore la précision et les chances de coup critique.",
     spd:"Réduit le délai entre deux actions : vous jouez plus souvent."
   },
-  STYLE:{estoc:"Estoc",overhead:"Frappe haute",throw:"Lancer"},
+  STYLE:{light:"Arme légère",heavy:"Arme lourde",throw:"Arme de jet"},
   TYPE:{A:"Attaque",C:"Contrôle",S:"Soutien"},
   STAGE:["Base","Milieu","Légende"],
   REVEAL_SKILLS:false,   // false = comme les armes : les compétences non apprises restent mystérieuses
@@ -74,10 +74,11 @@ function tipHTML(code){
   const bar=(l,v)=>`<div class="tb"><span>${l}</span><em><b style="width:${v*10}%"></b></em><u>${v}</u></div>`;
   if(!b) return "";
   if(k==="w"){
-    const w=D.WEAPONS[+id], own=b.weapons.includes(w.id);
+    const w=D.WEAPONS[+id]; if(!w) return "";
+    const own=b.weapons.includes(w.id);
     const lv=(typeof GameState!=="undefined"&&GameState.maitriseArmes?.[w.id])||(b.weaponLevels?.[w.id])||0;
     const bonus=lv>0?` +${lv}`:"";
-    return own?`<h4>${w.icon} ${E(w.name)}${bonus}</h4><p>${E(w.desc)}</p>${bar("Dégâts",w.dmg)}${bar("Vitesse",w.spd)}${bar("Précision",w.prec)}${bar("Critique",w.crit)}<div class="fxl k">Style : ${FX.STYLE[D.WEAPON_STYLE[w.id]]||"—"}</div>`
+    return own?`<h4>${w.icon} ${E(w.name)}${bonus}</h4><p>${E(w.desc)}</p>${bar("Dégâts",w.dmg)}${bar("Vitesse",w.spd)}${bar("Précision",w.prec)}${bar("Critique",w.crit)}<div class="fxl k">Catégorie : ${FX.STYLE[w.type]||"—"}</div>`
       :`<h4>? Arme inconnue</h4><p>Piratez une caisse de sécurité Wass-E pour la découvrir.</p>`;
   }
   if(k==="s"){
@@ -145,26 +146,7 @@ document.addEventListener("click",hideTip); addEventListener("scroll",hideTip,tr
 /* --- Rendu de la fiche --- */
 const WEAPON_RACK_LAYOUT_PREFIX="arene_weapon_rack_dev_layout_v1_";
 let weaponRackEditing=false, weaponRackPositions=null, weaponRackDrag=null, weaponRackBrute="general";
-const WEAPON_RACK_FROZEN={
-  "empereur": [
-    { "id": 0, "x": 53.09, "y": 51.45, "size": 31.12, "angle": 2 },
-    { "id": 1, "x": 60.64, "y": 17.34, "size": 31.12, "angle": 0 },
-    { "id": 2, "x": 77.97, "y": 17.34, "size": 31.12, "angle": 1 },
-    { "id": 3, "x": 84.85, "y": 26.68, "size": 31.12, "angle": 3 },
-    { "id": 4, "x": 29.92, "y": 47.06, "size": 31.12, "angle": 2 },
-    { "id": 5, "x": 34.52, "y": 41.48, "size": 31.12, "angle": 2 },
-    { "id": 6, "x": 53.33, "y": 48.38, "size": 31.12, "angle": -2 },
-    { "id": 7, "x": 44.92, "y": 41.34, "size": 31.12, "angle": -1 },
-    { "id": 8, "x": 82.79, "y": 63.92, "size": 31.12, "angle": 1 },
-    { "id": 9, "x": 57.14, "y": 75.94, "size": 31.12, "angle": -3 },
-    { "id": 10, "x": 35.06, "y": 62.45, "size": 31.12, "angle": -2 },
-    { "id": 11, "x": 23.69, "y": 46.91, "size": 31.12, "angle": 3 },
-    { "id": 12, "x": 43.32, "y": 17.34, "size": 31.12, "angle": -1 },
-    { "id": 13, "x": 22.18, "y": 62.01, "size": 31.12, "angle": 3 },
-    { "id": 14, "x": 77.97, "y": 84.17, "size": 31.12, "angle": 1 },
-    { "id": 15, "x": 71.06, "y": 50.13, "size": 31.12, "angle": 1 }
-  ]
-};
+const WEAPON_RACK_FROZEN={};
 function validRackPositions(p){
   return Array.isArray(p)&&p.length===DataEngine.WEAPONS.length&&p.every((q,i)=>q&&q.id===i&&[q.x,q.y,q.size,q.angle].every(Number.isFinite));
 }
@@ -354,11 +336,11 @@ function generateWeaponRackChaos(b,grid,buckleSize=weaponBuckleSize){
   const L=Math.round(GW*0.075), R=Math.round(GW*0.925), T=Math.round(GH*0.105), B=Math.round(GH*0.895);
   const WASS_L=Math.round(GW*0.68), WASS_B=Math.round(GH*0.25);
 
-  const buckleW=DataEngine.WEAPONS.find(w=>/bouclier|shield|rondache|ecu|écu/i.test(w.name))||DataEngine.WEAPONS[DataEngine.WEAPONS.length-1];
+  const buckleW=DataEngine.WEAPONS.find(w=>w.id===11||/pilier|bouclier|shield/i.test(w.name))||DataEngine.WEAPONS[DataEngine.WEAPONS.length-1];
   const buckleId=buckleW.id;
   const metrics=DataEngine.WEAPONS.map(w=>{
     const m=measureWeaponPixels(b,w.id)||{W:32,H:32,mask:new Uint8Array(1024).fill(1),wRatio:0.65,hRatio:0.65,area:0.3,tier:"med"};
-    const baseSize=m.tier==="big"?25.5:m.tier==="small"?18.0:21.5;
+    const baseSize=w.id===11?buckleSize:m.tier==="big"?25.5:m.tier==="small"?18.0:21.5;
     return {id:w.id,...m,size:baseSize};
   });
 
@@ -413,9 +395,9 @@ function generateWeaponRackChaos(b,grid,buckleSize=weaponBuckleSize){
   };
 
   const placed=[];
-  // 1. Bouclier / Boucle centrale verrouillé au centre du panneau bleu
+  // 1. Pilier central verrouillé au centre du panneau bleu
   const buckleM=metrics.find(m=>m.id===buckleId);
-  const bucklePos={id:buckleId,x:50,y:50,size:buckleSize,angle:0,flip:false};
+  const bucklePos={id:buckleId,x:50,y:50,size:buckleM?buckleM.size:buckleSize,angle:0,flip:false};
   commit(stampPoints(buckleM,bucklePos));
   placed.push(bucklePos);
 
@@ -467,7 +449,7 @@ function updateWeaponRackDevUI(){
     bar=document.createElement("div");
     bar.id="fx-rack-devbar";
     bar.style.cssText="position:absolute;right:12px;bottom:12px;z-index:25;display:flex;gap:6px;align-items:center;background:rgba(10,8,6,.88);border:1px solid #c9953a;padding:4px 8px;border-radius:3px;font:11px monospace;color:#ffd77a";
-    bar.innerHTML=`<label style="display:flex;align-items:center;gap:4px">Boucle <input id="fx-buckle-size" type="range" min="16" max="38" step="1" value="${weaponBuckleSize}" style="width:72px"></label>`
+    bar.innerHTML=`<label style="display:flex;align-items:center;gap:4px">Boucle <input id="fx-buckle-size" type="range" min="16" max="56" step="1" value="${weaponBuckleSize}" style="width:72px"></label>`
       + `<button type="button" id="fx-rack-chaos" class="fx-btn" style="width:auto!important;height:auto!important;min-height:0!important;padding:4px 8px!important;font-size:11px!important">🎲 Chaos</button>`;
     panel.appendChild(bar);
     bar.appendChild(edit);
