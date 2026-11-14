@@ -28,7 +28,7 @@ const CharacterSelect = (() => {
 #screen-select .neon-sign.flicker{animation:neonFlicker .28s ease-out}
 
 /* 1. Grand écran cyan de gauche (inpaint) : Stats LED + Compétence (statique, sans survol) */
-#screen-select .sign-hud{position:absolute;top:8.2%;left:11.8%;width:24.2%;height:22.4%;padding:8px 12px;display:flex;flex-direction:column;justify-content:space-between;background:transparent;border:none;box-shadow:none;pointer-events:none}
+#screen-select .sign-hud{position:absolute;top:6.2%;left:11.8%;width:24.2%;height:22.4%;padding:8px 12px;display:flex;flex-direction:column;justify-content:space-between;background:transparent;border:none;box-shadow:none;pointer-events:none}
 #screen-select .sheet{display:flex;flex-direction:column;gap:5px}
 #screen-select .stat{margin:0}
 #screen-select .stat .row{display:grid;grid-template-columns:56px 1fr;align-items:center;gap:8px}

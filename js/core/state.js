@@ -220,10 +220,13 @@ const GameState = {
   },
   /* ---- Équipement : donnerRecompense("equipement", n, { rarite, part }) ---- */
   donnerEquipement(n, o = {}){
-    const D = DataEngine, out = [];
+    const out = [];
     for (let i = 0; i < n; i++) {
       const r = Number.isInteger(o.rarite) && o.rarite >= 0 ? o.rarite : GachaShop.rollRarity();
-      const g = { part: o.part || D.pick(D.PARTS).id, rarity: Math.min(5, r) };
+      const rolled = GachaShop.rollGear(Math.min(5, r));
+      const g = rolled.item;
+      if (o.part) g.part = o.part;
+      if (o.set && g.part !== "ring") g.set = o.set;
       this.brute.gear.push(g); out.push(g);
     }
     this.save(); this.rafraichir(); return out;
@@ -317,7 +320,13 @@ const GameState = {
       h = r.maitrise === "parchemin" ? `Doublon (${r.w.icon} ${r.w.name}) : maîtrise max (+10) → <b>+1 📜 parchemin</b> !`
         : `Doublon (${r.w.icon} ${r.w.name}) : maîtrise <b>+${r.maitrise}</b> / +10 !`;
     } else if (r.type === "weapon") h = `Nouvelle arme : <b>${r.w.icon} ${r.w.name}</b> !`;
-    else h = `<b style="color:${R[r.rarity].color}">${r.part.icon} ${r.part.name} ${R[r.rarity].name}</b>`;
+    else {
+      const it = r.item || {}, setInfo = it.set && DataEngine.GEAR_SETS[it.set];
+      const tag = it.part === "ring"
+        ? (it.kind === "el" ? `(${DataEngine.EL_ICON[it.el]} ${DataEngine.ELEMENTS[it.el]})` : `(+${DataEngine.RING_STAT_BONUS[r.rarity]} ${{hp:"Vie",str:"Force",agi:"Agilité",spd:"Vitesse"}[it.stat]})`)
+        : (setInfo ? `[Set ${setInfo.icon} ${setInfo.name}]` : "");
+      h = `<b style="color:${R[r.rarity].color}">${r.part.icon} ${r.part.name} ${R[r.rarity].name} ${tag}</b>`;
+    }
     const c = $("#chest"); c.classList.remove("shake"); void c.offsetWidth; c.classList.add("shake");
     $("#chest-result").innerHTML = h;
     persist(); this.majCargos();

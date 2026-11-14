@@ -21,8 +21,13 @@ class BattleEngine {
   static elOf(br){ const k=(br.skills||[]).map(id=>DataEngine.SKILLS[id]).find(s=>s&&s.el>0); return k?k.el:0; }
   constructor(a,b,buffs=null){
     [a,b].forEach(br=>{ if(!br.skills||!br.skills.length) br.skills=DataEngine.pickSkills(3); });
-    this.f=[a,b].map((br,n)=>{ const bf=n===0?buffs:null, mx=BattleEngine.maxHp(br,bf);
-      return {br,el:BattleEngine.elOf(br),name:br.name,max:mx,hp:mx,str:BattleEngine.eff(br,"str",bf),agi:BattleEngine.eff(br,"agi",bf),spd:BattleEngine.eff(br,"spd",bf),next:0,st:{stun:0,slow:0,spdUp:0,rage:0,accD:null,dr:null,dodge:null,reflect:null,dot:[],shield:0,block:0}}; });
+    this.f=[a,b].map((br,n)=>{
+      const bf=n===0?buffs:null, sets=DataEngine.getActiveSetBonuses(br);
+      const hpMult=sets.some(s=>s.set.id==="mutant")?1.15:1;
+      const spdMult=sets.some(s=>s.set.id==="cyber")?1.10:1;
+      const mx=Math.round(BattleEngine.maxHp(br,bf)*hpMult);
+      return {br,el:BattleEngine.elOf(br),name:br.name,max:mx,hp:mx,str:BattleEngine.eff(br,"str",bf),agi:BattleEngine.eff(br,"agi",bf),spd:Math.max(1,Math.round(BattleEngine.eff(br,"spd",bf)*spdMult)),next:0,st:{stun:0,slow:0,spdUp:0,rage:0,accD:null,dr:null,dodge:null,reflect:null,dot:[],shield:0,block:0}};
+    });
     this.f.forEach(x=>x.next=(100/x.spd)*(.5+Math.random()*.5));
     this.h={}; this.round=0; this.over=false; this.winner=null;
   }
@@ -101,22 +106,33 @@ class BattleEngine {
     if(dead){ this.over=true; this.winner=j; this.emit("on_death",{i,j,dead:i,msg:A.name+" succombe à ses blessures."}); }
     else if(!stunned){
       const fx=Object.assign({},sk?sk.fx:{}), fl=[];
-      let pw=sk?sk.pw:1;
-      DataEngine.getSynergies(A.br.skills||[]).forEach(syn=>{
+      let pw=sk?sk.pw:1, critDmgMult=1.5;
+      const setsA=DataEngine.getActiveSetBonuses(A.br), setsD=DataEngine.getActiveSetBonuses(D.br);
+      const {rings:ringsA}=DataEngine.getEquippedGear(A.br);
+      setsA.forEach(sb=>{
+        if(sb.set.id==="carnage"){ critDmgMult+=0.12; if(sb.tier===4){ pw*=1.20; fx.pierce=Math.max(fx.pierce||0,0.15); } }
+        if(sb.set.id==="cyber"){ fx.acc=(fx.acc||0)+10; if(sb.tier===4){ if(fx.stun) fx.stun=Math.min(1,fx.stun+0.25); if(fx.slow) fx.slow+=1; } }
+        if(sb.set.id==="mutant"&&sb.tier===4){ A.hp=Math.min(A.max,A.hp+Math.max(1,Math.round(A.max*0.05))); }
+      });
+      ringsA.forEach(r=>{ if(r.kind==="el"&&sk&&sk.el===r.el) pw*=1+(DataEngine.RING_EL_BONUS[r.rarity]||0.10); });
+      DataEngine.getAllSynergies(A.br,A.br.skills||[]).forEach(syn=>{
         if(sk&&sk.el===syn.el&&syn.def.dmg) pw*=syn.def.dmg[syn.idx];
         if(syn.def.crit) fx.crit=(fx.crit||0)+syn.def.crit[syn.idx];
         if(syn.def.heal&&fx.heal) fx.heal*=syn.def.heal[syn.idx];
       });
       if(pw>0){
-        const acc=Math.max(15,Math.min(95,75+(A.agi-D.agi)*1.5+(fx.acc||0)-(S.accD?S.accD.v:0)-(D.st.dodge?D.st.dodge.v:0)));
+        const defDodgeBonus=setsD.some(sb=>sb.set.id==="mutant")?10:0;
+        const acc=Math.max(15,Math.min(95,75+(A.agi-D.agi)*1.5+(fx.acc||0)-(S.accD?S.accD.v:0)-(D.st.dodge?D.st.dodge.v:0)-defDodgeBonus));
         if(D.st.block){ D.st.block=0; this.emit("on_dodge",{i,j,msg:D.name+" bloque le coup derrière un mur de gravats !"}); }
         else if(fx.sure||Math.random()*100<acc){
           const crit=Math.random()<.08+A.agi*.003+(fx.crit||0);
-          const m=pw*BattleEngine.elMult(sk?sk.el||0:0,D.el)*(crit?1.5:1)*(S.rage?1+(1-A.hp/A.max)*.8:1)*(D.st.dr?1-D.st.dr.v:1);
-          let dmg=Math.max(1,Math.round((A.str*.95+1+Math.random()*4-D.br.stats.hp*.03*(1-(fx.pierce?1:0)))*m));
+          const m=pw*BattleEngine.elMult(sk?sk.el||0:0,D.el)*(crit?critDmgMult:1)*(S.rage?1+(1-A.hp/A.max)*.8:1)*(D.st.dr?1-D.st.dr.v:1);
+          const pierceVal=Math.min(1,fx.pierce||0);
+          let dmg=Math.max(1,Math.round((A.str*.95+1+Math.random()*4-D.br.stats.hp*.03*(1-pierceVal))*m));
           if(D.st.shield>0){ const x=Math.min(D.st.shield,dmg); D.st.shield-=x; dmg-=x; if(x) fl.push("le bouclier absorbe "+x); }
           D.hp=Math.max(0,D.hp-dmg);
           let back=0; if(D.st.reflect&&dmg>0) back+=Math.round(dmg*D.st.reflect.v); if(fx.recoil) back+=Math.round(dmg*fx.recoil);
+          if(setsD.some(sb=>sb.set.id==="mutant"&&sb.tier===4)&&dmg>0) back+=Math.max(1,Math.round(dmg*0.20));
           if(back){ A.hp=Math.max(1,A.hp-back); fl.push(A.name+" encaisse "+back+" de recul"); }
           this.emit("on_hit",{i,j,dmg,crit,prop:!!fx.push,hp:D.hp,hpA:A.hp,msg:crit?"Coup critique : -"+dmg+" HP !":D.name+" perd "+dmg+" HP."});
           if(D.hp>0){
@@ -130,13 +146,6 @@ class BattleEngine {
           if(fx.selfDelay){ A.next+=(100/A.spd)*fx.selfDelay; fl.push(A.name+" met du temps à récupérer"); }
         } else this.emit("on_dodge",{i,j,msg:D.name+" esquive !"});
       }
-      // Application des synergies élémentaires actives sur la Brute
-      const syns = DataEngine.getSynergies(A.br.competencesEquipees || A.br.skills || []);
-      syns.forEach(syn => {
-        if (sk && sk.el === syn.el && syn.def.dmg) pw *= syn.def.dmg[syn.idx];
-        if (syn.def.crit) fx.crit = (fx.crit || 0) + syn.def.crit[syn.idx];
-        if (syn.def.heal && fx.heal) fx.heal *= syn.def.heal[syn.idx];
-      });
       if(sk&&(sk.t!=="A"||pw===0||sk.pet)){   // effets sur soi (compétences de soutien ou passifs de familier)
         if(fx.dr) S.dr={v:fx.dr[0],n:fx.dr[1]}; if(fx.dodge) S.dodge={v:fx.dodge[0],n:fx.dodge[1]}; if(fx.reflect) S.reflect={v:fx.reflect[0],n:fx.reflect[1]};
         if(fx.rage) S.rage=fx.rage; if(fx.spdUp) S.spdUp=fx.spdUp; if(fx.block) S.block=1; if(fx.shield) S.shield=Math.round(8+A.str*fx.shield);

@@ -173,7 +173,7 @@ const CaserneUI = {
     persist();
     toast("Nouvelle compétence : " + D.EL_ICON[k.el] + " " + k.name + (auto ? " (équipée)" : "") + " !");
   },
-  /* ---------- 2b. CAISSES EN 1 CLIC & AUTO-FORGE ---------- */
+/* ---------- 2b. CAISSES EN 1 CLIC, ÉQUIPEMENT PVP & FORGE ---------- */
   actionCaisse(){
     const GS = GameState;
     if ((GS.ressources.caisses || 0) <= 0) {
@@ -185,6 +185,31 @@ const CaserneUI = {
     if (resEl && resEl.innerHTML) this._lastChestHTML = resEl.innerHTML;
     persist();
   },
+  equiperPiece(sig){
+    const b = S.cur; if (!b) return;
+    const item = (b.gear || []).find(g => DataEngine.gearSig(g) === sig);
+    if (!item) return;
+    if (item.part === "ring") {
+      if (!Array.isArray(b.eqRings)) b.eqRings = [];
+      const idx = b.eqRings.indexOf(sig);
+      if (idx >= 0) b.eqRings.splice(idx, 1);
+      else {
+        if (b.eqRings.length >= 2) b.eqRings.shift();
+        b.eqRings.push(sig);
+      }
+    } else {
+      if (!b.eqArmor) b.eqArmor = {};
+      b.eqArmor[item.part] = { set: item.set, rarity: item.rarity };
+    }
+    persist();
+  },
+  async transmuterGroupe(key){
+    if (!depenserRessource("pierres", 1)) { toast("1 Pierre de Transmutation (💎) requise."); return; }
+    const r = ForgeSystem.transmute(S.cur, key);
+    if (!r.ok) { donnerRecompense("pierres", 1); toast(r.msg); return; }
+    toast("💎 Pièce transmutée !");
+    persist();
+  },
   async fusionnerGroupe(key){
     const r = ForgeSystem.fuse(S.cur, key);
     if (!r.ok) { toast(r.msg); return; }
@@ -193,18 +218,10 @@ const CaserneUI = {
     persist();
   },
   async toutFusionner(){
-    let count = 0, divin = false;
-    for (;;) {
-      const gs = ForgeSystem.groups(S.cur).filter(g => g.n >= 3 && g.rarity < 5);
-      if (!gs.length) break;
-      const r = ForgeSystem.fuse(S.cur, gs[0].k);
-      if (!r.ok) break;
-      count++;
-      if (r.rarity === 5) divin = true;
-    }
-    if (!count) { toast("Aucune série de 3 équipements identiques à fusionner."); return; }
-    toast("Auto-Forge : " + count + " fusion" + (count > 1 ? "s" : "") + " effectuée" + (count > 1 ? "s" : "") + " !");
-    if (divin && typeof divineAwakening === "function") await divineAwakening(S.cur);
+    const res = ForgeSystem.autoFuse(S.cur);
+    if (!res.n) { toast("Aucune série de 3 équipements strictement identiques à fusionner."); return; }
+    toast("Auto-Forge : " + res.n + " fusion" + (res.n > 1 ? "s" : "") + " effectuée" + (res.n > 1 ? "s" : "") + " !");
+    for (let i = 0; i < res.div; i++) if (typeof divineAwakening === "function") await divineAwakening(S.cur);
     persist();
   },
 
@@ -236,7 +253,6 @@ const CaserneUI = {
         if (getComputedStyle(el).position === "static") el.style.position = "relative";
         const bd = document.createElement("span"); bd.className = "cs-rank"; bd.textContent = "+" + rang; el.appendChild(bd);
       }
-      
     });
     // Slots (1 / 5 / 10) — icône seule sans contour
     this.Q("#cs-slots").innerHTML = this.NIV_SLOTS.map((lv, i) => {
@@ -253,7 +269,7 @@ const CaserneUI = {
     const synBox = this.Q("#cs-synergies");
     if (synBox) {
       synBox.dataset.skItem = "syn";
-      const syns = DataEngine.getSynergies(eq), maxSlots = this.slotsOuverts();
+      const syns = DataEngine.getAllSynergies(b, eq), maxSlots = this.slotsOuverts();
       if (syns.length) {
         const s = syns[0];
         synBox.classList.add("active");
@@ -281,69 +297,117 @@ const CaserneUI = {
     this.majUnlock();
     this.Q("#fx-sgrid").querySelectorAll(".fx-s").forEach((el, idx) => { el.dataset.skItem = "sk_" + idx; });
     this.applySkillsLayout();
-    if (this._syncSkillsDev) this._syncSkillsDev();    this.renderEquipementTab();
+    if (this._syncSkillsDev) this._syncSkillsDev();
+    this.renderEquipementTab();
   },
-    majUnlock(){
+  majUnlock(){
     const u = this.Q("#cs-unlock"), b = S.cur; if (!u || !b) return;
     const c = this.coutParchemin(), tout = b.skills.length >= DataEngine.SKILLS.length, R = GameState.ressources;
     u.textContent = tout ? "✔ 32/32 DÉBLOQUÉES" : `📜 TIRAGE (${c} 📜 · stock: ${R.parchemins})`;
-    u.disabled = !this._skillsEditing && (tout || R.parchemins < c);   // un bouton disabled ne peut pas être glissé
+    u.disabled = !this._skillsEditing && (tout || R.parchemins < c);
   },
-    renderEquipementTab(){
+  describeGear(g){
+    const D = DataEngine, STAT_NOM = { hp: "Vie", str: "Force", agi: "Agilité", spd: "Vitesse" };
+    if (g.part === "ring") {
+      if (g.kind === "el") {
+        const pct = Math.round((D.RING_EL_BONUS[g.rarity] || 0.1) * 100);
+        return { title: "Anneau " + D.ELEMENTS[g.el], sub: `${D.EL_ICON[g.el]} +${pct}% Dégâts & +1 Synergie`, col: D.EL_COL[g.el] };
+      }
+      const val = D.RING_STAT_BONUS[g.rarity] || 2;
+      return { title: "Anneau " + STAT_NOM[g.stat], sub: `+${val} ${STAT_NOM[g.stat]}`, col: "#7ffcf4" };
+    }
+    const p = D.PARTS.find(x => x.id === g.part), s = D.GEAR_SETS[g.set] || D.GEAR_SETS.carnage;
+    const val = D.GEAR_BONUS[g.rarity] || 1;
+    return { title: `${p.name} ${s.name}`, sub: `${s.icon} +${val} ${STAT_NOM[D.PART_STAT[g.part]]}`, col: s.col };
+  },
+  renderEquipementTab(){
     const root = this.Q("#cs-equip-root"), b = S.cur; if (!root || !b) return;
-    const D = DataEngine, R = GameState.ressources, RAR = D.RARITIES, PARTS = D.PARTS;
+    const D = DataEngine, R = GameState.ressources, RAR = D.RARITIES;
     const gs = ForgeSystem.groups(b).sort((a, c) => c.rarity - a.rarity);
     const fusables = gs.filter(g => g.n >= 3 && g.rarity < 5).length;
+    const eq = D.getEquippedGear(b), eqSigs = new Set(eq.all.map(x => D.gearSig(x)));
+    const activeSets = D.getActiveSetBonuses(b);
 
     const cnt = this.Q("#cs-eqcount");
     if (cnt) cnt.textContent = (b.gear ? b.gear.length : 0) + " pièce(s)";
 
     const hasStock = (R.caisses || 0) > 0;
-    const btnTxt = hasStock ? `📦 Ouvrir Caisse en stock (${R.caisses})` : `📦 Acheter & Ouvrir Caisse — ${GameState.PRIX_CAISSE} Or`;
+    const btnTxt = hasStock ? `Ouvrir Caisse Wass-E (${R.caisses} en stock)` : `Pirater Caisse Wass-E — ${GameState.PRIX_CAISSE} Or`;
     const btnDis = !hasStock && R.or < GameState.PRIX_CAISSE ? "disabled" : "";
 
-    const equippedHTML = PARTS.map(p => {
-      const owned = (b.gear || []).filter(g => g.part === p.id).sort((a, c) => c.rarity - a.rarity);
-      const best = owned[0];
-      if (!best) return `<div class="cs-eq-slot"><span>${p.icon}</span><small>${p.name}<br>Vide</small></div>`;
-      const rInfo = RAR[best.rarity];
-      return `<div class="cs-eq-slot" style="border-color:${rInfo.color}"><span>${p.icon}</span><small style="color:${rInfo.color}">${p.name}<br><b>${rInfo.name}</b></small></div>`;
+    const slotsDef = [
+      { label: "Casque", icon: "🪖", item: eq.armors.find(g => g.part === "helmet") },
+      { label: "Plastron", icon: "🦺", item: eq.armors.find(g => g.part === "chest") },
+      { label: "Bottes", icon: "🥾", item: eq.armors.find(g => g.part === "boots") },
+      { label: "Collier", icon: "📿", item: eq.armors.find(g => g.part === "necklace") },
+      { label: "Anneau I", icon: "💍", item: eq.rings[0] },
+      { label: "Anneau II", icon: "💍", item: eq.rings[1] }
+    ];
+
+    const equippedHTML = slotsDef.map(sl => {
+      if (!sl.item) return `<div class="cs-eq-slot"><span class="cs-eq-ico" style="opacity:.35">${sl.icon}</span><span class="cs-eq-lbl">${sl.label}</span><span class="cs-eq-sub" style="opacity:.5">Vide</span></div>`;
+      const rInfo = RAR[sl.item.rarity], desc = this.describeGear(sl.item);
+      return `<div class="cs-eq-slot filled" style="--rc:${rInfo.color}" title="${desc.title} (${rInfo.name}) : ${desc.sub}">
+        <span class="cs-eq-ico">${sl.icon}</span>
+        <span class="cs-eq-lbl" style="color:${rInfo.color}">${desc.title}</span>
+        <span class="cs-eq-sub" style="color:${desc.col}">${desc.sub}</span>
+      </div>`;
     }).join("");
 
-    const invHTML = gs.length ? gs.map(g => {
-      const p = PARTS.find(q => q.id === g.part), rInfo = RAR[g.rarity];
-      const canFuse = g.n >= 3 && g.rarity < 5;
-      return `<button class="cs-inv-item ${canFuse ? "fusable" : ""}" data-fk="${g.k}" style="border-color:${rInfo.color}">
-        <span class="cs-inv-ico">${p.icon}</span>
-        <span class="cs-inv-name" style="color:${rInfo.color}">${p.name}</span>
-        <small>${rInfo.name} · <b>×${g.n}</b>${canFuse ? " 🔨" : ""}</small>
-      </button>`;
-    }).join("") : `<p class="cs-note">Votre inventaire est vide. Ouvrez une Caisse Wass-E ci-dessus !</p>`;
+    const setsHTML = activeSets.length
+      ? activeSets.map(sb => `<span class="cs-set-pill" style="--sc:${sb.set.col}">${sb.set.icon} <b>Set ${sb.set.name} (${sb.count}/4)</b> : ${sb.tier === 4 ? sb.set.p2 + " + " + sb.set.p4 : sb.set.p2}</span>`).join("")
+      : `<span style="opacity:.65">Aucun bonus de Set actif (équipez 2 ou 4 pièces Carnage, Cyber-Flux ou Cuve-Mutant).</span>`;
 
-    root.innerHTML = `
-      <div style="margin-bottom:10px">
-        <div class="cs-gold" id="cs-equip-gold" aria-live="polite">🪙 ${R.or.toLocaleString("fr-FR")} Or</div>
-        <button id="cs-oneclick-chest" class="fx-btn cs-btn" ${btnDis}>${btnTxt}</button>
-        ${this._lastChestHTML ? `<div class="cs-power" style="margin-top:6px">Dernier tirage : ${this._lastChestHTML}</div>` : ""}
+    const invHTML = gs.length ? gs.map(g => {
+      const p = D.PARTS.find(q => q.id === g.part), rInfo = RAR[g.rarity], desc = this.describeGear(g);
+      const canFuse = g.n >= 3 && g.rarity < 5, isEq = eqSigs.has(g.k);
+      return `<div class="cs-inv-item ${canFuse ? "fusable" : ""} ${isEq ? "equipped" : ""}" style="--rc:${rInfo.color}">
+        <span class="cs-inv-ico">${p.icon}</span>
+        <span class="cs-inv-name" style="color:${rInfo.color}">${desc.title}</span>
+        <small style="color:${desc.col}">${desc.sub}</small>
+        <small style="opacity:.8">${rInfo.name} · <b>×${g.n}</b></small>
+        <div class="cs-inv-acts">
+          <button type="button" data-eq="${g.k}">${isEq ? "✔ Équipé" : "Équiper"}</button>
+          ${canFuse ? `<button type="button" class="fuse-btn" data-fk="${g.k}" title="Fusionner 3 identiques">🔨 ×3</button>` : ""}
+          ${R.pierres > 0 ? `<button type="button" class="trans-btn" data-tr="${g.k}" title="Changer de Set/Élément (1 💎)">💎</button>` : ""}
+        </div>
+      </div>`;
+    }).join("") : `<p class="cs-note" style="grid-column:1/-1;padding:14px">Atelier vide. Piratez une Caisse Wass-E ci-dessus pour récupérer des pièces de Set !</p>`;
+
+    root.innerHTML = `<div class="cs-eq-hub">
+      <div class="cs-cargo-bay">
+        <div class="cs-crate-vis">📦</div>
+        <div class="cs-cargo-mid">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+            <span style="font:bold 11px monospace;color:#7ffcf4;letter-spacing:1px">TERMINAL DE FRET WASS-E</span>
+            <span class="cs-gold" id="cs-equip-gold">🪙 ${R.or.toLocaleString("fr-FR")} Or · 💎 ${R.pierres}</span>
+          </div>
+          <button id="cs-oneclick-chest" class="cs-cargo-btn" ${btnDis}>${btnTxt}</button>
+          ${this._lastChestHTML ? `<div style="font:11px monospace;color:#ffd77a">Dernier loot : ${this._lastChestHTML}</div>` : ""}
+        </div>
       </div>
-      <div class="fx-h" style="font-size:1.5em"><span>Équipement actif (auto-équipé)</span></div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px">${equippedHTML}</div>
-      <div class="fx-h" style="font-size:1.5em">
-        <span>Inventaire & Forge (${gs.length} types)</span>
+      <div class="cs-set-bar">${setsHTML}</div>
+      <div class="cs-eq-grid">${equippedHTML}</div>
+      <div class="fx-h" style="font-size:1.4em;margin-top:2px">
+        <span>Établi & Forge PvP (${gs.length} modèles)</span>
         <button id="cs-autofuse" class="fx-mini" ${fusables ? "" : "disabled"}>🔨 Tout fusionner (${fusables})</button>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px">${invHTML}</div>
-    `;
-
-    const cb = this.Q("#cs-oneclick-chest");
-    if (cb) cb.onclick = e => { e.stopPropagation(); this.actionCaisse(); };
-    const af = this.Q("#cs-autofuse");
-    if (af) af.onclick = e => { e.stopPropagation(); this.toutFusionner(); };
-    root.querySelectorAll("[data-fk]").forEach(btn => {
-      btn.onclick = e => { e.stopPropagation(); this.fusionnerGroupe(btn.dataset.fk); };
-    });
-  },
-/* ---------- 4. COMPAGNON : Nourriture + évolution Forme 3 (pop-up Évolutions) ---------- */
+      <div class="cs-inv-grid">${invHTML}</div>
+    </div>`;
+const cb = this.Q("#cs-oneclick-chest");
+if (cb) cb.onclick = e => { e.stopPropagation(); this.actionCaisse(); };
+const af = this.Q("#cs-autofuse");
+if (af) af.onclick = e => { e.stopPropagation(); this.toutFusionner(); };
+root.querySelectorAll("[data-eq]").forEach(btn => {
+btn.onclick = e => { e.stopPropagation(); this.equiperPiece(btn.dataset.eq); };
+});
+root.querySelectorAll("[data-fk]").forEach(btn => {
+btn.onclick = e => { e.stopPropagation(); this.fusionnerGroupe(btn.dataset.fk); };
+});
+root.querySelectorAll("[data-tr]").forEach(btn => {
+btn.onclick = e => { e.stopPropagation(); this.transmuterGroupe(btn.dataset.tr); };
+});
+},/* ---------- 4. COMPAGNON : Nourriture + évolution Forme 3 (pop-up Évolutions) ---------- */
   nourrir(key){
     const c = S.cur && S.cur.companion;
     if (!c) { toast("Aucun compagnon actif."); return; }
@@ -417,9 +481,34 @@ const CaserneUI = {
       + ".cs-pre{display:inline-flex;gap:2px}.cs-evo{margin-top:12px;padding:10px;border:1px solid #c9953a;display:flex;flex-direction:column;gap:8px;align-items:stretch}.cs-evo-h{text-align:center}.cs-note{margin:0;font-size:12px;opacity:.8;text-align:center}"
       + ".cs-power{margin:6px 0;padding:6px;text-align:center;font:bold 14px monospace;color:#ffd77a;background:rgba(26,16,8,.88);border:1px solid #c9953a}"
       + ".cs-rank{position:absolute;top:2px;right:2px;padding:0 4px;font:bold 11px monospace;color:#1a1008;background:#ffd77a;border-radius:3px;pointer-events:none}"
-      + ".cs-eq-slot{display:flex;flex-direction:column;align-items:center;padding:8px 4px;background:rgba(0,0,0,.6);border:1px solid #3a3f46;border-radius:4px;text-align:center}"
-      + ".cs-inv-item{display:flex;flex-direction:column;align-items:center;padding:8px 6px;background:rgba(15,17,20,.9);border:1px solid #555;border-radius:4px;cursor:pointer;text-align:center}"
-      + ".cs-inv-item.fusable{box-shadow:0 0 8px rgba(57,255,20,.45)}.cs-inv-ico{font-size:2em}.cs-inv-name{font-weight:bold;margin:2px 0}"
+      + ".cs-eq-hub{display:flex;flex-direction:column;gap:10px;padding:4px}"
+      + ".cs-cargo-bay{position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:linear-gradient(135deg,#12161c 0%,#0b0e12 100%);border:1px solid #4ff0e6;box-shadow:inset 0 0 18px rgba(79,240,230,.14),0 4px 14px rgba(0,0,0,.8)}"
+      + ".cs-cargo-bay::before,.cs-cargo-bay::after{content:'';position:absolute;width:7px;height:7px;border:2px solid #ffb000;pointer-events:none}"
+      + ".cs-cargo-bay::before{top:-1px;left:-1px;border-right:0;border-bottom:0}.cs-cargo-bay::after{bottom:-1px;right:-1px;border-left:0;border-top:0}"
+      + ".cs-crate-vis{font-size:34px;filter:drop-shadow(0 0 10px rgba(255,176,0,.55));user-select:none}"
+      + ".cs-cargo-mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}"
+      + ".cs-cargo-btn{padding:9px 12px;background:rgba(8,22,28,.95);border:1px solid #4ff0e6;color:#7ffcf4;font:bold 12px monospace;letter-spacing:.8px;text-transform:uppercase;cursor:pointer;box-shadow:0 0 12px rgba(79,240,230,.28);transition:all .15s}"
+      + ".cs-cargo-btn:hover:not(:disabled){background:#10303c;color:#fff;box-shadow:0 0 18px rgba(79,240,230,.65)}"
+      + ".cs-cargo-btn:disabled{opacity:.42;cursor:not-allowed;box-shadow:none}"
+      + ".cs-set-bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:6px 10px;background:rgba(10,14,18,.88);border:1px solid #2b343e;font:11px monospace}"
+      + ".cs-set-pill{padding:3px 7px;border:1px solid var(--sc,#4ff0e6);background:rgba(0,0,0,.55);color:var(--sc,#fff);border-radius:2px}"
+      + ".cs-eq-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}"
+      + "@media(max-width:700px){.cs-eq-grid{grid-template-columns:repeat(3,1fr)}}"
+      + ".cs-eq-slot{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:84px;padding:8px 4px;background:repeating-linear-gradient(0deg,rgba(79,240,230,.04) 0 1px,transparent 1px 3px),rgba(7,16,20,.92);border:1px solid var(--rc,#2c4c54);box-shadow:inset 0 0 12px rgba(79,240,230,.12);text-align:center}"
+      + ".cs-eq-slot.filled{box-shadow:inset 0 0 14px color-mix(in srgb,var(--rc,#4ff0e6) 28%,transparent),0 0 8px rgba(0,0,0,.7)}"
+      + ".cs-eq-ico{font-size:22px;line-height:1.1;margin-bottom:3px;filter:drop-shadow(0 2px 3px #000)}"
+      + ".cs-eq-lbl{font:bold 10px monospace;color:#9ad8df;text-transform:uppercase}"
+      + ".cs-eq-sub{font:10px/1.2 monospace;margin-top:2px}"
+      + ".cs-inv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:7px}"
+      + ".cs-inv-item{position:relative;display:flex;flex-direction:column;align-items:center;padding:8px 6px 26px;background:linear-gradient(180deg,#161a20 0%,#0d1014 100%);border:1px solid var(--rc,#454e59);color:#e6eef8;font:11px monospace;text-align:center;transition:transform .12s,box-shadow .12s}"
+      + ".cs-inv-item.equipped{outline:1px solid #4ff0e6;box-shadow:inset 0 0 12px rgba(79,240,230,.22)}"
+      + ".cs-inv-item.fusable{box-shadow:0 0 10px rgba(155,225,93,.45)}"
+      + ".cs-inv-ico{font-size:22px;margin:2px 0}.cs-inv-name{font-weight:bold;font-size:11px}"
+      + ".cs-inv-acts{position:absolute;left:3px;right:3px;bottom:3px;display:flex;gap:3px}"
+      + ".cs-inv-acts button{flex:1;padding:2px 3px;font:bold 9px monospace;background:#1c232b;border:1px solid #4a5562;color:#fff;cursor:pointer}"
+      + ".cs-inv-acts button:hover{border-color:#ffb000;color:#ffd77a}"
+      + ".cs-inv-acts button.fuse-btn{border-color:#9be15d;color:#9be15d}"
+      + ".cs-inv-acts button.trans-btn{border-color:#7fd8ff;color:#7fd8ff}"
       + ".cs-gold{align-self:flex-end;width:max-content;padding:3px 8px;color:#ffd77a;background:rgba(26,16,8,.88);border:1px solid #c9953a;font:11px monospace;white-space:nowrap}"
       + "#cs-skills{position:relative;width:100%;aspect-ratio:1408/752;background-size:100% 100%;background-repeat:no-repeat;margin:0 auto;overflow:hidden;user-select:none}"
       + "#cs-skills .cs-syn-screen{position:absolute;padding:3px 6px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;font:clamp(8px,.8vw,10px)/1.15 monospace;color:#8ef6ff;text-shadow:0 0 6px rgba(79,240,230,.8);overflow:hidden}"

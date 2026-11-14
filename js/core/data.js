@@ -45,7 +45,13 @@ class DataEngine {
     {id:2,name:"Rare",color:"#4fa0ff",w:12},{id:3,name:"Épique",color:"#b06cff",w:5},
     {id:4,name:"Légendaire",color:"#ff9d2e",w:2.2},{id:5,name:"Divin",color:"#ff5e7e",w:.8}
   ];
-  static PARTS = [{id:"boots",name:"Bottes",icon:"🥾"},{id:"chest",name:"Plastron",icon:"🦺"},{id:"gloves",name:"Gants",icon:"🧤"},{id:"necklace",name:"Collier",icon:"📿"}];
+  static PARTS = [
+    {id:"helmet",name:"Casque",icon:"🪖",statLabel:"+Vie"},
+    {id:"chest",name:"Plastron",icon:"🦺",statLabel:"+Agilité"},
+    {id:"boots",name:"Bottes",icon:"🥾",statLabel:"+Vitesse"},
+    {id:"necklace",name:"Collier",icon:"📿",statLabel:"+Force"},
+    {id:"ring",name:"Anneau",icon:"💍",statLabel:"Stat / Élément"}
+  ];
   static WEAPONS = [
 ["Épée", "⚔️", 7, 5, 6, 5,
 "Lame de récup, bien équilibrée."],
@@ -168,9 +174,73 @@ class DataEngine {
   // Style d'attaque par arme : estoc (P2 L1), overhead (P2 L2, saut), throw (P2 L3, jet)
   static WEAPON_STYLE = ["estoc","estoc","estoc","overhead","overhead","throw","estoc","estoc","throw","overhead","overhead","estoc","overhead","throw","estoc","overhead"];
   static WEAPON_CELLS = [0,12,13,4,5,9,1,7,14,6,11,15,10,2,3,8];
-  // Équipement : meilleure pièce de chaque slot, bonus Commun +1 … Divin +20
-  static GEAR_BONUS=[1,3,6,10,15,20]; static PART_STAT={boots:"spd",chest:"hp",gloves:"str",necklace:"agi"};
-  static gearBonus(b,k){ const m=(b.gear||[]).filter(g=>DataEngine.PART_STAT[g.part]===k).reduce((a,g)=>Math.max(a,g.rarity),-1); return m<0?0:DataEngine.GEAR_BONUS[m]; }
+  // Équipement : 4 armures (Casque=HP, Plastron=AGI, Bottes=SPD, Collier=STR) + 2 Anneaux (Stat ou Élément)
+  static GEAR_BONUS=[1,3,6,10,15,20];
+  static RING_STAT_BONUS=[2,5,9,14,20,28];
+  static RING_EL_BONUS=[0.10,0.15,0.20,0.25,0.30,0.38];
+  static PART_STAT={helmet:"hp",chest:"agi",boots:"spd",necklace:"str"};
+  static GEAR_SETS={
+    carnage:{id:"carnage",name:"Carnage",icon:"🩸",col:"#ff5e5e",p2:"+12% Dégâts crit.",p4:"+20% Dégâts & perce 15% armure"},
+    cyber:{id:"cyber",name:"Cyber-Flux",icon:"⚡",col:"#4ff0e6",p2:"+10% Vitesse & Précision",p4:"+25% Contrôle (Étourdit/Gel/Ralenti)"},
+    mutant:{id:"mutant",name:"Cuve-Mutant",icon:"☣️",col:"#9be15d",p2:"+15% PV max & Esquive",p4:"Renvoie 20% dégâts + Régén. 5% PV/tour"}
+  };
+  static normGearItem(g){
+    if(!g) return null;
+    if(g.part==="gloves") g.part="helmet";
+    if(g.part==="ring"){
+      if(!g.kind) g.kind="stat";
+      if(g.kind==="stat"&&!g.stat) g.stat="str";
+      if(g.kind==="el"&&!Number.isInteger(g.el)) g.el=1;
+      return g;
+    }
+    if(!g.set||!this.GEAR_SETS[g.set]) g.set="carnage";
+    return g;
+  }
+  static getEquippedGear(b){
+    const list=(b&&b.gear||[]).map(g=>this.normGearItem(g)).filter(Boolean);
+    const armors=["helmet","chest","boots","necklace"].map(part=>{
+      const pref=b&&b.eqArmor&&b.eqArmor[part];
+      const pool=list.filter(g=>g.part===part).sort((x,y)=>y.rarity-x.rarity);
+      if(!pool.length) return null;
+      return (pref&&pool.find(g=>g.set===pref.set&&g.rarity===pref.rarity))||pool[0];
+    }).filter(Boolean);
+    const allRings=list.filter(g=>g.part==="ring").sort((x,y)=>y.rarity-x.rarity);
+    const rings=[];
+    (b&&Array.isArray(b.eqRings)?b.eqRings:[]).forEach(sig=>{
+      if(rings.length>=2||!sig) return;
+      const found=allRings.find(r=>!rings.includes(r)&&this.gearSig(r)===sig);
+      if(found) rings.push(found);
+    });
+    allRings.forEach(r=>{ if(rings.length<2&&!rings.includes(r)) rings.push(r); });
+    return {armors,rings,all:armors.concat(rings)};
+  }
+  static gearSig(g){
+    g=this.normGearItem(g);
+    if(!g) return "";
+    return g.part==="ring"?`ring|${g.rarity}|${g.kind}|${g.kind==="el"?g.el:g.stat}`:`${g.part}|${g.rarity}|${g.set}`;
+  }
+  static getActiveSetBonuses(b){
+    const {armors}=this.getEquippedGear(b), counts={};
+    armors.forEach(g=>{ counts[g.set]=(counts[g.set]||0)+1; });
+    return Object.entries(counts).filter(([,n])=>n>=2).map(([id,n])=>({set:this.GEAR_SETS[id],count:n,tier:n>=4?4:2}));
+  }
+  static gearBonus(b,k){
+    const {armors,rings}=this.getEquippedGear(b);
+    let sum=0;
+    armors.forEach(g=>{ if(this.PART_STAT[g.part]===k) sum+=this.GEAR_BONUS[g.rarity]||0; });
+    rings.forEach(r=>{ if(r.kind==="stat"&&r.stat===k) sum+=this.RING_STAT_BONUS[r.rarity]||0; });
+    return sum;
+  }
+  static getAllSynergies(b,skillIds=[]){
+    const counts={};
+    (skillIds||[]).forEach(id=>{ const s=this.SKILLS[id]; if(s) counts[s.el]=(counts[s.el]||0)+1; });
+    const {rings}=this.getEquippedGear(b);
+    rings.forEach(r=>{ if(r.kind==="el"&&Number.isInteger(r.el)) counts[r.el]=(counts[r.el]||0)+1; });
+    return Object.entries(counts).filter(([,n])=>n>=2).map(([el,n])=>{
+      const tier=n>=3?3:2, idx=tier-2, def=this.EL_SYNERGIES[+el];
+      return {el:+el,count:n,tier,icon:this.EL_ICON[+el],name:this.ELEMENTS[+el],col:this.EL_COL[+el],desc:tier===3?def.p3:def.p2,def,idx};
+    });
+  }
   static rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a}
   static pick(a){return a[Math.floor(Math.random()*a.length)]}
   // Loterie de départ : budget fixe réparti au hasard, minimum garanti partout
@@ -322,21 +392,49 @@ CompanionData.family=function(c){ return this.FAMILIES.find(f=>f.species===c.spe
 
 /* ================= ForgeSystem ================= */
 class ForgeSystem {
-  static key(g){return g.part+"|"+g.rarity}
-  static autoFuse(b){ let n=0,div=0; for(let r=0;r<5;r++) DataEngine.PARTS.forEach(p=>{ for(;;){ const x=this.fuse(b,p.id+"|"+r); if(!x.ok) break; n++; if(x.rarity===5) div++; } }); return {n,div}; }
+  static key(g){ return DataEngine.gearSig(g); }
+  static autoFuse(b){
+    let n=0,div=0;
+    for(;;){
+      const gs=this.groups(b).filter(g=>g.n>=3&&g.rarity<5);
+      if(!gs.length) break;
+      const x=this.fuse(b,gs[0].k); if(!x.ok) break;
+      n++; if(x.rarity===5) div++;
+    }
+    return {n,div};
+  }
   static groups(brute){
     const m={};
-    brute.gear.forEach(g=>{const k=this.key(g); m[k]=(m[k]||0)+1;});
-    return Object.entries(m).map(([k,n])=>{const [part,r]=k.split("|");return {k,part,rarity:+r,n};});
+    (brute.gear||[]).forEach(g=>{
+      const norm=DataEngine.normGearItem(g), k=this.key(norm);
+      if(!m[k]) m[k]={k,part:norm.part,rarity:norm.rarity,set:norm.set,kind:norm.kind,stat:norm.stat,el:norm.el,n:0};
+      m[k].n++;
+    });
+    return Object.values(m);
   }
   static fuse(brute,k){
-    const [part,r]=k.split("|"), rar=+r;
+    const parts=k.split("|"), part=parts[0], rar=+parts[1];
     if(rar>=5) return {ok:false,msg:"Rareté maximale déjà atteinte."};
-    let idx=[]; brute.gear.forEach((g,i)=>{if(g.part===part&&g.rarity===rar) idx.push(i)});
-    if(idx.length<3) return {ok:false,msg:"Il faut 3 équipements identiques."};
+    let idx=[]; (brute.gear||[]).forEach((g,i)=>{ if(this.key(g)===k) idx.push(i); });
+    if(idx.length<3) return {ok:false,msg:"Il faut 3 équipements strictement identiques."};
+    const sample=Object.assign({},DataEngine.normGearItem(brute.gear[idx[0]]));
     idx.slice(0,3).reverse().forEach(i=>brute.gear.splice(i,1));
-    brute.gear.push({part,rarity:rar+1});
-    return {ok:true,part,rarity:rar+1};
+    sample.rarity=rar+1;
+    brute.gear.push(sample);
+    return {ok:true,part,rarity:rar+1,item:sample};
+  }
+  static transmute(brute,k){
+    const idx=(brute.gear||[]).findIndex(g=>this.key(g)===k);
+    if(idx<0) return {ok:false,msg:"Pièce introuvable."};
+    const item=DataEngine.normGearItem(brute.gear[idx]);
+    if(item.part==="ring"){
+      if(item.kind==="stat"){ item.kind="el"; item.el=DataEngine.rnd(0,6); delete item.stat; }
+      else { const nextEl=(item.el+1)%7; if(nextEl===0){ item.kind="stat"; item.stat=DataEngine.pick(["hp","str","agi","spd"]); delete item.el; } else item.el=nextEl; }
+    } else {
+      const sets=["carnage","cyber","mutant"];
+      item.set=sets[(sets.indexOf(item.set)+1)%sets.length];
+    }
+    return {ok:true,item};
   }
 }
 
@@ -348,15 +446,25 @@ class GachaShop {
     for(const r of DataEngine.RARITIES){ if((x-=r.w)<0) return r.id; }
     return 0;
   }
+  static rollGear(rarity=this.rollRarity()){
+    const part=DataEngine.pick(DataEngine.PARTS);
+    if(part.id==="ring"){
+      const isEl=Math.random()<0.5;
+      const item=isEl?{part:"ring",rarity,kind:"el",el:DataEngine.rnd(0,6)}:{part:"ring",rarity,kind:"stat",stat:DataEngine.pick(["hp","str","agi","spd"])};
+      return {part,rarity,item};
+    }
+    const set=DataEngine.pick(["carnage","cyber","mutant"]);
+    return {part,rarity,item:{part:part.id,rarity,set}};
+  }
   static roll(brute){
     if(Math.random()<0.35){
       const w=DataEngine.pick(DataEngine.WEAPONS);
       if(brute.weapons.includes(w.id)) return {type:"dup",w};
       brute.weapons.push(w.id); return {type:"weapon",w};
     }
-    const part=DataEngine.pick(DataEngine.PARTS), rarity=this.rollRarity();
-    brute.gear.push({part:part.id,rarity});
-    return {type:"gear",part,rarity};
+    const g=this.rollGear();
+    brute.gear.push(g.item);
+    return Object.assign({type:"gear"},g);
   }
   static open(brute){
     if(brute.gold<this.PRICE) return {ok:false,msg:"Pas assez d’Or."};
