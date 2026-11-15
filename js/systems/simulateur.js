@@ -190,6 +190,9 @@ const TRAIN={
           const step=Math.floor(((el-dashT)/animDur)*fx.hits)+1;
           if(step>this._hitStep && el>=dashT+animDur*0.35){
             this._hitStep=step; D.anim="hit"; D.t0=this.clock; D.flash0=this.clock; this.A.amp=fx.shake; this.A.shake0=this.clock;
+            if(!this.A.vfx) this.A.vfx=[];
+            if([4,5,6,7,10].includes(wid)) this.A.vfx.push({kind:"slam",x:D.bx,y:D.y,crit:isCrit,t0:this.clock,dur:420});
+            else if(isCrit) this.A.vfx.push({kind:"crit",x:D.bx,y:D.y,t0:this.clock,dur:340});
             if(step===fx.hits && fx.freeze) renderer.freeze(fx.freeze);
           }
         }
@@ -204,7 +207,14 @@ const TRAIN={
         if(el<animDur){
           if(F.anim!==this.cur){ F.anim=this.cur; this._hitStep=0; }
           if(el>=animDur*0.35&&F.wpn){ this.A.proj={ic:F.wpn.ic,id:F.wpn.id,b:F.b,x0:F.bx+(F.flip0?-28:28),y0:F.y-48,x1:D.bx,y1:D.y-42,t0:this.clock,t1:this.clock+260}; F.wpn=null; }
-          if(!this._hitStep && el>=animDur*0.35+220){ this._hitStep=1; D.anim="hit"; D.t0=this.clock; D.flash0=this.clock; this.A.amp=isCrit?12:5; this.A.shake0=this.clock; if(isCrit) renderer.freeze(90); }
+          if(!this._hitStep && el>=animDur*0.35+220){
+            this._hitStep=1; D.anim="hit"; D.t0=this.clock; D.flash0=this.clock; this.A.amp=isCrit?12:5; this.A.shake0=this.clock;
+            if(!this.A.vfx) this.A.vfx=[];
+            if(wid===13) this.A.vfx.push({kind:"molotov",x:D.bx,y:D.y,t0:this.clock,dur:750});
+            else if(wid===12) this.A.vfx.push({kind:"grenade",x:D.bx,y:D.y,t0:this.clock,dur:420});
+            else if(isCrit) this.A.vfx.push({kind:"crit",x:D.bx,y:D.y,t0:this.clock,dur:340});
+            if(isCrit) renderer.freeze(90);
+          }
         }
         else {
           F.anim="idle";

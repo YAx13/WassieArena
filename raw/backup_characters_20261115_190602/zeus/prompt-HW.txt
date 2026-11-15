@@ -1,0 +1,65 @@
+Here is Batch 2 (Zeus's 4 Heavy Weapons: wpn-4 to wpn-7). Attach Image 1: Dummy Heavy Greybox Sheet, Image 2: Zeus Base Sprite, Image 3: Zeus Weapon Sheet.
+
+5. wpn-4.png — Winged Labrys Battleaxe (Row 2, Column 1)
+
+text
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) that strictly copies the exact character poses, frame-by-frame motion timing, grid cell placement, and energy slash smears from Image 1, replacing the greybox mannequin with the exact Zeus platypus god character from Image 2 and replacing the greybox battleaxe with the exact two-handed winged gold-and-silver Olympian labrys battleaxe (Row 2, Column 1 of Image 3).
+
+STRICT POSE & TIMING LOCK:
+- Every single frame (Frames 1 to 16) must match the exact body posture, limb angles, axe orientation, and white/cyan slash smears of the corresponding frame in Image 1.
+- Keep the battleaxe gripped firmly in both hands on every frame, and keep both hands empty on Frame 14 (Row 4, Column 2) while the battleaxe flies mid-air, just like Image 1.
+
+CONSISTENCY & PIXEL ART RULES:
+- Apply the exact character proportions, glowing pure white eyes, silver-grey hair and beard with green olive laurel wreath, white toga with gold belt, golden armbands, orange-brown platypus bill and flat tail, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2 onto the poses of Image 1.
+- Apply the exact winged double-edged battleaxe design, golden wing motifs, cyan-trimmed steel shaft, and proportional size from Image 3 onto the weapon angles of Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+Utilisez le code avec précaution.
+
+6. wpn-5.png — Thunder-Cracked Warhammer (Row 2, Column 2)
+
+text
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) that strictly copies the exact character poses, frame-by-frame motion timing, grid cell placement, and shockwave smears from Image 1, replacing the greybox mannequin with the exact Zeus platypus god character from Image 2 and replacing the greybox warhammer with the exact two-handed dark iron and gold warhammer with glowing golden cracks and cyan lightning arcs (Row 2, Column 2 of Image 3).
+
+STRICT POSE & TIMING LOCK:
+- Every single frame (Frames 1 to 16) must match the exact body posture, limb angles, warhammer orientation, and white/cyan shockwave smears of the corresponding frame in Image 1.
+- Keep the warhammer gripped firmly in both hands on every frame, and keep both hands empty on Frame 14 (Row 4, Column 2) while the warhammer flies mid-air, just like Image 1.
+
+CONSISTENCY & PIXEL ART RULES:
+- Apply the exact character proportions, glowing pure white eyes, silver-grey hair and beard with green olive laurel wreath, white toga with gold belt, golden armbands, orange-brown platypus bill and flat tail, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2 onto the poses of Image 1.
+- Apply the exact thunder-cracked warhammer design, glowing golden veins, golden striking face, cyan lightning sparks, and proportional size from Image 3 onto the weapon angles of Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+Utilisez le code avec précaution.
+
+7. wpn-6.png — Gold-Shafted Olympian Pickaxe (Row 2, Column 3)
+
+text
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) that strictly copies the exact character poses, frame-by-frame motion timing, grid cell placement, and piercing smears from Image 1, replacing the greybox mannequin with the exact Zeus platypus god character from Image 2 and replacing the greybox pickaxe with the exact two-handed silver-bladed pickaxe with golden shaft and cyan grip wrap (Row 2, Column 3 of Image 3).
+
+STRICT POSE & TIMING LOCK:
+- Every single frame (Frames 1 to 16) must match the exact body posture, limb angles, pickaxe orientation, and white/cyan piercing smears of the corresponding frame in Image 1.
+- Keep the pickaxe gripped firmly in both hands on every frame, and keep both hands empty on Frame 14 (Row 4, Column 2) while the pickaxe flies mid-air, just like Image 1.
+
+CONSISTENCY & PIXEL ART RULES:
+- Apply the exact character proportions, glowing pure white eyes, silver-grey hair and beard with green olive laurel wreath, white toga with gold belt, golden armbands, orange-brown platypus bill and flat tail, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2 onto the poses of Image 1.
+- Apply the exact silver-and-gold pickaxe design, cyan lower shaft wrap, and proportional size from Image 3 onto the weapon angles of Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+Utilisez le code avec précaution.
+
+8. wpn-7.png — Gold-Capped Titan Bone Club (Row 2, Column 4)
+
+text
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) that strictly copies the exact character poses, frame-by-frame motion timing, grid cell placement, and blunt impact smears from Image 1, replacing the greybox mannequin with the exact Zeus platypus god character from Image 2 and replacing the greybox club with the exact two-handed giant white Titan femur bone club with golden filigree caps (Row 2, Column 4 of Image 3).
+
+STRICT POSE & TIMING LOCK:
+- Every single frame (Frames 1 to 16) must match the exact body posture, limb angles, bone club orientation, and white/cyan impact smears of the corresponding frame in Image 1.
+- Keep the giant bone club gripped firmly in both hands on every frame, and keep both hands empty on Frame 14 (Row 4, Column 2) while the bone club flies mid-air, just like Image 1.
+
+CONSISTENCY & PIXEL ART RULES:
+- Apply the exact character proportions, glowing pure white eyes, silver-grey hair and beard with green olive laurel wreath, white toga with gold belt, golden armbands, orange-brown platypus bill and flat tail, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2 onto the poses of Image 1.
+- Apply the exact white Titan bone club design, ornate golden end-caps, and proportional size from Image 3 onto the weapon angles of Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+Utilisez le code avec précaution.

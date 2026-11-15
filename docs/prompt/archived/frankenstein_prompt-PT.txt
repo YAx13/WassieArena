@@ -1,0 +1,146 @@
+Here is Batch 3 (Frankenstein's Colossal Pillar wpn-10 + his 5 Special & Throwable Weapons) already updated to 100% flat solid chroma-key bright magenta (#FF00FF)—and remember to swap #00FF00 to #FF00FF in Batches 1 & 2 for Frankenstein as well!
+
+Part A: Colossal Copper-Banded Iron Pillar (wpn-10.png — Four 2x2 Sheets)
+
+For each of the 4 sheets below, attach Image 1: pillar1.jpg (then pillar2.jpg, pillar3.jpg, pillar4.jpg), Image 2: Frankenstein Base Sprite, Image 3: Frankenstein Weapon Sheet (Row 3, Column 4).
+
+9A. wpn-10 Part 1 (2x2) — Idle & Equip (pillar1.jpg)
+
+text
+Create a square 1:1 2x2 pixel-art sprite sheet (strictly 4 large frames total: 2 columns by 2 rows) that strictly copies the exact poses, scale, and quadrant placement from Image 1, replacing the greybox mannequin with the exact Frankenstein monster platypus character from Image 2 and replacing the grey stone pillar with the colossal dark iron industrial column wrapped with copper-and-bolt bands and cracked stone ends (Row 3, Column 4 of Image 3).
+- Keep Frankenstein's exact chibi proportions, flat-top black hair, stitched green monster skin, silver neck bolts, brown platypus bill with small lower fangs, purple open jacket over an orange shirt, dark torn pants, brown boots, and 1-pixel pure black (#000000) outer outline from Image 2.
+- Every frame must stay strictly inside its quadrant with zero bleeding across the center dividers and a 100% flat solid chroma-key bright magenta (#FF00FF) background with zero blur.
+Utilisez le code avec précaution.
+
+9B. wpn-10 Part 2 (2x2) — Standard Forward Slam (pillar2.jpg)
+
+text
+Create a square 1:1 2x2 pixel-art sprite sheet (strictly 4 large frames total: 2 columns by 2 rows) that strictly copies the exact poses, scale, white crescent impact arc, dust shockwave, and quadrant placement from Image 1, replacing the greybox mannequin with the exact Frankenstein monster platypus character from Image 2 and replacing the grey stone pillar with the colossal dark iron industrial column wrapped with copper-and-bolt bands and cracked stone ends (Row 3, Column 4 of Image 3).
+- Keep Frankenstein's exact chibi proportions, flat-top black hair, stitched green monster skin, silver neck bolts, brown platypus bill with small lower fangs, purple open jacket over an orange shirt, dark torn pants, brown boots, and 1-pixel pure black (#000000) outer outline from Image 2.
+- Every frame must stay strictly inside its quadrant with zero bleeding across the center dividers and a 100% flat solid chroma-key bright magenta (#FF00FF) background with zero blur.
+Utilisez le code avec précaution.
+
+9C. wpn-10 Part 3 (2x2) — Critical Seismic Smash (pillar3.jpg)
+
+text
+Create a square 1:1 2x2 pixel-art sprite sheet (strictly 4 large frames total: 2 columns by 2 rows) that strictly copies the exact poses, scale, cyan lightning charge, seismic ground shockwave, and quadrant placement from Image 1, replacing the greybox mannequin with the exact Frankenstein monster platypus character from Image 2 and replacing the grey stone pillar with the colossal dark iron industrial column wrapped with copper-and-bolt bands and cracked stone ends (Row 3, Column 4 of Image 3).
+- Keep Frankenstein's exact chibi proportions, flat-top black hair, stitched green monster skin, silver neck bolts, brown platypus bill with small lower fangs, purple open jacket over an orange shirt, dark torn pants, brown boots, and 1-pixel pure black (#000000) outer outline from Image 2.
+- Every frame must stay strictly inside its quadrant with zero bleeding across the center dividers and a 100% flat solid chroma-key bright magenta (#FF00FF) background with zero blur.
+Utilisez le code avec précaution.
+
+9D. wpn-10 Part 4 (2x2) — Caber-Toss Throw & Heavy Dash (pillar4.jpg)
+
+text
+Create a square 1:1 2x2 pixel-art sprite sheet (strictly 4 large frames total: 2 columns by 2 rows) that strictly copies the exact poses, scale, and quadrant placement from Image 1, replacing the greybox mannequin with the exact Frankenstein monster platypus character from Image 2 and replacing the grey stone pillar with the colossal dark iron industrial column wrapped with copper-and-bolt bands and cracked stone ends (Row 3, Column 4 of Image 3).
+- Keep Frankenstein's exact chibi proportions, flat-top black hair, stitched green monster skin, silver neck bolts, brown platypus bill with small lower fangs, purple open jacket over an orange shirt, dark torn pants, brown boots, and 1-pixel pure black (#000000) outer outline from Image 2.
+- Every frame must stay strictly inside its quadrant with zero bleeding across the center dividers and a 100% flat solid chroma-key bright magenta (#FF00FF) background with zero blur.
+Utilisez le code avec précaution.
+
+Part B: Frankenstein's 5 Special & Throwable Weapons (Direct 4x4 Prompts on #FF00FF)
+
+Attach Image 1: Frankenstein Base Sprite, Image 2: Frankenstein Weapon Sheet.
+
+10. wpn-8.png — Stitched Green Monster Boomerang (Row 3, Column 1)
+
+text
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) of the exact Frankenstein monster platypus character from Image 1 wielding the exact stitched green monster-skin boomerang bound with leather straps and metal bolts (Row 3, Column 1 of Image 2) in his right hand, in 3/4 side view, 2.5D beat-'em-up perspective, facing right. STRICT 16-FRAME SQUARE GRID & HIT-FRAME TIMING:
+- Row 1 (Frames 1-4): Frames 1-2 = hulking battle stance holding the curved stitched green boomerang angled forward; Frames 3-4 = spinning/equipping the stitched boomerang into a ready guard stance.
+- Row 2 (Frames 5-8 — Close-Range Curved Swipe):
+  * Frame 5: pulling the stitched green boomerang back behind the shoulder.
+  * Frame 6 (HIT FRAME): stepping forward with a fast horizontal curved melee swipe and a sharp white crescent smear.
+  * Frame 7: cross-body follow-through recoil.
+  * Frame 8: snapping back to guard stance.
+- Row 3 (Frames 9-12 — Galvanic Cyclone Throw Ult):
+  * Frame 9: side-arm crouch charge holding the stitched boomerang crackling with bright cyan electric energy.
+  * Frame 10 (CRITICAL HIT FRAME): explosive side-arm spin launch unleashing a glowing cyan-and-white electric wind arc forward.
+  * Frame 11: follow-through recoil with outstretched arm.
+  * Frame 12: recovery back to guard stance.
+- Row 4 (Frames 13-16): Frames 13-14 = quick underhand boomerang toss (Frame 13 = low wind-up, Frame 14 = release follow-through with empty hand and spinning stitched boomerang mid-air); Frames 15-16 = fast forward dash / dodge holding the stitched boomerang.
+CONSISTENCY & PIXEL ART RULES:
+- Keep Frankenstein's exact chibi proportions, flat-top black hair, stitched green monster skin, silver neck bolts, brown platypus bill with small lower fangs, purple open jacket over an orange shirt, dark torn pants, brown boots, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns with zero cell bleeding and a 100% flat solid chroma-key bright magenta (#FF00FF) background.
+Utilisez le code avec précaution.
+
+11. wpn-9.png — High-Voltage Electric Trident (Row 3, Column 3)
+
+text
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) of the exact Frankenstein monster platypus character from Image 1 wielding the exact heavy two-handed steel trident with glowing cyan electric arcs between its three prongs and a brown wooden shaft (Row 3, Column 3 of Image 2) with both hands, in 3/4 side view, 2.5D beat-'em-up perspective, facing right. STRICT 16-FRAME SQUARE GRID & HIT-FRAME TIMING:
+- Row 1 (Frames 1-4): Frames 1-2 = wide-legged heavy guard stance holding the long electric trident angled forward with both hands; Frames 3-4 = hoisting/equipping the trident into a ready two-handed guard stance.
+- Row 2 (Frames 5-8 — Heavy Long-Reach Skewer Lunge):
+  * Frame 5: leaning back and pulling the electric trident shaft far behind the shoulder with both hands.
+  * Frame 6 (HIT FRAME): explosive two-handed forward lunge thrusting the electric trident horizontally at maximum reach with a sharp triple-pronged white shockwave cone.
+  * Frame 7: bracing feet against the heavy follow-through recoil.
+  * Frame 8: stepping back into two-handed guard stance.
+- Row 3 (Frames 9-12 — Franken-Volt Triple-Impale Ult):
+  * Frame 9: low crouched charge stance holding the trident back, all three steel prongs blazing with bright cyan lightning.
+  * Frame 10 (CRITICAL HIT FRAME): devastating rapid multi-hit forward skewer thrust showing three overlapping cyan-and-white trident afterimages and an electric burst.
+  * Frame 11: heavy recoil bounce backward while gripping the shaft with both hands.
+  * Frame 12: recovery back to two-handed guard stance.
+- Row 4 (Frames 13-16): Frames 13-14 = overhead heavy javelin throw (Frame 13 = deep back-leaning overhead aim wind-up, Frame 14 = full-extension release with empty hands and flying electric trident mid-air); Frames 15-16 = heavy forward charging sprint carrying the trident horizontally with both hands.
+CONSISTENCY & PIXEL ART RULES:
+- Keep Frankenstein's exact chibi proportions, flat-top black hair, stitched green monster skin, silver neck bolts, brown platypus bill with small lower fangs, purple open jacket over an orange shirt, dark torn pants, brown boots, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns with zero cell bleeding and a 100% flat solid chroma-key bright magenta (#FF00FF) background.
+Utilisez le code avec précaution.
+
+12. wpn-11.png — Copper-Gear Riveted Shuriken (Row 4, Column 1)
+
+text
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) of the exact Frankenstein monster platypus character from Image 1 wielding the exact four-pointed steel shuriken throwing star with a copper gear-cog center and bolted blades (Row 4, Column 1 of Image 2) in his right hand, in 3/4 side view, 2.5D beat-'em-up perspective, facing right. STRICT 16-FRAME SQUARE GRID & HIT-FRAME TIMING:
+- Row 1 (Frames 1-4): Frames 1-2 = agile monster battle stance holding the copper-gear shuriken poised between fingers; Frames 3-4 = flicking/drawing the gear shuriken into a ready guard stance.
+- Row 2 (Frames 5-8 — Rapid Gear-Star Flick):
+  * Frame 5: quick cross-body wrist cock back holding the copper-gear shuriken near the chest.
+  * Frame 6 (HIT FRAME): snappy side-step flick launching a crisp spinning white-and-steel shuriken motion streak forward.
+  * Frame 7: balanced follow-through pose.
+  * Frame 8: returning to agile guard stance.
+- Row 3 (Frames 9-12 — Giant Industrial Buzzsaw Ult):
+  * Frame 9: low crouched charge holding the shuriken overhead, star blazing with bright cyan electric energy.
+  * Frame 10 (CRITICAL HIT FRAME): leaping side-arm hurl unleashing a massive, oversized spinning cyan-and-steel energy buzzsaw projectile forward.
+  * Frame 11: nimble landing recoil crouch.
+  * Frame 12: rising back into agile guard stance.
+- Row 4 (Frames 13-16): Frames 13-14 = overhand shuriken throw (Frame 13 = high over-the-shoulder aim wind-up, Frame 14 = release follow-through with empty hand and spinning copper-gear shuriken mid-air); Frames 15-16 = fast low sprint dash holding the gear shuriken ready.
+CONSISTENCY & PIXEL ART RULES:
+- Keep Frankenstein's exact chibi proportions, flat-top black hair, stitched green monster skin, silver neck bolts, brown platypus bill with small lower fangs, purple open jacket over an orange shirt, dark torn pants, brown boots, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns with zero cell bleeding and a 100% flat solid chroma-key bright magenta (#FF00FF) background.
+Utilisez le code avec précaution.
+
+13. wpn-12.png — Copper-Coil Dynamo Grenade (Row 4, Column 2)
+
+text
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) of the exact Frankenstein monster platypus character from Image 1 wielding the exact dark iron industrial grenade with glowing copper-orange coil vents inside its ribbed casing (Row 4, Column 2 of Image 2) in his right hand, in 3/4 side view, 2.5D beat-'em-up perspective, facing right. STRICT 16-FRAME SQUARE GRID & HIT-FRAME TIMING:
+- Row 1 (Frames 1-4): Frames 1-2 = ready combat idle stance holding the copper-coil iron grenade in the right hand; Frames 3-4 = pulling the pin / prepping the dynamo grenade into a ready guard stance.
+- Row 2 (Frames 5-8 — Underhand Dynamo Lob):
+  * Frame 5: swinging the right arm low behind the hip for an underhand pitch.
+  * Frame 6 (HIT FRAME): stepping forward and lobbing the copper-coil grenade upward along a crisp white-and-orange arc trail.
+  * Frame 7: high follow-through arm extension.
+  * Frame 8: returning to ready guard stance.
+- Row 3 (Frames 9-12 — Overcharged Tesla Blast Pitch Ult):
+  * Frame 9: leaning far back in a pitcher's wind-up, the dynamo grenade crackling intensely with bright cyan lightning arcs.
+  * Frame 10 (CRITICAL HIT FRAME): explosive full-body fastball throw launching a blazing cyan-and-white electric comet trail straight ahead.
+  * Frame 11: crouched blast-bracing follow-through shielding face with left arm.
+  * Frame 12: recovering back to ready guard stance.
+- Row 4 (Frames 13-16): Frames 13-14 = standard overhand grenade throw (Frame 13 = overhead wind-up, Frame 14 = release follow-through with empty hand and flying dynamo grenade mid-air); Frames 15-16 = fast forward tactical sprint holding the grenade.
+CONSISTENCY & PIXEL ART RULES:
+- Keep Frankenstein's exact chibi proportions, flat-top black hair, stitched green monster skin, silver neck bolts, brown platypus bill with small lower fangs, purple open jacket over an orange shirt, dark torn pants, brown boots, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns with zero cell bleeding and a 100% flat solid chroma-key bright magenta (#FF00FF) background.
+Utilisez le code avec précaution.
+
+14. wpn-13.png — Acid-Green Lab Flask Molotov (Row 4, Column 3)
+
+text
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) of the exact Frankenstein monster platypus character from Image 1 wielding the exact clear glass Molotov bottle filled with glowing acid-green chemical liquid and a grey cloth wick (Row 4, Column 3 of Image 2) in his right hand, in 3/4 side view, 2.5D beat-'em-up perspective, facing right. STRICT 16-FRAME SQUARE GRID & HIT-FRAME TIMING:
+- Row 1 (Frames 1-4): Frames 1-2 = monster brawler idle stance holding the glowing acid-green flask angled up; Frames 3-4 = lighting/prepping the grey cloth wick into a ready guard stance.
+- Row 2 (Frames 5-8 — High-Arc Acid Firebomb Sling):
+  * Frame 5: winding the glass flask back overhead with elbow bent.
+  * Frame 6 (HIT FRAME): whipping the arm forward to sling the acid Molotov bottle along a bright white-and-lime flame arc trail.
+  * Frame 7: low cross-body follow-through.
+  * Frame 8: snapping back to ready guard stance.
+- Row 3 (Frames 9-12 — Toxic Plasma Meteor Smash Ult):
+  * Frame 9: hoisting the acid flask high with both hands, bottle erupting with intense cyan-and-lime volatile plasma.
+  * Frame 10 (CRITICAL HIT FRAME): leaping downward hurl smashing the bottle forward with a massive cyan-and-white chemical shockwave cone.
+  * Frame 11: low landing crouch shielding eyes from the flash.
+  * Frame 12: rising back into ready guard stance.
+- Row 4 (Frames 13-16): Frames 13-14 = side-arm bottle toss (Frame 13 = side-body wind-up, Frame 14 = release follow-through with empty hand and spinning acid-green flask mid-air); Frames 15-16 = fast forward sprint dash holding the glass flask tucked low.
+CONSISTENCY & PIXEL ART RULES:
+- Keep Frankenstein's exact chibi proportions, flat-top black hair, stitched green monster skin, silver neck bolts, brown platypus bill with small lower fangs, purple open jacket over an orange shirt, dark torn pants, brown boots, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns with zero cell bleeding and a 100% flat solid chroma-key bright magenta (#FF00FF) background.
+Utilisez le code avec précaution.

@@ -1,0 +1,16 @@
+
+3. Universal Stasis Pod Master Prompt (For Any of the 39 Evolutions)
+
+Attach Image 1: The cropped pod reference (image_KOnFfY.png for Top-Row large pods, or image_8l2fI0.png for Bottom-Row standard pods) and Image 2: That exact evolution's sprite (assets/companion/form-<1|2|3>/<species>.png):
+
+
+Using the glass laboratory stasis cylinder in Image 1 as the exact interior width-to-height proportion and perspective reference, create a single centered 1:1 square 16-bit retro pixel-art sprite of the exact creature from Image 2 contained inside that cylinder.
+
+CONTAINMENT POSE & EVOLUTION SCALE:
+- [PASTE EXACT SPECIES & FORM POSE FROM THE TABLE BELOW]
+- Keep the creature's colors 100% natural and un-tinted (do NOT apply any colored glass tint or glow) so it blends seamlessly into any room theme.
+
+ISOLATED SPRITE OUTPUT RULES (DO NOT INCLUDE THE POD):
+- Output ONLY the isolated creature itself—do NOT draw the glass tube, metal caps, background room, pipes, bubbles, or glass reflections from Image 1.
+- Keep the exact creature design, markings, 1-pixel pure black (#000000) outer outline, and 16-bit pixel-art shading from Image 2.
+- Center the single creature cleanly inside the 1:1 square canvas on a 100% flat solid chroma-key bright magenta (#FF00FF) background with zero anti-aliasing, zero blur, and zero drop shadows.

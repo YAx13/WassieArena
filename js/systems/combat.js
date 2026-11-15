@@ -376,6 +376,11 @@ const Combat={
       this.lg(e.msg,this.cls(e));
       if(e.type==="on_hit"){
         d.hp=e.hp; d.flash0=c; this.shake0=c; if(e.crit||p.kind==="pet") renderer.freeze(100);
+        if(!this.vfx) this.vfx=[];
+        if(p.wid===13) this.vfx.push({kind:"molotov",x:d.bx,y:d.y,t0:c,dur:750});
+        else if(p.wid===12) this.vfx.push({kind:"grenade",x:d.bx,y:d.y,t0:c,dur:420});
+        else if([4,5,6,7,10].includes(p.wid)) this.vfx.push({kind:"slam",x:d.bx,y:d.y,crit:!!e.crit,t0:c,dur:420});
+        else if(e.crit) this.vfx.push({kind:"crit",x:d.bx,y:d.y,t0:c,dur:340});
         this.V[p.i].hp=e.hpA; this.fl.push({s:e.dmg>0?"-"+e.dmg:"Absorbé",x:d.bx,y:d.y-CanvasRenderer.HEAD,c0:c,col:e.crit?"#ffb000":"#ffffff",big:e.crit});
         if((e.crit||e.prop)&&this.pan===1) p.prop=p.j;   // propulsion possible UNIQUEMENT depuis l'arène centrale
         if(!dying||e.crit) this.setA(d,"hit",c);

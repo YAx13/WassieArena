@@ -1,0 +1,65 @@
+Here is Samouraï Batch 2 (Heavy Weapons: wpn-4 to wpn-7). Attach Image 1: Dummy Heavy Greybox Sheet, Image 2: Samouraï Base Sprite (image_pojRkW.png), Image 3: Samouraï Weapon Sheet (image_sHjffh.png).
+
+5. wpn-4.png — Crimson-Wrapped Masakari Battleaxe (Row 2, Column 1)
+
+text
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) that strictly copies the exact character poses, frame-by-frame motion timing, grid cell placement, and energy slash smears from Image 1, replacing the greybox mannequin with the exact dark-armored Oni Samurai platypus character from Image 2 and replacing the greybox battleaxe with the exact two-handed double-edged dark-steel Masakari battleaxe featuring a crimson-and-gold center mount and crimson-wrapped shaft (Row 2, Column 1 of Image 3).
+
+STRICT POSE & TIMING LOCK:
+- Every single frame (Frames 1 to 16) must match the exact body posture, limb angles, axe orientation, and white/cyan slash smears of the corresponding frame in Image 1.
+- Keep the Masakari battleaxe gripped firmly in both hands on every frame, and keep both hands empty on Frame 14 (Row 4, Column 2) while the battleaxe flies mid-air, just like Image 1.
+
+CONSISTENCY & PIXEL ART RULES:
+- Apply the exact character proportions, dark charcoal samurai kabuto helmet with golden crescent horns, fierce Oni face mask with white fangs and glowing white eyes, dark segmented samurai armor with crimson chest emblem, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2 onto the poses of Image 1.
+- Apply the exact dark-steel double-edged Masakari battleaxe design, crimson-and-gold center collar, crimson shaft, and proportional size from Image 3 onto the weapon angles of Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+Utilisez le code avec précaution.
+
+6. wpn-5.png — Horned Oni Demon Warhammer (Row 2, Column 2)
+
+text
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) that strictly copies the exact character poses, frame-by-frame motion timing, grid cell placement, and shockwave smears from Image 1, replacing the greybox mannequin with the exact dark-armored Oni Samurai platypus character from Image 2 and replacing the greybox warhammer with the exact two-handed dark-iron and crimson Oni warhammer featuring a demon-face hammer head with curved golden horns and a crimson-and-gold shaft (Row 2, Column 2 of Image 3).
+
+STRICT POSE & TIMING LOCK:
+- Every single frame (Frames 1 to 16) must match the exact body posture, limb angles, warhammer orientation, and white/cyan shockwave smears of the corresponding frame in Image 1.
+- Keep the horned Oni warhammer gripped firmly in both hands on every frame, and keep both hands empty on Frame 14 (Row 4, Column 2) while the warhammer flies mid-air, just like Image 1.
+
+CONSISTENCY & PIXEL ART RULES:
+- Apply the exact character proportions, dark charcoal samurai kabuto helmet with golden crescent horns, fierce Oni face mask with white fangs and glowing white eyes, dark segmented samurai armor with crimson chest emblem, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2 onto the poses of Image 1.
+- Apply the exact horned Oni demon warhammer design, golden curved horns, crimson-and-gold trim, crimson handle, and proportional size from Image 3 onto the weapon angles of Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+Utilisez le code avec précaution.
+
+7. wpn-6.png — Dark-Iron Samurai Pickaxe (Row 2, Column 3)
+
+text
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) that strictly copies the exact character poses, frame-by-frame motion timing, grid cell placement, and piercing smears from Image 1, replacing the greybox mannequin with the exact dark-armored Oni Samurai platypus character from Image 2 and replacing the greybox pickaxe with the exact two-handed dark-iron pickaxe secured with golden cross-straps and a dark wooden shaft with golden end-wrap (Row 2, Column 3 of Image 3).
+
+STRICT POSE & TIMING LOCK:
+- Every single frame (Frames 1 to 16) must match the exact body posture, limb angles, pickaxe orientation, and white/cyan piercing smears of the corresponding frame in Image 1.
+- Keep the dark-iron pickaxe gripped firmly in both hands on every frame, and keep both hands empty on Frame 14 (Row 4, Column 2) while the pickaxe flies mid-air, just like Image 1.
+
+CONSISTENCY & PIXEL ART RULES:
+- Apply the exact character proportions, dark charcoal samurai kabuto helmet with golden crescent horns, fierce Oni face mask with white fangs and glowing white eyes, dark segmented samurai armor with crimson chest emblem, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2 onto the poses of Image 1.
+- Apply the exact dark-iron pickaxe design, golden X-binding straps, dark wooden handle, and proportional size from Image 3 onto the weapon angles of Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+Utilisez le code avec précaution.
+
+8. wpn-7.png — Crimson-Bound Oni Bone Kanabo Club (Row 2, Column 4)
+
+text
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) that strictly copies the exact character poses, frame-by-frame motion timing, grid cell placement, and blunt impact smears from Image 1, replacing the greybox mannequin with the exact dark-armored Oni Samurai platypus character from Image 2 and replacing the greybox club with the exact two-handed giant ivory bone club bound with crimson cords, hanging red tassels, a crimson-wrapped grip, and a silver pommel ring (Row 2, Column 4 of Image 3).
+
+STRICT POSE & TIMING LOCK:
+- Every single frame (Frames 1 to 16) must match the exact body posture, limb angles, bone club orientation, and white/cyan impact smears of the corresponding frame in Image 1.
+- Keep the crimson-bound bone club gripped firmly in both hands on every frame, and keep both hands empty on Frame 14 (Row 4, Column 2) while the bone club flies mid-air, just like Image 1.
+
+CONSISTENCY & PIXEL ART RULES:
+- Apply the exact character proportions, dark charcoal samurai kabuto helmet with golden crescent horns, fierce Oni face mask with white fangs and glowing white eyes, dark segmented samurai armor with crimson chest emblem, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2 onto the poses of Image 1.
+- Apply the exact crimson-bound ivory bone club design, hanging red tassels, crimson-wrapped lower shaft, silver ring pommel, and proportional size from Image 3 onto the weapon angles of Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+Utilisez le code avec précaution.

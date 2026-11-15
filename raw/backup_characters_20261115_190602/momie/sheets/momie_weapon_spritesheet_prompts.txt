@@ -1,0 +1,379 @@
+================================================================================
+WASSI ARENA — MASTER SPRITESHEET PROMPTS FOR MOMIE (EGYPTIAN DUCK MUMMY)
+================================================================================
+Total Sheets Covered: 14 Weapon Sheets (wpn-0 to wpn-13) + 4x 2x2 Colossal Pillar
+Format: 1:1 Square Pixel-Art Sprite Sheets on #00FF00 Chroma-Key Green
+================================================================================
+
+
+################################################################################
+SECTION 1: STEP 2 RESKIN PROMPTS (wpn-0 to wpn-7)
+HOW TO USE: Attach 3 images in this exact order:
+  - Image 1: The Dummy's Master Greybox Sheet (assets/characters/dummy/sheets/wpn-X.png)
+  - Image 2: Momie's Base Sprite Sheet (assets/characters/momie/sprite.png)
+  - Image 3: Momie's Egyptian 16-Weapon Sheet (weapons-momie.png)
+################################################################################
+
+
+--- wpn-0.png : Egyptian Khopesh (Sword) (Row 1, Column 1) ---
+Attachments: [Image 1 = dummy/sheets/wpn-0.png] + [Image 2 = momie/sprite.png] + [Image 3 = weapons-momie.png]
+
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) that strictly copies the exact character poses, frame-by-frame motion timing, grid cell placement, and energy slash smears from Image 1, replacing the greybox mannequin with the exact chibi anthropomorphic Egyptian Duck Mummy character from Image 2: grey-green duck head with a long brownish-tan flat duck bill, glowing bright red eyes, green-and-tan striped Egyptian nemes headdress with a golden collar, torso and limbs wrapped in weathered beige mummy bandages, wearing a white shendyt kilt/loincloth, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading, and replacing the greybox weapon with the exact curved black-and-gold Egyptian khopesh sword with golden hieroglyphs and turquoise pommel gem from Row 1, Column 1 of Image 3 held in his right hand.
+
+STRICT POSE & TIMING LOCK:
+- Every single frame (Frames 1 to 16) must match the exact body posture, limb angles, weapon orientation, and white/cyan slash smears of the corresponding frame in Image 1.
+- Keep the weapon held in his right hand on every frame, and keep the hands empty on Frame 14 (Row 4, Column 2) while the weapon flies mid-air, just like Image 1.
+
+CONSISTENCY & PIXEL ART RULES:
+- Keep the exact character proportions, glowing red eyes, duck bill, green-and-tan nemes headdress, golden collar, mummy bandages, white loincloth, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2.
+- Every single frame (Frames 1 to 16) must strictly copy the exact body posture, limb angles, weapon orientation, grid cell placement, and white/cyan energy slash smears from Image 1.
+- Keep the hands completely empty on Frame 14 (Row 4, Column 2) while the weapon flies mid-air, matching Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+
+================================================================================
+
+
+--- wpn-1.png : Scarab Stiletto Dagger (Row 1, Column 2) ---
+Attachments: [Image 1 = dummy/sheets/wpn-1.png] + [Image 2 = momie/sprite.png] + [Image 3 = weapons-momie.png]
+
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) that strictly copies the exact character poses, frame-by-frame motion timing, grid cell placement, and energy slash smears from Image 1, replacing the greybox mannequin with the exact chibi anthropomorphic Egyptian Duck Mummy character from Image 2: grey-green duck head with a long brownish-tan flat duck bill, glowing bright red eyes, green-and-tan striped Egyptian nemes headdress with a golden collar, torso and limbs wrapped in weathered beige mummy bandages, wearing a white shendyt kilt/loincloth, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading, and replacing the greybox weapon with the exact straight double-edged black-and-gold scarab stiletto dagger with golden scarab crossguard and turquoise gem from Row 1, Column 2 of Image 3 held in his right hand.
+
+STRICT POSE & TIMING LOCK:
+- Every single frame (Frames 1 to 16) must match the exact body posture, limb angles, weapon orientation, and white/cyan slash smears of the corresponding frame in Image 1.
+- Keep the weapon held in his right hand on every frame, and keep the hands empty on Frame 14 (Row 4, Column 2) while the weapon flies mid-air, just like Image 1.
+
+CONSISTENCY & PIXEL ART RULES:
+- Keep the exact character proportions, glowing red eyes, duck bill, green-and-tan nemes headdress, golden collar, mummy bandages, white loincloth, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2.
+- Every single frame (Frames 1 to 16) must strictly copy the exact body posture, limb angles, weapon orientation, grid cell placement, and white/cyan energy slash smears from Image 1.
+- Keep the hands completely empty on Frame 14 (Row 4, Column 2) while the weapon flies mid-air, matching Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+
+================================================================================
+
+
+--- wpn-2.png : Hieroglyph Hunting Knife (Row 1, Column 3) ---
+Attachments: [Image 1 = dummy/sheets/wpn-2.png] + [Image 2 = momie/sprite.png] + [Image 3 = weapons-momie.png]
+
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) that strictly copies the exact character poses, frame-by-frame motion timing, grid cell placement, and energy slash smears from Image 1, replacing the greybox mannequin with the exact chibi anthropomorphic Egyptian Duck Mummy character from Image 2: grey-green duck head with a long brownish-tan flat duck bill, glowing bright red eyes, green-and-tan striped Egyptian nemes headdress with a golden collar, torso and limbs wrapped in weathered beige mummy bandages, wearing a white shendyt kilt/loincloth, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading, and replacing the greybox weapon with the exact curved black-and-gold Egyptian hunting knife with golden blade hieroglyphs and turquoise-inlaid grip from Row 1, Column 3 of Image 3 held in his right hand.
+
+STRICT POSE & TIMING LOCK:
+- Every single frame (Frames 1 to 16) must match the exact body posture, limb angles, weapon orientation, and white/cyan slash smears of the corresponding frame in Image 1.
+- Keep the weapon held in his right hand on every frame, and keep the hands empty on Frame 14 (Row 4, Column 2) while the weapon flies mid-air, just like Image 1.
+
+CONSISTENCY & PIXEL ART RULES:
+- Keep the exact character proportions, glowing red eyes, duck bill, green-and-tan nemes headdress, golden collar, mummy bandages, white loincloth, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2.
+- Every single frame (Frames 1 to 16) must strictly copy the exact body posture, limb angles, weapon orientation, grid cell placement, and white/cyan energy slash smears from Image 1.
+- Keep the hands completely empty on Frame 14 (Row 4, Column 2) while the weapon flies mid-air, matching Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+
+================================================================================
+
+
+--- wpn-3.png : Sarcophagus Hand-Saw (Row 1, Column 4) ---
+Attachments: [Image 1 = dummy/sheets/wpn-3.png] + [Image 2 = momie/sprite.png] + [Image 3 = weapons-momie.png]
+
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) that strictly copies the exact character poses, frame-by-frame motion timing, grid cell placement, and energy slash smears from Image 1, replacing the greybox mannequin with the exact chibi anthropomorphic Egyptian Duck Mummy character from Image 2: grey-green duck head with a long brownish-tan flat duck bill, glowing bright red eyes, green-and-tan striped Egyptian nemes headdress with a golden collar, torso and limbs wrapped in weathered beige mummy bandages, wearing a white shendyt kilt/loincloth, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading, and replacing the greybox weapon with the exact golden pharaoh sarcophagus hand-saw with a D-shaped handle, blue-and-gold striped nemes pharaoh head on the tip, and serrated steel teeth from Row 1, Column 4 of Image 3 gripped by its D-handle in his right hand.
+
+STRICT POSE & TIMING LOCK:
+- Every single frame (Frames 1 to 16) must match the exact body posture, limb angles, weapon orientation, and white/cyan slash smears of the corresponding frame in Image 1.
+- Keep the weapon gripped by its D-handle in his right hand on every frame, and keep the hands empty on Frame 14 (Row 4, Column 2) while the weapon flies mid-air, just like Image 1.
+
+CONSISTENCY & PIXEL ART RULES:
+- Keep the exact character proportions, glowing red eyes, duck bill, green-and-tan nemes headdress, golden collar, mummy bandages, white loincloth, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2.
+- Every single frame (Frames 1 to 16) must strictly copy the exact body posture, limb angles, weapon orientation, grid cell placement, and white/cyan energy slash smears from Image 1.
+- Keep the hands completely empty on Frame 14 (Row 4, Column 2) while the weapon flies mid-air, matching Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+
+================================================================================
+
+
+--- wpn-4.png : Winged Scarab Battleaxe (Row 2, Column 1) ---
+Attachments: [Image 1 = dummy/sheets/wpn-4.png] + [Image 2 = momie/sprite.png] + [Image 3 = weapons-momie.png]
+
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) that strictly copies the exact character poses, frame-by-frame motion timing, grid cell placement, and energy slash smears from Image 1, replacing the greybox mannequin with the exact chibi anthropomorphic Egyptian Duck Mummy character from Image 2: grey-green duck head with a long brownish-tan flat duck bill, glowing bright red eyes, green-and-tan striped Egyptian nemes headdress with a golden collar, torso and limbs wrapped in weathered beige mummy bandages, wearing a white shendyt kilt/loincloth, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading, and replacing the greybox weapon with the exact two-handed double-edged black-and-gold winged battleaxe with golden hieroglyphs on the dark blades and a turquoise-wrapped shaft from Row 2, Column 1 of Image 3 gripped with both hands.
+
+STRICT POSE & TIMING LOCK:
+- Every single frame (Frames 1 to 16) must match the exact body posture, limb angles, weapon orientation, and white/cyan slash smears of the corresponding frame in Image 1.
+- Keep the weapon gripped with both hands on every frame, and keep the hands empty on Frame 14 (Row 4, Column 2) while the weapon flies mid-air, just like Image 1.
+
+CONSISTENCY & PIXEL ART RULES:
+- Keep the exact character proportions, glowing red eyes, duck bill, green-and-tan nemes headdress, golden collar, mummy bandages, white loincloth, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2.
+- Every single frame (Frames 1 to 16) must strictly copy the exact body posture, limb angles, weapon orientation, grid cell placement, and white/cyan energy slash smears from Image 1.
+- Keep the hands completely empty on Frame 14 (Row 4, Column 2) while the weapon flies mid-air, matching Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+
+================================================================================
+
+
+--- wpn-5.png : Obelisk Block Warhammer (Row 2, Column 2) ---
+Attachments: [Image 1 = dummy/sheets/wpn-5.png] + [Image 2 = momie/sprite.png] + [Image 3 = weapons-momie.png]
+
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) that strictly copies the exact character poses, frame-by-frame motion timing, grid cell placement, and energy slash smears from Image 1, replacing the greybox mannequin with the exact chibi anthropomorphic Egyptian Duck Mummy character from Image 2: grey-green duck head with a long brownish-tan flat duck bill, glowing bright red eyes, green-and-tan striped Egyptian nemes headdress with a golden collar, torso and limbs wrapped in weathered beige mummy bandages, wearing a white shendyt kilt/loincloth, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading, and replacing the greybox weapon with the exact two-handed heavy black stone-and-gold rectangular warhammer etched with golden hieroglyphs and a mummy-wrapped handle with turquoise bands from Row 2, Column 2 of Image 3 gripped with both hands.
+
+STRICT POSE & TIMING LOCK:
+- Every single frame (Frames 1 to 16) must match the exact body posture, limb angles, weapon orientation, and white/cyan slash smears of the corresponding frame in Image 1.
+- Keep the weapon gripped with both hands on every frame, and keep the hands empty on Frame 14 (Row 4, Column 2) while the weapon flies mid-air, just like Image 1.
+
+CONSISTENCY & PIXEL ART RULES:
+- Keep the exact character proportions, glowing red eyes, duck bill, green-and-tan nemes headdress, golden collar, mummy bandages, white loincloth, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2.
+- Every single frame (Frames 1 to 16) must strictly copy the exact body posture, limb angles, weapon orientation, grid cell placement, and white/cyan energy slash smears from Image 1.
+- Keep the hands completely empty on Frame 14 (Row 4, Column 2) while the weapon flies mid-air, matching Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+
+================================================================================
+
+
+--- wpn-6.png : Golden Scarab Pickaxe (Row 2, Column 3) ---
+Attachments: [Image 1 = dummy/sheets/wpn-6.png] + [Image 2 = momie/sprite.png] + [Image 3 = weapons-momie.png]
+
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) that strictly copies the exact character poses, frame-by-frame motion timing, grid cell placement, and energy slash smears from Image 1, replacing the greybox mannequin with the exact chibi anthropomorphic Egyptian Duck Mummy character from Image 2: grey-green duck head with a long brownish-tan flat duck bill, glowing bright red eyes, green-and-tan striped Egyptian nemes headdress with a golden collar, torso and limbs wrapped in weathered beige mummy bandages, wearing a white shendyt kilt/loincloth, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading, and replacing the greybox weapon with the exact two-handed curved golden pickaxe with a scarab-shaped head and bandage-and-turquoise wrapped handle from Row 2, Column 3 of Image 3 gripped with both hands.
+
+STRICT POSE & TIMING LOCK:
+- Every single frame (Frames 1 to 16) must match the exact body posture, limb angles, weapon orientation, and white/cyan slash smears of the corresponding frame in Image 1.
+- Keep the weapon gripped with both hands on every frame, and keep the hands empty on Frame 14 (Row 4, Column 2) while the weapon flies mid-air, just like Image 1.
+
+CONSISTENCY & PIXEL ART RULES:
+- Keep the exact character proportions, glowing red eyes, duck bill, green-and-tan nemes headdress, golden collar, mummy bandages, white loincloth, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2.
+- Every single frame (Frames 1 to 16) must strictly copy the exact body posture, limb angles, weapon orientation, grid cell placement, and white/cyan energy slash smears from Image 1.
+- Keep the hands completely empty on Frame 14 (Row 4, Column 2) while the weapon flies mid-air, matching Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+
+================================================================================
+
+
+--- wpn-7.png : Mummy Femur Great-Club (Row 2, Column 4) ---
+Attachments: [Image 1 = dummy/sheets/wpn-7.png] + [Image 2 = momie/sprite.png] + [Image 3 = weapons-momie.png]
+
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) that strictly copies the exact character poses, frame-by-frame motion timing, grid cell placement, and energy slash smears from Image 1, replacing the greybox mannequin with the exact chibi anthropomorphic Egyptian Duck Mummy character from Image 2: grey-green duck head with a long brownish-tan flat duck bill, glowing bright red eyes, green-and-tan striped Egyptian nemes headdress with a golden collar, torso and limbs wrapped in weathered beige mummy bandages, wearing a white shendyt kilt/loincloth, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading, and replacing the greybox weapon with the exact two-handed giant ancient bone great-club wrapped in tattered mummy bandages with a golden-and-turquoise collar band from Row 2, Column 4 of Image 3 gripped with both hands.
+
+STRICT POSE & TIMING LOCK:
+- Every single frame (Frames 1 to 16) must match the exact body posture, limb angles, weapon orientation, and white/cyan slash smears of the corresponding frame in Image 1.
+- Keep the weapon gripped with both hands on every frame, and keep the hands empty on Frame 14 (Row 4, Column 2) while the weapon flies mid-air, just like Image 1.
+
+CONSISTENCY & PIXEL ART RULES:
+- Keep the exact character proportions, glowing red eyes, duck bill, green-and-tan nemes headdress, golden collar, mummy bandages, white loincloth, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2.
+- Every single frame (Frames 1 to 16) must strictly copy the exact body posture, limb angles, weapon orientation, grid cell placement, and white/cyan energy slash smears from Image 1.
+- Keep the hands completely empty on Frame 14 (Row 4, Column 2) while the weapon flies mid-air, matching Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+
+================================================================================
+
+
+################################################################################
+SECTION 2: COLOSSAL EGYPTIAN OBELISK PILLAR (wpn-10 — Four 2x2 Sheets)
+HOW TO USE: Attach 3 images for each of the 4 parts, then stitch with pack_dummy.py:
+  - Image 1: The corresponding Dummy 2x2 Pillar Sheet (pillar1..4.jpg)
+  - Image 2: Momie's Base Sprite Sheet (assets/characters/momie/sprite.png)
+  - Image 3: Momie's Egyptian 16-Weapon Sheet (Row 3, Column 4 = Sandstone Scarab Pillar)
+################################################################################
+
+
+--- wpn-10_part1_idle_equip.png : sheety/pillar1.jpg (Idle & Equip 2x2) ---
+Attachments: [Image 1 = sheety/pillar1.jpg] + [Image 2 = momie/sprite.png] + [Image 3 = weapons-momie.png]
+
+Create a square 1:1 2x2 pixel-art sprite sheet (strictly 4 large frames total: 2 columns by 2 rows) that strictly copies the exact character poses, colossal weapon scale (twice as tall as the character), quadrant placement, and energy shockwaves from Image 1, replacing the greybox mannequin with the exact chibi anthropomorphic Egyptian Duck Mummy character from Image 2: grey-green duck head with a long brownish-tan flat duck bill, glowing bright red eyes, green-and-tan striped Egyptian nemes headdress with a golden collar, torso and limbs wrapped in weathered beige mummy bandages, wearing a white shendyt kilt/loincloth, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading, and replacing the grey stone pillar with the colossal carved sandstone Egyptian obelisk pillar topped with a golden winged scarab capital and etched with hieroglyphs from Row 3, Column 4 of Image 3.
+
+STRICT 2x2 QUADRANT POSE LOCK:
+- Top-Left & Top-Right = heavy strongman idle stance holding the colossal upright cracked sandstone Egyptian obelisk pillar (topped with a golden winged scarab capital and etched with hieroglyphs) slightly off the ground with both arms; Bottom-Left = bending knees gripping the pillar planted on the floor; Bottom-Right = hoisting the colossal pillar upright into ready carry stance.
+
+CONSISTENCY & PIXEL ART RULES:
+- Keep the exact character proportions, glowing red eyes, duck bill, green-and-tan nemes headdress, golden collar, mummy bandages, white loincloth, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2.
+- Every frame must stay strictly inside its quadrant with zero bleeding across the center dividers and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+
+================================================================================
+
+
+--- wpn-10_part2_standard_slam.png : sheety/pillar2.jpg (Standard Forward Slam 2x2) ---
+Attachments: [Image 1 = sheety/pillar2.jpg] + [Image 2 = momie/sprite.png] + [Image 3 = weapons-momie.png]
+
+Create a square 1:1 2x2 pixel-art sprite sheet (strictly 4 large frames total: 2 columns by 2 rows) that strictly copies the exact character poses, colossal weapon scale (twice as tall as the character), quadrant placement, and energy shockwaves from Image 1, replacing the greybox mannequin with the exact chibi anthropomorphic Egyptian Duck Mummy character from Image 2: grey-green duck head with a long brownish-tan flat duck bill, glowing bright red eyes, green-and-tan striped Egyptian nemes headdress with a golden collar, torso and limbs wrapped in weathered beige mummy bandages, wearing a white shendyt kilt/loincloth, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading, and replacing the grey stone pillar with the colossal carved sandstone Egyptian obelisk pillar topped with a golden winged scarab capital and etched with hieroglyphs from Row 3, Column 4 of Image 3.
+
+STRICT 2x2 QUADRANT POSE LOCK:
+- Top-Left = leaning back tilting the colossal sandstone Egyptian obelisk pillar backward; Top-Right (HIT FRAME) = slamming the colossal pillar horizontally forward onto the ground with a massive white crescent arc and dust shockwave; Bottom-Left = crouching with both hands on the fallen horizontal pillar; Bottom-Right = hoisting the colossal pillar back upright.
+
+CONSISTENCY & PIXEL ART RULES:
+- Keep the exact character proportions, glowing red eyes, duck bill, green-and-tan nemes headdress, golden collar, mummy bandages, white loincloth, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2.
+- Every frame must stay strictly inside its quadrant with zero bleeding across the center dividers and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+
+================================================================================
+
+
+--- wpn-10_part3_critical_smash.png : sheety/pillar3.jpg (Critical Seismic Smash 2x2) ---
+Attachments: [Image 1 = sheety/pillar3.jpg] + [Image 2 = momie/sprite.png] + [Image 3 = weapons-momie.png]
+
+Create a square 1:1 2x2 pixel-art sprite sheet (strictly 4 large frames total: 2 columns by 2 rows) that strictly copies the exact character poses, colossal weapon scale (twice as tall as the character), quadrant placement, and energy shockwaves from Image 1, replacing the greybox mannequin with the exact chibi anthropomorphic Egyptian Duck Mummy character from Image 2: grey-green duck head with a long brownish-tan flat duck bill, glowing bright red eyes, green-and-tan striped Egyptian nemes headdress with a golden collar, torso and limbs wrapped in weathered beige mummy bandages, wearing a white shendyt kilt/loincloth, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading, and replacing the grey stone pillar with the colossal carved sandstone Egyptian obelisk pillar topped with a golden winged scarab capital and etched with hieroglyphs from Row 3, Column 4 of Image 3.
+
+STRICT 2x2 QUADRANT POSE LOCK:
+- Top-Left = hoisting the colossal sandstone Egyptian obelisk pillar horizontally overhead crackling with bright cyan lightning; Top-Right (CRITICAL HIT FRAME) = airborne downward slam driving the base of the upright colossal pillar straight into the floor with a massive cyan-and-white shockwave burst; Bottom-Left = kneeling on one knee absorbing recoil; Bottom-Right = lifting the pillar back upright.
+
+CONSISTENCY & PIXEL ART RULES:
+- Keep the exact character proportions, glowing red eyes, duck bill, green-and-tan nemes headdress, golden collar, mummy bandages, white loincloth, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2.
+- Every frame must stay strictly inside its quadrant with zero bleeding across the center dividers and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+
+================================================================================
+
+
+--- wpn-10_part4_throw_dash.png : sheety/pillar4.jpg (Caber-Toss Throw & Dash 2x2) ---
+Attachments: [Image 1 = sheety/pillar4.jpg] + [Image 2 = momie/sprite.png] + [Image 3 = weapons-momie.png]
+
+Create a square 1:1 2x2 pixel-art sprite sheet (strictly 4 large frames total: 2 columns by 2 rows) that strictly copies the exact character poses, colossal weapon scale (twice as tall as the character), quadrant placement, and energy shockwaves from Image 1, replacing the greybox mannequin with the exact chibi anthropomorphic Egyptian Duck Mummy character from Image 2: grey-green duck head with a long brownish-tan flat duck bill, glowing bright red eyes, green-and-tan striped Egyptian nemes headdress with a golden collar, torso and limbs wrapped in weathered beige mummy bandages, wearing a white shendyt kilt/loincloth, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading, and replacing the grey stone pillar with the colossal carved sandstone Egyptian obelisk pillar topped with a golden winged scarab capital and etched with hieroglyphs from Row 3, Column 4 of Image 3.
+
+STRICT 2x2 QUADRANT POSE LOCK:
+- Top-Left = leaning far back aiming the colossal sandstone Egyptian obelisk pillar overhead; Top-Right = explosive two-handed heave release with empty outstretched hands and the colossal pillar flying horizontally mid-air; Bottom-Left & Bottom-Right = heavy stomping sprint loop carrying the angled colossal pillar across the chest.
+
+CONSISTENCY & PIXEL ART RULES:
+- Keep the exact character proportions, glowing red eyes, duck bill, green-and-tan nemes headdress, golden collar, mummy bandages, white loincloth, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2.
+- Every frame must stay strictly inside its quadrant with zero bleeding across the center dividers and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+
+================================================================================
+
+
+################################################################################
+SECTION 3: DIRECT GENERATION PROMPTS FOR REMAINING 5 WEAPONS (wpn-8, 9, 11, 12, 13)
+HOW TO USE: Attach ONLY 2 images (since Dummy templates weren't generated yet):
+  - Image 1: Momie's Base Sprite Sheet (assets/characters/momie/sprite.png)
+  - Image 2: Momie's Egyptian 16-Weapon Sheet (weapons-momie.png)
+################################################################################
+
+
+--- wpn-8.png : Golden Cobra Boomerang (Row 3, Column 1) ---
+Attachments: [Image 1 = momie/sprite.png] + [Image 2 = weapons-momie.png]
+
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) of the exact chibi anthropomorphic Egyptian Duck Mummy character from Image 1: grey-green duck head with a long brownish-tan flat duck bill, glowing bright red eyes, green-and-tan striped Egyptian nemes headdress with a golden collar, torso and limbs wrapped in weathered beige mummy bandages, wearing a white shendyt kilt/loincloth, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading wielding the exact curved golden cobra-headed boomerang studded with red and turquoise gems from Row 3, Column 1 of Image 2, in 3/4 side view, 2.5D beat-'em-up perspective, facing right. STRICT 16-FRAME SQUARE GRID & HIT-FRAME TIMING (MATCHING IMAGE 1'S EXACT CELL SPACING):
+- Row 1 (Frames 1-4): Frames 1-2 = agile idle battle stance holding the golden cobra boomerang angled forward in his right hand; Frames 3-4 = spinning/equipping the boomerang into a ready guard stance.
+- Row 2 (Frames 5-8 — Close-Range Curved Swipe):
+  * Frame 5: pulling the boomerang back behind the shoulder.
+  * Frame 6 (HIT FRAME): stepping forward with a fast horizontal curved melee swipe and a sharp white crescent smear.
+  * Frame 7: cross-body follow-through recoil.
+  * Frame 8: snapping back to guard stance.
+- Row 3 (Frames 9-12 — Spinning Cyclone Throw):
+  * Frame 9: side-arm crouch charge holding the boomerang glowing with bright cyan energy.
+  * Frame 10 (CRITICAL HIT FRAME): explosive side-arm spin launch unleashing a glowing cyan-and-white curved wind arc forward.
+  * Frame 11: follow-through recoil with outstretched arm.
+  * Frame 12: recovery back to guard stance.
+- Row 4 (Frames 13-16): Frames 13-14 = quick underhand boomerang toss (Frame 13 = low wind-up, Frame 14 = release follow-through with empty hand and spinning boomerang mid-air); Frames 15-16 = fast forward dash / dodge holding the boomerang.
+
+CONSISTENCY & PIXEL ART RULES:
+- Keep the exact character proportions, glowing red eyes, duck bill, green-and-tan nemes headdress, golden collar, mummy bandages, white loincloth, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 1.
+- Keep the exact weapon design, colors, and proportional size from Image 2 firmly gripped in the hand(s) on every frame (except on Frame 14 where it is flying mid-air).
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+
+================================================================================
+
+
+--- wpn-9.png : Royal Gold & Turquoise Trident (Row 3, Column 3) ---
+Attachments: [Image 1 = momie/sprite.png] + [Image 2 = weapons-momie.png]
+
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) of the exact chibi anthropomorphic Egyptian Duck Mummy character from Image 1: grey-green duck head with a long brownish-tan flat duck bill, glowing bright red eyes, green-and-tan striped Egyptian nemes headdress with a golden collar, torso and limbs wrapped in weathered beige mummy bandages, wearing a white shendyt kilt/loincloth, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading wielding the exact two-handed long golden royal trident with turquoise accents from Row 3, Column 3 of Image 2, in 3/4 side view, 2.5D beat-'em-up perspective, facing right. STRICT 16-FRAME SQUARE GRID & HIT-FRAME TIMING (MATCHING IMAGE 1'S EXACT CELL SPACING):
+- Row 1 (Frames 1-4): Frames 1-2 = wide-legged heavy guard stance holding the long golden trident angled forward with both hands; Frames 3-4 = hoisting/equipping the heavy trident into a ready two-handed guard stance.
+- Row 2 (Frames 5-8 — Heavy Long-Reach Skewer Lunge):
+  * Frame 5: leaning back and pulling the heavy trident shaft far behind the shoulder with both hands.
+  * Frame 6 (HIT FRAME): explosive two-handed forward lunge thrusting the trident horizontally at maximum reach with a sharp triple-pronged white shockwave cone.
+  * Frame 7: bracing feet against the heavy follow-through recoil.
+  * Frame 8: stepping back into two-handed guard stance.
+- Row 3 (Frames 9-12 — Pharaoh Triple-Impale Ult):
+  * Frame 9: low crouched charge stance holding the trident back, all three prongs blazing with bright cyan lightning energy.
+  * Frame 10 (CRITICAL HIT FRAME): devastating rapid multi-hit forward skewer thrust showing three overlapping cyan-and-white trident afterimages and a piercing energy burst.
+  * Frame 11: heavy recoil bounce backward while gripping the shaft with both hands.
+  * Frame 12: recovery back to two-handed guard stance.
+- Row 4 (Frames 13-16): Frames 13-14 = overhead heavy javelin throw (Frame 13 = deep back-leaning overhead aim wind-up, Frame 14 = full-extension release with empty hands and flying trident mid-air); Frames 15-16 = heavy forward charging sprint carrying the trident horizontally with both hands.
+
+CONSISTENCY & PIXEL ART RULES:
+- Keep the exact character proportions, glowing red eyes, duck bill, green-and-tan nemes headdress, golden collar, mummy bandages, white loincloth, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 1.
+- Keep the exact weapon design, colors, and proportional size from Image 2 firmly gripped in the hand(s) on every frame (except on Frame 14 where it is flying mid-air).
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+
+================================================================================
+
+
+--- wpn-11.png : Winged Scarab Shuriken (Row 4, Column 1) ---
+Attachments: [Image 1 = momie/sprite.png] + [Image 2 = weapons-momie.png]
+
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) of the exact chibi anthropomorphic Egyptian Duck Mummy character from Image 1: grey-green duck head with a long brownish-tan flat duck bill, glowing bright red eyes, green-and-tan striped Egyptian nemes headdress with a golden collar, torso and limbs wrapped in weathered beige mummy bandages, wearing a white shendyt kilt/loincloth, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading wielding the exact four-pointed black, gold, and turquoise winged scarab shuriken star from Row 4, Column 1 of Image 2, in 3/4 side view, 2.5D beat-'em-up perspective, facing right. STRICT 16-FRAME SQUARE GRID & HIT-FRAME TIMING (MATCHING IMAGE 1'S EXACT CELL SPACING):
+- Row 1 (Frames 1-4): Frames 1-2 = agile ninja idle battle stance holding the winged scarab shuriken poised in his right hand; Frames 3-4 = flicking/drawing the shuriken into a ready guard stance.
+- Row 2 (Frames 5-8 — Rapid Scarab Star Flick):
+  * Frame 5: quick cross-body wrist cock back holding the scarab shuriken near the chest.
+  * Frame 6 (HIT FRAME): snappy side-step flick launching a crisp spinning white shuriken motion streak forward.
+  * Frame 7: balanced follow-through pose.
+  * Frame 8: returning to agile guard stance.
+- Row 3 (Frames 9-12 — Giant Razor Buzzsaw Ult):
+  * Frame 9: low crouched charge holding the shuriken overhead, scarab star blazing with bright cyan energy.
+  * Frame 10 (CRITICAL HIT FRAME): leaping side-arm hurl unleashing a massive, oversized spinning cyan-and-white energy buzzsaw projectile forward.
+  * Frame 11: nimble landing recoil crouch.
+  * Frame 12: rising back into agile guard stance.
+- Row 4 (Frames 13-16): Frames 13-14 = overhand shuriken throw (Frame 13 = high over-the-shoulder aim wind-up, Frame 14 = release follow-through with empty hand and spinning shuriken mid-air); Frames 15-16 = fast low sprint dash holding the shuriken ready.
+
+CONSISTENCY & PIXEL ART RULES:
+- Keep the exact character proportions, glowing red eyes, duck bill, green-and-tan nemes headdress, golden collar, mummy bandages, white loincloth, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 1.
+- Keep the exact weapon design, colors, and proportional size from Image 2 firmly gripped in the hand(s) on every frame (except on Frame 14 where it is flying mid-air).
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+
+================================================================================
+
+
+--- wpn-12.png : Mummy-Wrapped Hieroglyph Grenade (Row 4, Column 2) ---
+Attachments: [Image 1 = momie/sprite.png] + [Image 2 = weapons-momie.png]
+
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) of the exact chibi anthropomorphic Egyptian Duck Mummy character from Image 1: grey-green duck head with a long brownish-tan flat duck bill, glowing bright red eyes, green-and-tan striped Egyptian nemes headdress with a golden collar, torso and limbs wrapped in weathered beige mummy bandages, wearing a white shendyt kilt/loincloth, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading wielding the exact mummy-bandage-wrapped hand grenade with golden hieroglyph band and golden pull-ring from Row 4, Column 2 of Image 2, in 3/4 side view, 2.5D beat-'em-up perspective, facing right. STRICT 16-FRAME SQUARE GRID & HIT-FRAME TIMING (MATCHING IMAGE 1'S EXACT CELL SPACING):
+- Row 1 (Frames 1-4): Frames 1-2 = ready combat idle stance holding the mummy-wrapped grenade in his right hand; Frames 3-4 = pulling the golden pin / prepping the grenade into a ready guard stance.
+- Row 2 (Frames 5-8 — Underhand Arc Lob):
+  * Frame 5: swinging the right arm low behind the hip for an underhand pitch.
+  * Frame 6 (HIT FRAME): stepping forward and lobbing the grenade upward along a crisp white arc trail.
+  * Frame 7: high follow-through arm extension.
+  * Frame 8: returning to ready guard stance.
+- Row 3 (Frames 9-12 — Cursed Plasma Pitch Ult):
+  * Frame 9: leaning far back in a pitcher's wind-up, the grenade crackling intensely with bright cyan energy.
+  * Frame 10 (CRITICAL HIT FRAME): explosive full-body fastball throw launching a blazing cyan-and-white energy comet trail straight ahead.
+  * Frame 11: crouched blast-bracing follow-through shielding face with left arm.
+  * Frame 12: recovering back to ready guard stance.
+- Row 4 (Frames 13-16): Frames 13-14 = standard overhand grenade throw (Frame 13 = overhead wind-up, Frame 14 = release follow-through with empty hand and flying grenade mid-air); Frames 15-16 = fast forward tactical sprint holding the grenade.
+
+CONSISTENCY & PIXEL ART RULES:
+- Keep the exact character proportions, glowing red eyes, duck bill, green-and-tan nemes headdress, golden collar, mummy bandages, white loincloth, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 1.
+- Keep the exact weapon design, colors, and proportional size from Image 2 firmly gripped in the hand(s) on every frame (except on Frame 14 where it is flying mid-air).
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+
+================================================================================
+
+
+--- wpn-13.png : Cursed Turquoise Potion Molotov (Row 4, Column 3) ---
+Attachments: [Image 1 = momie/sprite.png] + [Image 2 = weapons-momie.png]
+
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) of the exact chibi anthropomorphic Egyptian Duck Mummy character from Image 1: grey-green duck head with a long brownish-tan flat duck bill, glowing bright red eyes, green-and-tan striped Egyptian nemes headdress with a golden collar, torso and limbs wrapped in weathered beige mummy bandages, wearing a white shendyt kilt/loincloth, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading wielding the exact glass potion bottle filled with glowing turquoise liquid and a rolled papyrus scroll tied to the neck from Row 4, Column 3 of Image 2, in 3/4 side view, 2.5D beat-'em-up perspective, facing right. STRICT 16-FRAME SQUARE GRID & HIT-FRAME TIMING (MATCHING IMAGE 1'S EXACT CELL SPACING):
+- Row 1 (Frames 1-4): Frames 1-2 = scrappy brawler idle stance holding the turquoise potion Molotov bottle angled up in his right hand; Frames 3-4 = lighting/prepping the papyrus wick into a ready guard stance.
+- Row 2 (Frames 5-8 — High-Arc Firebomb Sling):
+  * Frame 5: winding the bottle back overhead with elbow bent.
+  * Frame 6 (HIT FRAME): whipping the arm forward to sling the potion bottle along a bright white-and-cyan flame arc trail.
+  * Frame 7: low cross-body follow-through.
+  * Frame 8: snapping back to ready guard stance.
+- Row 3 (Frames 9-12 — Cursed Inferno Smash Ult):
+  * Frame 9: hoisting the potion bottle high with both hands, bottle erupting with intense cyan-white volatile fire.
+  * Frame 10 (CRITICAL HIT FRAME): leaping downward hurl smashing the bottle forward with a massive cyan-and-white fiery shockwave cone.
+  * Frame 11: low landing crouch shielding eyes from the flash.
+  * Frame 12: rising back into ready guard stance.
+- Row 4 (Frames 13-16): Frames 13-14 = side-arm bottle toss (Frame 13 = side-body wind-up, Frame 14 = release follow-through with empty hand and spinning bottle mid-air); Frames 15-16 = fast forward sprint dash holding the potion bottle tucked low.
+
+CONSISTENCY & PIXEL ART RULES:
+- Keep the exact character proportions, glowing red eyes, duck bill, green-and-tan nemes headdress, golden collar, mummy bandages, white loincloth, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 1.
+- Keep the exact weapon design, colors, and proportional size from Image 2 firmly gripped in the hand(s) on every frame (except on Frame 14 where it is flying mid-air).
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+
+================================================================================
+

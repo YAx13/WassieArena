@@ -1,0 +1,65 @@
+Here is Batch 1 (Samouraï's 4 Light Weapons: wpn-0 to wpn-3). Attach Image 1: Dummy Light Greybox Sheet, Image 2: Samouraï Base Sprite (image_pojRkW.png), Image 3: Samouraï Weapon Sheet (image_sHjffh.png).
+
+1. wpn-0.png — Golden Dragon-Guard Dark Katana (Row 1, Column 1)
+
+text
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) that strictly copies the exact character poses, frame-by-frame motion timing, grid cell placement, and energy slash smears from Image 1, replacing the greybox mannequin with the exact dark-armored Oni Samurai platypus character from Image 2 and replacing the greybox sword with the exact dark obsidian-steel katana featuring an ornate golden dragon-head guard and crimson-wrapped hilt (Row 1, Column 1 of Image 3).
+
+STRICT POSE & TIMING LOCK:
+- Every single frame (Frames 1 to 16) must match the exact body posture, limb angles, katana orientation, and white/cyan slash smears of the corresponding frame in Image 1.
+- Keep the dark katana held in the right hand on every frame, and keep the hands empty on Frame 14 (Row 4, Column 2) while the katana flies mid-air, just like Image 1.
+
+CONSISTENCY & PIXEL ART RULES:
+- Apply the exact character proportions, dark charcoal samurai kabuto helmet with golden crescent horns, fierce Oni face mask with white fangs and glowing white eyes, dark segmented samurai armor with crimson chest emblem, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2 onto the poses of Image 1.
+- Apply the exact dark-bladed katana design, golden dragon-head tsuba guard, crimson grip, and proportional size from Image 3 onto the sword angles of Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+Utilisez le code avec précaution.
+
+2. wpn-1.png — Crimson-Sheathed Gold-Trimmed Tanto Dagger (Row 1, Column 2)
+
+text
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) that strictly copies the exact character poses, frame-by-frame motion timing, grid cell placement, and energy thrust smears from Image 1, replacing the greybox mannequin with the exact dark-armored Oni Samurai platypus character from Image 2 and replacing the greybox dagger with the exact Japanese tanto dagger featuring a dark steel tip emerging from a crimson-and-gold collar guard and black-and-gold hilt (Row 1, Column 2 of Image 3).
+
+STRICT POSE & TIMING LOCK:
+- Every single frame (Frames 1 to 16) must match the exact body posture, limb angles, dagger orientation, and white/cyan thrust smears of the corresponding frame in Image 1.
+- Keep the tanto dagger held in the right hand on every frame, and keep the hands empty on Frame 14 (Row 4, Column 2) while the dagger flies mid-air, just like Image 1.
+
+CONSISTENCY & PIXEL ART RULES:
+- Apply the exact character proportions, dark charcoal samurai kabuto helmet with golden crescent horns, fierce Oni face mask with white fangs and glowing white eyes, dark segmented samurai armor with crimson chest emblem, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2 onto the poses of Image 1.
+- Apply the exact crimson-and-gold tanto dagger design, dark steel blade, black handle, and proportional size from Image 3 onto the dagger angles of Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+Utilisez le code avec précaution.
+
+3. wpn-2.png — Crimson-Hilt Gold-Dragon Hunting Knife (Row 1, Column 3)
+
+text
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) that strictly copies the exact character poses, frame-by-frame motion timing, grid cell placement, and energy slash smears from Image 1, replacing the greybox mannequin with the exact dark-armored Oni Samurai platypus character from Image 2 and replacing the greybox knife with the exact dark-bladed Japanese hunting knife featuring a golden guard and a crimson grip inlaid with a golden dragon motif (Row 1, Column 3 of Image 3).
+
+STRICT POSE & TIMING LOCK:
+- Every single frame (Frames 1 to 16) must match the exact body posture, limb angles, knife orientation, and white/cyan slash smears of the corresponding frame in Image 1.
+- Keep the Japanese hunting knife held in the right hand on every frame, and keep the hands empty on Frame 14 (Row 4, Column 2) while the knife flies mid-air, just like Image 1.
+
+CONSISTENCY & PIXEL ART RULES:
+- Apply the exact character proportions, dark charcoal samurai kabuto helmet with golden crescent horns, fierce Oni face mask with white fangs and glowing white eyes, dark segmented samurai armor with crimson chest emblem, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2 onto the poses of Image 1.
+- Apply the exact dark steel hunting knife design, golden dragon-inlaid crimson grip, golden pommel, and proportional size from Image 3 onto the knife angles of Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+Utilisez le code avec précaution.
+
+4. wpn-3.png — Dark-Steel Nokogiri Carpenter Hand-Saw (Row 1, Column 4)
+
+text
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) that strictly copies the exact character poses, frame-by-frame motion timing, grid cell placement, and grinding sparks from Image 1, replacing the greybox mannequin with the exact dark-armored Oni Samurai platypus character from Image 2 and replacing the greybox hand-saw with the exact dark-steel serrated hand-saw featuring a reddish-brown wooden D-handle and steel rivets (Row 1, Column 4 of Image 3).
+
+STRICT POSE & TIMING LOCK:
+- Every single frame (Frames 1 to 16) must match the exact body posture, limb angles, hand-saw orientation, and white/cyan grinding sparks of the corresponding frame in Image 1.
+- Keep the dark-steel hand-saw held by its wooden D-handle in the right hand on every frame, and keep the hands empty on Frame 14 (Row 4, Column 2) while the hand-saw flies mid-air, just like Image 1.
+
+CONSISTENCY & PIXEL ART RULES:
+- Apply the exact character proportions, dark charcoal samurai kabuto helmet with golden crescent horns, fierce Oni face mask with white fangs and glowing white eyes, dark segmented samurai armor with crimson chest emblem, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2 onto the poses of Image 1.
+- Apply the exact dark-steel hand-saw design, reddish-brown wooden D-handle, serrated blade, and proportional size from Image 3 onto the hand-saw angles of Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+Utilisez le code avec précaution.

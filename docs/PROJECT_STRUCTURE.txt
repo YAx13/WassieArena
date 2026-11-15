@@ -2,9 +2,7 @@ Structure du dossier
 Le numéro de série du volume est 8455-7515
 C:.
 |   .gitattributes
-|   cut_weapons.py
 |   index.html
-|   Structure-update.cmd
 |   
 +---assets
 |   +---backgrounds
@@ -85,6 +83,46 @@ C:.
 |   |   +---character-select
 |   |   |       background.jpeg
 |   |   |       
+|   |   +---companion
+|   |   |   +---dummy
+|   |   |   |       background.jpg
+|   |   |   |       
+|   |   |   +---empereur
+|   |   |   |       background.jpeg
+|   |   |   |       foreground.png
+|   |   |   |       
+|   |   |   +---frankenstein
+|   |   |   |       background.jpeg
+|   |   |   |       foreground.png
+|   |   |   |       
+|   |   |   +---general
+|   |   |   |       background.jpeg
+|   |   |   |       foreground.png
+|   |   |   |       
+|   |   |   +---hazmat
+|   |   |   |       background.jpeg
+|   |   |   |       foreground.png
+|   |   |   |       
+|   |   |   +---human
+|   |   |   |       background.jpeg
+|   |   |   |       foreground.png
+|   |   |   |       
+|   |   |   +---inversebrah
+|   |   |   |       background.jpeg
+|   |   |   |       foreground.png
+|   |   |   |       
+|   |   |   +---momie
+|   |   |   |       background.jpeg
+|   |   |   |       foreground.png
+|   |   |   |       
+|   |   |   +---samourai
+|   |   |   |       background.jpeg
+|   |   |   |       foreground.png
+|   |   |   |       
+|   |   |   \---zeus
+|   |   |           background.jpeg
+|   |   |           foreground.png
+|   |   |           
 |   |   +---competence
 |   |   |       background.jpeg
 |   |   |       
@@ -127,13 +165,15 @@ C:.
 |   |   |           pvpPreview.jpeg
 |   |   |           
 |   |   +---stats
-|   |   |   |   greybox-pilier.jpg
 |   |   |   |   greybox.jpg
 |   |   |   |   pillar-test.txt
 |   |   |   |   prompt-add-pillar.txt
 |   |   |   |   prompt-indoor.txt
 |   |   |   |   prompt-outdoor.txt
 |   |   |   |   
+|   |   |   +---dummy
+|   |   |   |       background.jpg
+|   |   |   |       
 |   |   |   +---empereur
 |   |   |   |       background.jpeg
 |   |   |   |       background.jpg
@@ -216,32 +256,40 @@ C:.
 |   |               sheet-1.png
 |   |               
 |   +---characters
-|   |   |   Capture d’écran 2026-11-15 004800.png
-|   |   |   heavy.txt
-|   |   |   light.txt
-|   |   |   
 |   |   +---dummy
-|   |   |   |   sprite.png
-|   |   |   |   
-|   |   |   \---sheets
-|   |   |           sheet-1.png
-|   |   |           sheet-2.png
-|   |   |           sheet-3.png
-|   |   |           sheet-4.png
+|   |   |   +---sheets
+|   |   |   |       sheet-1.png
+|   |   |   |       sheet-2.png
+|   |   |   |       sheet-3.png
+|   |   |   |       sheet-4.png
+|   |   |   |       wpn-0.png
+|   |   |   |       wpn-1.png
+|   |   |   |       wpn-10.png
+|   |   |   |       wpn-2.png
+|   |   |   |       wpn-3.png
+|   |   |   |       wpn-4.png
+|   |   |   |       wpn-5.png
+|   |   |   |       wpn-6.png
+|   |   |   |       wpn-7.png
+|   |   |   |       
+|   |   |   \---weapons
+|   |   |           weapon-1-transparent.png
 |   |   |           wpn-0.png
 |   |   |           wpn-1.png
 |   |   |           wpn-10.png
+|   |   |           wpn-11.png
+|   |   |           wpn-12.png
+|   |   |           wpn-13.png
 |   |   |           wpn-2.png
 |   |   |           wpn-3.png
 |   |   |           wpn-4.png
 |   |   |           wpn-5.png
 |   |   |           wpn-6.png
 |   |   |           wpn-7.png
+|   |   |           wpn-8.png
+|   |   |           wpn-9.png
 |   |   |           
 |   |   +---empereur
-|   |   |   |   portrait.png
-|   |   |   |   sprite.png
-|   |   |   |   
 |   |   |   +---sheets
 |   |   |   |       sheet-1.png
 |   |   |   |       sheet-2.png
@@ -258,10 +306,22 @@ C:.
 |   |   |   |       
 |   |   |   \---weapons
 |   |   |           weapon-1-transparent.png
+|   |   |           wpn-0.png
+|   |   |           wpn-1.png
+|   |   |           wpn-10.png
+|   |   |           wpn-11.png
+|   |   |           wpn-12.png
+|   |   |           wpn-13.png
+|   |   |           wpn-2.png
+|   |   |           wpn-3.png
+|   |   |           wpn-4.png
+|   |   |           wpn-5.png
+|   |   |           wpn-6.png
+|   |   |           wpn-7.png
+|   |   |           wpn-8.png
+|   |   |           wpn-9.png
 |   |   |           
 |   |   +---frankenstein
-|   |   |   |   starter.jpeg
-|   |   |   |   
 |   |   |   +---sheets
 |   |   |   |       sheet-1.png
 |   |   |   |       sheet-2.png
@@ -278,12 +338,22 @@ C:.
 |   |   |   |       
 |   |   |   \---weapons
 |   |   |           weapon-1-transparent.png
+|   |   |           wpn-0.png
+|   |   |           wpn-1.png
+|   |   |           wpn-10.png
+|   |   |           wpn-11.png
+|   |   |           wpn-12.png
+|   |   |           wpn-13.png
+|   |   |           wpn-2.png
+|   |   |           wpn-3.png
+|   |   |           wpn-4.png
+|   |   |           wpn-5.png
+|   |   |           wpn-6.png
+|   |   |           wpn-7.png
+|   |   |           wpn-8.png
+|   |   |           wpn-9.png
 |   |   |           
 |   |   +---general
-|   |   |   |   portrait.png
-|   |   |   |   sprite.png
-|   |   |   |   starter.jpeg
-|   |   |   |   
 |   |   |   +---sheets
 |   |   |   |       sheet-1.png
 |   |   |   |       sheet-2.png
@@ -300,11 +370,22 @@ C:.
 |   |   |   |       
 |   |   |   \---weapons
 |   |   |           weapon-1-transparent.png
+|   |   |           wpn-0.png
+|   |   |           wpn-1.png
+|   |   |           wpn-10.png
+|   |   |           wpn-11.png
+|   |   |           wpn-12.png
+|   |   |           wpn-13.png
+|   |   |           wpn-2.png
+|   |   |           wpn-3.png
+|   |   |           wpn-4.png
+|   |   |           wpn-5.png
+|   |   |           wpn-6.png
+|   |   |           wpn-7.png
+|   |   |           wpn-8.png
+|   |   |           wpn-9.png
 |   |   |           
 |   |   +---hazmat
-|   |   |   |   sprite.png
-|   |   |   |   starter.jpeg
-|   |   |   |   
 |   |   |   +---sheets
 |   |   |   |       sheet-1.png
 |   |   |   |       sheet-2.png
@@ -321,10 +402,22 @@ C:.
 |   |   |   |       
 |   |   |   \---weapons
 |   |   |           weapon-1-transparent.png
+|   |   |           wpn-0.png
+|   |   |           wpn-1.png
+|   |   |           wpn-10.png
+|   |   |           wpn-11.png
+|   |   |           wpn-12.png
+|   |   |           wpn-13.png
+|   |   |           wpn-2.png
+|   |   |           wpn-3.png
+|   |   |           wpn-4.png
+|   |   |           wpn-5.png
+|   |   |           wpn-6.png
+|   |   |           wpn-7.png
+|   |   |           wpn-8.png
+|   |   |           wpn-9.png
 |   |   |           
 |   |   +---human
-|   |   |   |   starter.jpeg
-|   |   |   |   
 |   |   |   +---sheets
 |   |   |   |       sheet-1.png
 |   |   |   |       sheet-2.png
@@ -346,11 +439,22 @@ C:.
 |   |   |           weapon-2.jpeg
 |   |   |           weapon-3-transparent.png
 |   |   |           weapon-3.jpeg
+|   |   |           wpn-0.png
+|   |   |           wpn-1.png
+|   |   |           wpn-10.png
+|   |   |           wpn-11.png
+|   |   |           wpn-12.png
+|   |   |           wpn-13.png
+|   |   |           wpn-2.png
+|   |   |           wpn-3.png
+|   |   |           wpn-4.png
+|   |   |           wpn-5.png
+|   |   |           wpn-6.png
+|   |   |           wpn-7.png
+|   |   |           wpn-8.png
+|   |   |           wpn-9.png
 |   |   |           
 |   |   +---inversebrah
-|   |   |   |   sprite.png
-|   |   |   |   starter.jpeg
-|   |   |   |   
 |   |   |   +---sheets
 |   |   |   |       sheet-1.png
 |   |   |   |       sheet-2.png
@@ -374,29 +478,816 @@ C:.
 |   |   |           weapon-3.jpeg
 |   |   |           weapon-4-transparent.png
 |   |   |           weapon-4.jpeg
+|   |   |           wpn-0.png
+|   |   |           wpn-1.png
+|   |   |           wpn-10.png
+|   |   |           wpn-11.png
+|   |   |           wpn-12.png
+|   |   |           wpn-13.png
+|   |   |           wpn-2.png
+|   |   |           wpn-3.png
+|   |   |           wpn-4.png
+|   |   |           wpn-5.png
+|   |   |           wpn-6.png
+|   |   |           wpn-7.png
+|   |   |           wpn-8.png
+|   |   |           wpn-9.png
 |   |   |           
+|   |   +---momie
+|   |   |   +---sheets
+|   |   |   |       sheet-1.png
+|   |   |   |       sheet-2.png
+|   |   |   |       sheet-3.png
+|   |   |   |       sheet-4.png
+|   |   |   |       wpn-0.png
+|   |   |   |       wpn-1.png
+|   |   |   |       wpn-2.png
+|   |   |   |       wpn-3.png
+|   |   |   |       wpn-4.png
+|   |   |   |       wpn-5.png
+|   |   |   |       wpn-6.png
+|   |   |   |       wpn-7.png
+|   |   |   |       
+|   |   |   \---weapons
+|   |   |           weapon-1-transparent.png
+|   |   |           wpn-0.png
+|   |   |           wpn-1.png
+|   |   |           wpn-10.png
+|   |   |           wpn-11.png
+|   |   |           wpn-12.png
+|   |   |           wpn-13.png
+|   |   |           wpn-2.png
+|   |   |           wpn-3.png
+|   |   |           wpn-4.png
+|   |   |           wpn-5.png
+|   |   |           wpn-6.png
+|   |   |           wpn-7.png
+|   |   |           wpn-8.png
+|   |   |           wpn-9.png
+|   |   |           
+|   |   +---samourai
+|   |   |   +---sheets
+|   |   |   |       sheet-1.png
+|   |   |   |       sheet-2.png
+|   |   |   |       sheet-3.png
+|   |   |   |       sheet-4.png
+|   |   |   |       wpn-0.png
+|   |   |   |       wpn-1.png
+|   |   |   |       wpn-2.png
+|   |   |   |       wpn-3.png
+|   |   |   |       wpn-4.png
+|   |   |   |       wpn-5.png
+|   |   |   |       wpn-6.png
+|   |   |   |       wpn-7.png
+|   |   |   |       
+|   |   |   \---weapons
+|   |   |           weapon-1-transparent.png
+|   |   |           wpn-0.png
+|   |   |           wpn-1.png
+|   |   |           wpn-10.png
+|   |   |           wpn-11.png
+|   |   |           wpn-12.png
+|   |   |           wpn-13.png
+|   |   |           wpn-2.png
+|   |   |           wpn-3.png
+|   |   |           wpn-4.png
+|   |   |           wpn-5.png
+|   |   |           wpn-6.png
+|   |   |           wpn-7.png
+|   |   |           wpn-8.png
+|   |   |           wpn-9.png
+|   |   |           
+|   |   \---zeus
+|   |       +---sheets
+|   |       |       sheet-1.png
+|   |       |       sheet-2.png
+|   |       |       sheet-3.png
+|   |       |       sheet-4.png
+|   |       |       wpn-0.png
+|   |       |       wpn-1.png
+|   |       |       wpn-2.png
+|   |       |       wpn-3.png
+|   |       |       wpn-4.png
+|   |       |       wpn-5.png
+|   |       |       wpn-6.png
+|   |       |       wpn-7.png
+|   |       |       
+|   |       \---weapons
+|   |               weapon-1-transparent.png
+|   |               wpn-0.png
+|   |               wpn-1.png
+|   |               wpn-10.png
+|   |               wpn-11.png
+|   |               wpn-12.png
+|   |               wpn-13.png
+|   |               wpn-2.png
+|   |               wpn-3.png
+|   |               wpn-4.png
+|   |               wpn-5.png
+|   |               wpn-6.png
+|   |               wpn-7.png
+|   |               wpn-8.png
+|   |               wpn-9.png
+|   |               
+|   \---companion
+|       +---form-1
+|       |       aqua.png
+|       |       beetle.png
+|       |       bird.png
+|       |       bull.png
+|       |       cat.png
+|       |       dog.png
+|       |       eagle.png
+|       |       lizard.png
+|       |       ours.png
+|       |       racoon.png
+|       |       snake.png
+|       |       spectre.png
+|       |       wolf.png
+|       |       
+|       +---form-2
+|       |       aqua.png
+|       |       beetle.png
+|       |       bird.png
+|       |       bull.png
+|       |       cat.png
+|       |       dog.png
+|       |       eagle.png
+|       |       lizard.png
+|       |       ours.png
+|       |       racoon.png
+|       |       snake.png
+|       |       spectre.png
+|       |       wolf.png
+|       |       
+|       \---form-3
+|               aqua.png
+|               beetle.png
+|               bird.png
+|               bull.png
+|               cat.png
+|               dog.png
+|               eagle.png
+|               lizard.png
+|               ours.png
+|               racoon.png
+|               snake.png
+|               spectre.png
+|               wolf.png
+|               
++---css
+|       character-select.css
+|       game-frame.css
+|       styles.css
+|       
++---docs
+|   |   enquete_economie.txt
+|   |   enquete_gold.txt
+|   |   enquete_ressources.txt
+|   |   enquete_variables.txt
+|   |   PROJECT_STRUCTURE.txt
+|   |   
+|   +---.md
+|   |       game designer.txt
+|   |       senior developer.txt
+|   |       
+|   +---econ
+|   |       Nouveau Document texte.txt
+|   |       
+|   \---prompt
+|       |   cell.paint
+|       |   
+|       +---archived
+|       |       characters_prompt-HW.txt
+|       |       characters_prompt-LW.txt
+|       |       characters_prompt-PT.txt
+|       |       companion_bottom-row.txt
+|       |       companion_explanation.txt
+|       |       companion_top-row.txt
+|       |       companion_universal-stasis-pod-master-prompt.txt
+|       |       empereur_prompt-HW.txt
+|       |       empereur_prompt-LW.txt
+|       |       empereur_prompt-PT.txt
+|       |       frankenstein_prompt-HW.txt
+|       |       frankenstein_prompt-LW.txt
+|       |       frankenstein_prompt-PT.txt
+|       |       general_prompt-HW.txt
+|       |       general_prompt-LW.txt
+|       |       general_prompt-PT.txt
+|       |       hazmat_prompt-HW.txt
+|       |       hazmat_prompt-LW.txt
+|       |       hazmat_prompt-PT.txt
+|       |       samourai_prompt-HW.txt
+|       |       samourai_prompt-LW.txt
+|       |       samourai_prompt-PT.txt
+|       |       sheets_momie_weapon_spritesheet_prompts.txt
+|       |       zeus_prompt-HW.txt
+|       |       zeus_prompt-LW.txt
+|       |       zeus_prompt-PT.txt
+|       |       
+|       +---Nouveau dossier
+|       |       compagnon cell.txt
+|       |       image_ff637b67.jpg
+|       |       
+|       +---prompt background stats
+|       |       image (26).jpg
+|       |       image (27).jpg
+|       |       image (28).jpg
+|       |       image (29).jpg
+|       |       
+|       \---spritesheet
+|           |   prompt boss.txt
+|           |   prompt PLANCHE 1.txt
+|           |   prompt PLANCHE 2.txt
+|           |   prompt PLANCHE 3.txt
+|           |   prompt PLANCHE 4.txt
+|           |   sprite nomenclature.txt
+|           |   
+|           \---companion
+|                   &.png
+|                   &é.png
+|                   '.png
+|                   (.png
+|                   Prompt compagnon.txt
+|                   
++---js
+|   +---core
+|   |       data.js
+|   |       main.js
+|   |       state.js
+|   |       
+|   +---systems
+|   |       afk.js
+|   |       combat.js
+|   |       pvp.js
+|   |       raids.js
+|   |       simulateur.js
+|   |       
+|   \---ui
+|           armurerie.js
+|           caserne.js
+|           character-select.js
+|           compagnons.js
+|           devlayout.js
+|           game-frame.js
+|           recorder.js
+|           renderer.js
+|           stats.js
+|           ui-core.js
+|           
++---raw
+|   |   A UTILISER.jpeg
+|   |   background.jpeg
+|   |   background.jpg
+|   |   ezfzf.jpg
+|   |   HXKyWz9W4AACUSf.jpg
+|   |   image_3488da6e.jpeg
+|   |   image_6d6b5f1a.jpeg
+|   |   mockup-simulator.jpg
+|   |   starter.jpeg
+|   |   
+|   +---avif
+|   |       frankenstein.avif
+|   |       hazmat.avif
+|   |       inversebrah.avif
+|   |       momie.avif
+|   |       samourai.avif
+|   |       zeus.avif
+|   |       
+|   +---background_comp
+|   |       image_15544ee3.jpg
+|   |       image_a3079ac0.jpg
+|   |       image_bfb224d7.jpg
+|   |       prompt-background.txt
+|   |       
+|   +---backup_characters_20261115_190602
+|   |   |   prompt-HW.txt
+|   |   |   prompt-LW.txt
+|   |   |   prompt-PT.txt
+|   |   |   
+|   |   +---dummy
+|   |   |   |   sprite.png
+|   |   |   |   
+|   |   |   \---sheets
+|   |   |           sheet-1.png
+|   |   |           sheet-2.png
+|   |   |           sheet-3.png
+|   |   |           sheet-4.png
+|   |   |           wpn-0.png
+|   |   |           wpn-1.png
+|   |   |           wpn-10.png
+|   |   |           wpn-2.png
+|   |   |           wpn-3.png
+|   |   |           wpn-4.png
+|   |   |           wpn-5.png
+|   |   |           wpn-6.png
+|   |   |           wpn-7.png
+|   |   |           
+|   |   +---empereur
+|   |   |   |   portrait.png
+|   |   |   |   prompt-HW.txt
+|   |   |   |   prompt-LW.txt
+|   |   |   |   prompt-PT.txt
+|   |   |   |   sprite.png
+|   |   |   |   
+|   |   |   +---sheets
+|   |   |   |       sheet-1.png
+|   |   |   |       sheet-2.png
+|   |   |   |       sheet-3.png
+|   |   |   |       sheet-4.png
+|   |   |   |       wpn-0.png
+|   |   |   |       wpn-1.png
+|   |   |   |       wpn-2.png
+|   |   |   |       wpn-3.png
+|   |   |   |       wpn-4.png
+|   |   |   |       wpn-5.png
+|   |   |   |       wpn-6.png
+|   |   |   |       wpn-7.png
+|   |   |   |       
+|   |   |   \---weapons
+|   |   |       |   weapon-1-transparent.png
+|   |   |       |   
+|   |   |       \---weapons_cut
+|   |   |           \---weapon-1-transparent
+|   |   |                   wpn-0.png
+|   |   |                   wpn-1.png
+|   |   |                   wpn-10.png
+|   |   |                   wpn-11.png
+|   |   |                   wpn-12.png
+|   |   |                   wpn-13.png
+|   |   |                   wpn-2.png
+|   |   |                   wpn-3.png
+|   |   |                   wpn-4.png
+|   |   |                   wpn-5.png
+|   |   |                   wpn-6.png
+|   |   |                   wpn-7.png
+|   |   |                   wpn-8.png
+|   |   |                   wpn-9.png
+|   |   |                   
+|   |   +---frankenstein
+|   |   |   |   prompt-HW.txt
+|   |   |   |   prompt-LW.txt
+|   |   |   |   prompt-PT.txt
+|   |   |   |   starter.jpeg
+|   |   |   |   
+|   |   |   +---sheets
+|   |   |   |       sheet-1.png
+|   |   |   |       sheet-2.png
+|   |   |   |       sheet-3.png
+|   |   |   |       sheet-4.png
+|   |   |   |       wpn-0.png
+|   |   |   |       wpn-1.png
+|   |   |   |       wpn-2.png
+|   |   |   |       wpn-3.png
+|   |   |   |       wpn-4.png
+|   |   |   |       wpn-5.png
+|   |   |   |       wpn-6.png
+|   |   |   |       wpn-7.png
+|   |   |   |       
+|   |   |   \---weapons
+|   |   |       |   weapon-1-transparent.png
+|   |   |       |   
+|   |   |       \---weapons_cut
+|   |   |           \---weapon-1-transparent
+|   |   |                   wpn-0.png
+|   |   |                   wpn-1.png
+|   |   |                   wpn-10.png
+|   |   |                   wpn-11.png
+|   |   |                   wpn-12.png
+|   |   |                   wpn-13.png
+|   |   |                   wpn-2.png
+|   |   |                   wpn-3.png
+|   |   |                   wpn-4.png
+|   |   |                   wpn-5.png
+|   |   |                   wpn-6.png
+|   |   |                   wpn-7.png
+|   |   |                   wpn-8.png
+|   |   |                   wpn-9.png
+|   |   |                   
+|   |   +---general
+|   |   |   |   portrait.png
+|   |   |   |   prompt-HW.txt
+|   |   |   |   prompt-LW.txt
+|   |   |   |   prompt-PT.txt
+|   |   |   |   sprite.png
+|   |   |   |   starter.jpeg
+|   |   |   |   
+|   |   |   +---sheets
+|   |   |   |       sheet-1.png
+|   |   |   |       sheet-2.png
+|   |   |   |       sheet-3.png
+|   |   |   |       sheet-4.png
+|   |   |   |       wpn-0.png
+|   |   |   |       wpn-1.png
+|   |   |   |       wpn-2.png
+|   |   |   |       wpn-3.png
+|   |   |   |       wpn-4.png
+|   |   |   |       wpn-5.png
+|   |   |   |       wpn-6.png
+|   |   |   |       wpn-7.png
+|   |   |   |       
+|   |   |   \---weapons
+|   |   |       |   weapon-1-transparent.png
+|   |   |       |   
+|   |   |       \---weapons_cut
+|   |   |           \---weapon-1-transparent
+|   |   |                   wpn-0.png
+|   |   |                   wpn-1.png
+|   |   |                   wpn-10.png
+|   |   |                   wpn-11.png
+|   |   |                   wpn-12.png
+|   |   |                   wpn-13.png
+|   |   |                   wpn-2.png
+|   |   |                   wpn-3.png
+|   |   |                   wpn-4.png
+|   |   |                   wpn-5.png
+|   |   |                   wpn-6.png
+|   |   |                   wpn-7.png
+|   |   |                   wpn-8.png
+|   |   |                   wpn-9.png
+|   |   |                   
+|   |   +---hazmat
+|   |   |   |   prompt-HW.txt
+|   |   |   |   prompt-LW.txt
+|   |   |   |   prompt-PT.txt
+|   |   |   |   sprite.png
+|   |   |   |   starter.jpeg
+|   |   |   |   
+|   |   |   +---sheets
+|   |   |   |       sheet-1.png
+|   |   |   |       sheet-2.png
+|   |   |   |       sheet-3.png
+|   |   |   |       sheet-4.png
+|   |   |   |       wpn-0.png
+|   |   |   |       wpn-1.png
+|   |   |   |       wpn-2.png
+|   |   |   |       wpn-3.png
+|   |   |   |       wpn-4.png
+|   |   |   |       wpn-5.png
+|   |   |   |       wpn-6.png
+|   |   |   |       wpn-7.png
+|   |   |   |       
+|   |   |   \---weapons
+|   |   |       |   weapon-1-transparent.png
+|   |   |       |   
+|   |   |       \---weapons_cut
+|   |   |           \---weapon-1-transparent
+|   |   |                   wpn-0.png
+|   |   |                   wpn-1.png
+|   |   |                   wpn-10.png
+|   |   |                   wpn-11.png
+|   |   |                   wpn-12.png
+|   |   |                   wpn-13.png
+|   |   |                   wpn-2.png
+|   |   |                   wpn-3.png
+|   |   |                   wpn-4.png
+|   |   |                   wpn-5.png
+|   |   |                   wpn-6.png
+|   |   |                   wpn-7.png
+|   |   |                   wpn-8.png
+|   |   |                   wpn-9.png
+|   |   |                   
+|   |   +---human
+|   |   |   |   starter.jpeg
+|   |   |   |   
+|   |   |   +---sheets
+|   |   |   |       sheet-1.png
+|   |   |   |       sheet-2.png
+|   |   |   |       sheet-3.png
+|   |   |   |       sheet-4.png
+|   |   |   |       wpn-0.png
+|   |   |   |       wpn-1.png
+|   |   |   |       wpn-2.png
+|   |   |   |       wpn-3.png
+|   |   |   |       wpn-4.png
+|   |   |   |       wpn-5.png
+|   |   |   |       wpn-6.png
+|   |   |   |       wpn-7.png
+|   |   |   |       
+|   |   |   \---weapons
+|   |   |       |   weapon-1-transparent.png
+|   |   |       |   weapon-1.jpeg
+|   |   |       |   weapon-2-transparent.png
+|   |   |       |   weapon-2.jpeg
+|   |   |       |   weapon-3-transparent.png
+|   |   |       |   weapon-3.jpeg
+|   |   |       |   
+|   |   |       \---weapons_cut
+|   |   |           +---weapon-1
+|   |   |           |       wpn-0.png
+|   |   |           |       wpn-1.png
+|   |   |           |       wpn-10.png
+|   |   |           |       wpn-11.png
+|   |   |           |       wpn-12.png
+|   |   |           |       wpn-13.png
+|   |   |           |       wpn-2.png
+|   |   |           |       wpn-3.png
+|   |   |           |       wpn-4.png
+|   |   |           |       wpn-5.png
+|   |   |           |       wpn-6.png
+|   |   |           |       wpn-7.png
+|   |   |           |       wpn-8.png
+|   |   |           |       wpn-9.png
+|   |   |           |       
+|   |   |           +---weapon-1-transparent
+|   |   |           |       wpn-0.png
+|   |   |           |       wpn-1.png
+|   |   |           |       wpn-10.png
+|   |   |           |       wpn-11.png
+|   |   |           |       wpn-12.png
+|   |   |           |       wpn-13.png
+|   |   |           |       wpn-2.png
+|   |   |           |       wpn-3.png
+|   |   |           |       wpn-4.png
+|   |   |           |       wpn-5.png
+|   |   |           |       wpn-6.png
+|   |   |           |       wpn-7.png
+|   |   |           |       wpn-8.png
+|   |   |           |       wpn-9.png
+|   |   |           |       
+|   |   |           +---weapon-2
+|   |   |           |       wpn-0.png
+|   |   |           |       wpn-1.png
+|   |   |           |       wpn-10.png
+|   |   |           |       wpn-11.png
+|   |   |           |       wpn-12.png
+|   |   |           |       wpn-13.png
+|   |   |           |       wpn-2.png
+|   |   |           |       wpn-3.png
+|   |   |           |       wpn-4.png
+|   |   |           |       wpn-5.png
+|   |   |           |       wpn-6.png
+|   |   |           |       wpn-7.png
+|   |   |           |       wpn-8.png
+|   |   |           |       wpn-9.png
+|   |   |           |       
+|   |   |           +---weapon-2-transparent
+|   |   |           |       wpn-0.png
+|   |   |           |       wpn-1.png
+|   |   |           |       wpn-10.png
+|   |   |           |       wpn-11.png
+|   |   |           |       wpn-12.png
+|   |   |           |       wpn-13.png
+|   |   |           |       wpn-2.png
+|   |   |           |       wpn-3.png
+|   |   |           |       wpn-4.png
+|   |   |           |       wpn-5.png
+|   |   |           |       wpn-6.png
+|   |   |           |       wpn-7.png
+|   |   |           |       wpn-8.png
+|   |   |           |       wpn-9.png
+|   |   |           |       
+|   |   |           +---weapon-3
+|   |   |           |       wpn-0.png
+|   |   |           |       wpn-1.png
+|   |   |           |       wpn-10.png
+|   |   |           |       wpn-11.png
+|   |   |           |       wpn-12.png
+|   |   |           |       wpn-13.png
+|   |   |           |       wpn-2.png
+|   |   |           |       wpn-3.png
+|   |   |           |       wpn-4.png
+|   |   |           |       wpn-5.png
+|   |   |           |       wpn-6.png
+|   |   |           |       wpn-7.png
+|   |   |           |       wpn-8.png
+|   |   |           |       wpn-9.png
+|   |   |           |       
+|   |   |           \---weapon-3-transparent
+|   |   |                   wpn-0.png
+|   |   |                   wpn-1.png
+|   |   |                   wpn-10.png
+|   |   |                   wpn-11.png
+|   |   |                   wpn-12.png
+|   |   |                   wpn-13.png
+|   |   |                   wpn-2.png
+|   |   |                   wpn-3.png
+|   |   |                   wpn-4.png
+|   |   |                   wpn-5.png
+|   |   |                   wpn-6.png
+|   |   |                   wpn-7.png
+|   |   |                   wpn-8.png
+|   |   |                   wpn-9.png
+|   |   |                   
+|   |   +---inversebrah
+|   |   |   |   sprite.png
+|   |   |   |   starter.jpeg
+|   |   |   |   
+|   |   |   +---sheets
+|   |   |   |       sheet-1.png
+|   |   |   |       sheet-2.png
+|   |   |   |       sheet-3.png
+|   |   |   |       sheet-4.png
+|   |   |   |       wpn-0.png
+|   |   |   |       wpn-1.png
+|   |   |   |       wpn-2.png
+|   |   |   |       wpn-3.png
+|   |   |   |       wpn-4.png
+|   |   |   |       wpn-5.png
+|   |   |   |       wpn-6.png
+|   |   |   |       wpn-7.png
+|   |   |   |       
+|   |   |   \---weapons
+|   |   |       |   weapon-1-transparent.png
+|   |   |       |   weapon-1.jpeg
+|   |   |       |   weapon-2-transparent.png
+|   |   |       |   weapon-2.jpeg
+|   |   |       |   weapon-3-transparent.png
+|   |   |       |   weapon-3.jpeg
+|   |   |       |   weapon-4-transparent.png
+|   |   |       |   weapon-4.jpeg
+|   |   |       |   
+|   |   |       \---weapons_cut
+|   |   |           +---weapon-1
+|   |   |           |       wpn-0.png
+|   |   |           |       wpn-1.png
+|   |   |           |       wpn-10.png
+|   |   |           |       wpn-11.png
+|   |   |           |       wpn-12.png
+|   |   |           |       wpn-13.png
+|   |   |           |       wpn-2.png
+|   |   |           |       wpn-3.png
+|   |   |           |       wpn-4.png
+|   |   |           |       wpn-5.png
+|   |   |           |       wpn-6.png
+|   |   |           |       wpn-7.png
+|   |   |           |       wpn-8.png
+|   |   |           |       wpn-9.png
+|   |   |           |       
+|   |   |           +---weapon-1-transparent
+|   |   |           |       wpn-0.png
+|   |   |           |       wpn-1.png
+|   |   |           |       wpn-10.png
+|   |   |           |       wpn-11.png
+|   |   |           |       wpn-12.png
+|   |   |           |       wpn-13.png
+|   |   |           |       wpn-2.png
+|   |   |           |       wpn-3.png
+|   |   |           |       wpn-4.png
+|   |   |           |       wpn-5.png
+|   |   |           |       wpn-6.png
+|   |   |           |       wpn-7.png
+|   |   |           |       wpn-8.png
+|   |   |           |       wpn-9.png
+|   |   |           |       
+|   |   |           +---weapon-2
+|   |   |           |       wpn-0.png
+|   |   |           |       wpn-1.png
+|   |   |           |       wpn-10.png
+|   |   |           |       wpn-11.png
+|   |   |           |       wpn-12.png
+|   |   |           |       wpn-13.png
+|   |   |           |       wpn-2.png
+|   |   |           |       wpn-3.png
+|   |   |           |       wpn-4.png
+|   |   |           |       wpn-5.png
+|   |   |           |       wpn-6.png
+|   |   |           |       wpn-7.png
+|   |   |           |       wpn-8.png
+|   |   |           |       wpn-9.png
+|   |   |           |       
+|   |   |           +---weapon-2-transparent
+|   |   |           |       wpn-0.png
+|   |   |           |       wpn-1.png
+|   |   |           |       wpn-10.png
+|   |   |           |       wpn-11.png
+|   |   |           |       wpn-12.png
+|   |   |           |       wpn-13.png
+|   |   |           |       wpn-2.png
+|   |   |           |       wpn-3.png
+|   |   |           |       wpn-4.png
+|   |   |           |       wpn-5.png
+|   |   |           |       wpn-6.png
+|   |   |           |       wpn-7.png
+|   |   |           |       wpn-8.png
+|   |   |           |       wpn-9.png
+|   |   |           |       
+|   |   |           +---weapon-3
+|   |   |           |       wpn-0.png
+|   |   |           |       wpn-1.png
+|   |   |           |       wpn-10.png
+|   |   |           |       wpn-11.png
+|   |   |           |       wpn-12.png
+|   |   |           |       wpn-13.png
+|   |   |           |       wpn-2.png
+|   |   |           |       wpn-3.png
+|   |   |           |       wpn-4.png
+|   |   |           |       wpn-5.png
+|   |   |           |       wpn-6.png
+|   |   |           |       wpn-7.png
+|   |   |           |       wpn-8.png
+|   |   |           |       wpn-9.png
+|   |   |           |       
+|   |   |           +---weapon-3-transparent
+|   |   |           |       wpn-0.png
+|   |   |           |       wpn-1.png
+|   |   |           |       wpn-10.png
+|   |   |           |       wpn-11.png
+|   |   |           |       wpn-12.png
+|   |   |           |       wpn-13.png
+|   |   |           |       wpn-2.png
+|   |   |           |       wpn-3.png
+|   |   |           |       wpn-4.png
+|   |   |           |       wpn-5.png
+|   |   |           |       wpn-6.png
+|   |   |           |       wpn-7.png
+|   |   |           |       wpn-8.png
+|   |   |           |       wpn-9.png
+|   |   |           |       
+|   |   |           +---weapon-4
+|   |   |           |       wpn-0.png
+|   |   |           |       wpn-1.png
+|   |   |           |       wpn-10.png
+|   |   |           |       wpn-11.png
+|   |   |           |       wpn-12.png
+|   |   |           |       wpn-13.png
+|   |   |           |       wpn-2.png
+|   |   |           |       wpn-3.png
+|   |   |           |       wpn-4.png
+|   |   |           |       wpn-5.png
+|   |   |           |       wpn-6.png
+|   |   |           |       wpn-7.png
+|   |   |           |       wpn-8.png
+|   |   |           |       wpn-9.png
+|   |   |           |       
+|   |   |           \---weapon-4-transparent
+|   |   |                   wpn-0.png
+|   |   |                   wpn-1.png
+|   |   |                   wpn-10.png
+|   |   |                   wpn-11.png
+|   |   |                   wpn-12.png
+|   |   |                   wpn-13.png
+|   |   |                   wpn-2.png
+|   |   |                   wpn-3.png
+|   |   |                   wpn-4.png
+|   |   |                   wpn-5.png
+|   |   |                   wpn-6.png
+|   |   |                   wpn-7.png
+|   |   |                   wpn-8.png
+|   |   |                   wpn-9.png
+|   |   |                   
 |   |   +---momie
 |   |   |   |   sprite.png
 |   |   |   |   starter.jpeg
 |   |   |   |   
 |   |   |   +---sheets
-|   |   |   |       sheet-1.png
-|   |   |   |       sheet-2.png
-|   |   |   |       sheet-3.png
-|   |   |   |       sheet-4.png
-|   |   |   |       wpn-0.png
-|   |   |   |       wpn-1.png
-|   |   |   |       wpn-2.png
-|   |   |   |       wpn-3.png
-|   |   |   |       wpn-4.png
-|   |   |   |       wpn-5.png
-|   |   |   |       wpn-6.png
-|   |   |   |       wpn-7.png
-|   |   |   |       
+|   |   |   |   |   image_5c90b94e.jpg
+|   |   |   |   |   momie_weapon_spritesheet_prompts.txt
+|   |   |   |   |   sheet-1.png
+|   |   |   |   |   sheet-2.png
+|   |   |   |   |   sheet-3.png
+|   |   |   |   |   sheet-4.png
+|   |   |   |   |   weapon-1-transparent.png
+|   |   |   |   |   wpn-0.png
+|   |   |   |   |   wpn-1.png
+|   |   |   |   |   wpn-2.png
+|   |   |   |   |   wpn-3.png
+|   |   |   |   |   wpn-4.png
+|   |   |   |   |   wpn-5.png
+|   |   |   |   |   wpn-6.png
+|   |   |   |   |   wpn-7.png
+|   |   |   |   |   
+|   |   |   |   \---weapons_cut
+|   |   |   |       \---weapon-1-transparent
+|   |   |   |               wpn-0.png
+|   |   |   |               wpn-1.png
+|   |   |   |               wpn-10.png
+|   |   |   |               wpn-11.png
+|   |   |   |               wpn-12.png
+|   |   |   |               wpn-13.png
+|   |   |   |               wpn-2.png
+|   |   |   |               wpn-3.png
+|   |   |   |               wpn-4.png
+|   |   |   |               wpn-5.png
+|   |   |   |               wpn-6.png
+|   |   |   |               wpn-7.png
+|   |   |   |               wpn-8.png
+|   |   |   |               wpn-9.png
+|   |   |   |               
 |   |   |   \---weapons
-|   |   |           weapon-1-transparent.png
-|   |   |           
+|   |   |       |   weapon-1-transparent.png
+|   |   |       |   
+|   |   |       \---weapons_cut
+|   |   |           \---weapon-1-transparent
+|   |   |                   wpn-0.png
+|   |   |                   wpn-1.png
+|   |   |                   wpn-10.png
+|   |   |                   wpn-11.png
+|   |   |                   wpn-12.png
+|   |   |                   wpn-13.png
+|   |   |                   wpn-2.png
+|   |   |                   wpn-3.png
+|   |   |                   wpn-4.png
+|   |   |                   wpn-5.png
+|   |   |                   wpn-6.png
+|   |   |                   wpn-7.png
+|   |   |                   wpn-8.png
+|   |   |                   wpn-9.png
+|   |   |                   
 |   |   +---samourai
+|   |   |   |   prompt-HW.txt
+|   |   |   |   prompt-LW.txt
+|   |   |   |   prompt-PT.txt
 |   |   |   |   sprite.png
 |   |   |   |   starter.jpeg
 |   |   |   |   
@@ -415,10 +1306,30 @@ C:.
 |   |   |   |       wpn-7.png
 |   |   |   |       
 |   |   |   \---weapons
-|   |   |           weapon-1-transparent.png
-|   |   |           
+|   |   |       |   weapon-1-transparent.png
+|   |   |       |   
+|   |   |       \---weapons_cut
+|   |   |           \---weapon-1-transparent
+|   |   |                   wpn-0.png
+|   |   |                   wpn-1.png
+|   |   |                   wpn-10.png
+|   |   |                   wpn-11.png
+|   |   |                   wpn-12.png
+|   |   |                   wpn-13.png
+|   |   |                   wpn-2.png
+|   |   |                   wpn-3.png
+|   |   |                   wpn-4.png
+|   |   |                   wpn-5.png
+|   |   |                   wpn-6.png
+|   |   |                   wpn-7.png
+|   |   |                   wpn-8.png
+|   |   |                   wpn-9.png
+|   |   |                   
 |   |   \---zeus
 |   |       |   image_c4798b7.jpg
+|   |       |   prompt-HW.txt
+|   |       |   prompt-LW.txt
+|   |       |   prompt-PT.txt
 |   |       |   sprite.png
 |   |       |   starter.jpeg
 |   |       |   
@@ -437,103 +1348,541 @@ C:.
 |   |       |       wpn-7.png
 |   |       |       
 |   |       \---weapons
-|   |               weapon-1-transparent.png
-|   |               
-|   +---companion
-|   |   |   background-greybox.jpg
-|   |   |   image_15544ee3.jpg
-|   |   |   image_a3079ac0.jpg
-|   |   |   image_bfb224d7.jpg
-|   |   |   prompt-background.txt
+|   |           |   weapon-1-transparent.png
+|   |           |   
+|   |           \---weapons_cut
+|   |               \---weapon-1-transparent
+|   |                       wpn-0.png
+|   |                       wpn-1.png
+|   |                       wpn-10.png
+|   |                       wpn-11.png
+|   |                       wpn-12.png
+|   |                       wpn-13.png
+|   |                       wpn-2.png
+|   |                       wpn-3.png
+|   |                       wpn-4.png
+|   |                       wpn-5.png
+|   |                       wpn-6.png
+|   |                       wpn-7.png
+|   |                       wpn-8.png
+|   |                       wpn-9.png
+|   |                       
+|   +---boss
+|   |   |   image_207d3a66.jpeg
 |   |   |   
-|   |   +---empereur
-|   |   |       background.jpeg
-|   |   |       foreground.png
-|   |   |       image_f6603f04.jpg
+|   |   +---pet
+|   |   |       image_65816223-transparent.png
+|   |   |       image_65816223.jpeg
+|   |   |       image_667026fd.jpeg
 |   |   |       
-|   |   +---form-1
-|   |   |       aqua.png
-|   |   |       beetle.png
-|   |   |       bird.png
-|   |   |       bull.png
-|   |   |       cat.png
-|   |   |       dog.png
-|   |   |       eagle.png
-|   |   |       lizard.png
-|   |   |       ours.png
-|   |   |       racoon.png
-|   |   |       snake.png
-|   |   |       spectre.png
-|   |   |       wolf.png
-|   |   |       
-|   |   +---form-2
-|   |   |       aqua.png
-|   |   |       beetle.png
-|   |   |       bird.png
-|   |   |       bull.png
-|   |   |       cat.png
-|   |   |       dog.png
-|   |   |       eagle.png
-|   |   |       lizard.png
-|   |   |       ours.png
-|   |   |       racoon.png
-|   |   |       snake.png
-|   |   |       spectre.png
-|   |   |       wolf.png
-|   |   |       
-|   |   +---form-3
-|   |   |       aqua.png
-|   |   |       beetle.png
-|   |   |       bird.png
-|   |   |       bull.png
-|   |   |       cat.png
-|   |   |       dog.png
-|   |   |       eagle.png
-|   |   |       lizard.png
-|   |   |       ours.png
-|   |   |       racoon.png
-|   |   |       snake.png
-|   |   |       spectre.png
-|   |   |       wolf.png
-|   |   |       
-|   |   +---frankenstein
-|   |   |       background.jpeg
-|   |   |       foreground.png
-|   |   |       image_f9788fbd.jpg
-|   |   |       
-|   |   +---general
-|   |   |       background.jpeg
-|   |   |       foreground.png
-|   |   |       image_4ee21b13.jpg
-|   |   |       
-|   |   +---hazmat
-|   |   |       background.jpeg
-|   |   |       foreground.png
-|   |   |       image_28a77d2c.jpg
-|   |   |       
-|   |   +---human
-|   |   |       background.jpeg
-|   |   |       foreground.png
-|   |   |       
-|   |   +---inversebrah
-|   |   |       background.jpeg
-|   |   |       foreground.png
-|   |   |       
-|   |   +---momie
-|   |   |       background.jpeg
-|   |   |       foreground.png
-|   |   |       image_b48401da.jpg
-|   |   |       
-|   |   +---samourai
-|   |   |       background.jpeg
-|   |   |       foreground.png
-|   |   |       image_319e839.jpg
-|   |   |       
-|   |   \---zeus
-|   |           background.jpeg
-|   |           foreground.png
-|   |           image_aa95009f.jpg
+|   |   \---weapon
+|   |           image_19cef7c8-transparent.png
+|   |           image_19cef7c8.jpeg
+|   |           image_ddd92bc8.jpeg
+|   |           image_f6ccc56b-transparent.png
+|   |           image_f6ccc56b.jpeg
 |   |           
+|   +---cleaned_from_assets_20261115_190602
+|   |   +---characters
+|   |   |   +---empereur
+|   |   |   |   \---weapons
+|   |   |   |       \---weapons_cut
+|   |   |   |           \---weapon-1-transparent
+|   |   |   |                   wpn-0.png
+|   |   |   |                   wpn-1.png
+|   |   |   |                   wpn-10.png
+|   |   |   |                   wpn-11.png
+|   |   |   |                   wpn-12.png
+|   |   |   |                   wpn-13.png
+|   |   |   |                   wpn-2.png
+|   |   |   |                   wpn-3.png
+|   |   |   |                   wpn-4.png
+|   |   |   |                   wpn-5.png
+|   |   |   |                   wpn-6.png
+|   |   |   |                   wpn-7.png
+|   |   |   |                   wpn-8.png
+|   |   |   |                   wpn-9.png
+|   |   |   |                   
+|   |   |   +---frankenstein
+|   |   |   |   \---weapons
+|   |   |   |       \---weapons_cut
+|   |   |   |           \---weapon-1-transparent
+|   |   |   |                   wpn-0.png
+|   |   |   |                   wpn-1.png
+|   |   |   |                   wpn-10.png
+|   |   |   |                   wpn-11.png
+|   |   |   |                   wpn-12.png
+|   |   |   |                   wpn-13.png
+|   |   |   |                   wpn-2.png
+|   |   |   |                   wpn-3.png
+|   |   |   |                   wpn-4.png
+|   |   |   |                   wpn-5.png
+|   |   |   |                   wpn-6.png
+|   |   |   |                   wpn-7.png
+|   |   |   |                   wpn-8.png
+|   |   |   |                   wpn-9.png
+|   |   |   |                   
+|   |   |   +---general
+|   |   |   |   \---weapons
+|   |   |   |       \---weapons_cut
+|   |   |   |           \---weapon-1-transparent
+|   |   |   |                   wpn-0.png
+|   |   |   |                   wpn-1.png
+|   |   |   |                   wpn-10.png
+|   |   |   |                   wpn-11.png
+|   |   |   |                   wpn-12.png
+|   |   |   |                   wpn-13.png
+|   |   |   |                   wpn-2.png
+|   |   |   |                   wpn-3.png
+|   |   |   |                   wpn-4.png
+|   |   |   |                   wpn-5.png
+|   |   |   |                   wpn-6.png
+|   |   |   |                   wpn-7.png
+|   |   |   |                   wpn-8.png
+|   |   |   |                   wpn-9.png
+|   |   |   |                   
+|   |   |   +---hazmat
+|   |   |   |   \---weapons
+|   |   |   |       \---weapons_cut
+|   |   |   |           \---weapon-1-transparent
+|   |   |   |                   wpn-0.png
+|   |   |   |                   wpn-1.png
+|   |   |   |                   wpn-10.png
+|   |   |   |                   wpn-11.png
+|   |   |   |                   wpn-12.png
+|   |   |   |                   wpn-13.png
+|   |   |   |                   wpn-2.png
+|   |   |   |                   wpn-3.png
+|   |   |   |                   wpn-4.png
+|   |   |   |                   wpn-5.png
+|   |   |   |                   wpn-6.png
+|   |   |   |                   wpn-7.png
+|   |   |   |                   wpn-8.png
+|   |   |   |                   wpn-9.png
+|   |   |   |                   
+|   |   |   +---human
+|   |   |   |   \---weapons
+|   |   |   |       \---weapons_cut
+|   |   |   |           +---weapon-1
+|   |   |   |           |       wpn-0.png
+|   |   |   |           |       wpn-1.png
+|   |   |   |           |       wpn-10.png
+|   |   |   |           |       wpn-11.png
+|   |   |   |           |       wpn-12.png
+|   |   |   |           |       wpn-13.png
+|   |   |   |           |       wpn-2.png
+|   |   |   |           |       wpn-3.png
+|   |   |   |           |       wpn-4.png
+|   |   |   |           |       wpn-5.png
+|   |   |   |           |       wpn-6.png
+|   |   |   |           |       wpn-7.png
+|   |   |   |           |       wpn-8.png
+|   |   |   |           |       wpn-9.png
+|   |   |   |           |       
+|   |   |   |           +---weapon-1-transparent
+|   |   |   |           |       wpn-0.png
+|   |   |   |           |       wpn-1.png
+|   |   |   |           |       wpn-10.png
+|   |   |   |           |       wpn-11.png
+|   |   |   |           |       wpn-12.png
+|   |   |   |           |       wpn-13.png
+|   |   |   |           |       wpn-2.png
+|   |   |   |           |       wpn-3.png
+|   |   |   |           |       wpn-4.png
+|   |   |   |           |       wpn-5.png
+|   |   |   |           |       wpn-6.png
+|   |   |   |           |       wpn-7.png
+|   |   |   |           |       wpn-8.png
+|   |   |   |           |       wpn-9.png
+|   |   |   |           |       
+|   |   |   |           +---weapon-2
+|   |   |   |           |       wpn-0.png
+|   |   |   |           |       wpn-1.png
+|   |   |   |           |       wpn-10.png
+|   |   |   |           |       wpn-11.png
+|   |   |   |           |       wpn-12.png
+|   |   |   |           |       wpn-13.png
+|   |   |   |           |       wpn-2.png
+|   |   |   |           |       wpn-3.png
+|   |   |   |           |       wpn-4.png
+|   |   |   |           |       wpn-5.png
+|   |   |   |           |       wpn-6.png
+|   |   |   |           |       wpn-7.png
+|   |   |   |           |       wpn-8.png
+|   |   |   |           |       wpn-9.png
+|   |   |   |           |       
+|   |   |   |           +---weapon-2-transparent
+|   |   |   |           |       wpn-0.png
+|   |   |   |           |       wpn-1.png
+|   |   |   |           |       wpn-10.png
+|   |   |   |           |       wpn-11.png
+|   |   |   |           |       wpn-12.png
+|   |   |   |           |       wpn-13.png
+|   |   |   |           |       wpn-2.png
+|   |   |   |           |       wpn-3.png
+|   |   |   |           |       wpn-4.png
+|   |   |   |           |       wpn-5.png
+|   |   |   |           |       wpn-6.png
+|   |   |   |           |       wpn-7.png
+|   |   |   |           |       wpn-8.png
+|   |   |   |           |       wpn-9.png
+|   |   |   |           |       
+|   |   |   |           +---weapon-3
+|   |   |   |           |       wpn-0.png
+|   |   |   |           |       wpn-1.png
+|   |   |   |           |       wpn-10.png
+|   |   |   |           |       wpn-11.png
+|   |   |   |           |       wpn-12.png
+|   |   |   |           |       wpn-13.png
+|   |   |   |           |       wpn-2.png
+|   |   |   |           |       wpn-3.png
+|   |   |   |           |       wpn-4.png
+|   |   |   |           |       wpn-5.png
+|   |   |   |           |       wpn-6.png
+|   |   |   |           |       wpn-7.png
+|   |   |   |           |       wpn-8.png
+|   |   |   |           |       wpn-9.png
+|   |   |   |           |       
+|   |   |   |           \---weapon-3-transparent
+|   |   |   |                   wpn-0.png
+|   |   |   |                   wpn-1.png
+|   |   |   |                   wpn-10.png
+|   |   |   |                   wpn-11.png
+|   |   |   |                   wpn-12.png
+|   |   |   |                   wpn-13.png
+|   |   |   |                   wpn-2.png
+|   |   |   |                   wpn-3.png
+|   |   |   |                   wpn-4.png
+|   |   |   |                   wpn-5.png
+|   |   |   |                   wpn-6.png
+|   |   |   |                   wpn-7.png
+|   |   |   |                   wpn-8.png
+|   |   |   |                   wpn-9.png
+|   |   |   |                   
+|   |   |   +---inversebrah
+|   |   |   |   \---weapons
+|   |   |   |       \---weapons_cut
+|   |   |   |           +---weapon-1
+|   |   |   |           |       wpn-0.png
+|   |   |   |           |       wpn-1.png
+|   |   |   |           |       wpn-10.png
+|   |   |   |           |       wpn-11.png
+|   |   |   |           |       wpn-12.png
+|   |   |   |           |       wpn-13.png
+|   |   |   |           |       wpn-2.png
+|   |   |   |           |       wpn-3.png
+|   |   |   |           |       wpn-4.png
+|   |   |   |           |       wpn-5.png
+|   |   |   |           |       wpn-6.png
+|   |   |   |           |       wpn-7.png
+|   |   |   |           |       wpn-8.png
+|   |   |   |           |       wpn-9.png
+|   |   |   |           |       
+|   |   |   |           +---weapon-1-transparent
+|   |   |   |           |       wpn-0.png
+|   |   |   |           |       wpn-1.png
+|   |   |   |           |       wpn-10.png
+|   |   |   |           |       wpn-11.png
+|   |   |   |           |       wpn-12.png
+|   |   |   |           |       wpn-13.png
+|   |   |   |           |       wpn-2.png
+|   |   |   |           |       wpn-3.png
+|   |   |   |           |       wpn-4.png
+|   |   |   |           |       wpn-5.png
+|   |   |   |           |       wpn-6.png
+|   |   |   |           |       wpn-7.png
+|   |   |   |           |       wpn-8.png
+|   |   |   |           |       wpn-9.png
+|   |   |   |           |       
+|   |   |   |           +---weapon-2
+|   |   |   |           |       wpn-0.png
+|   |   |   |           |       wpn-1.png
+|   |   |   |           |       wpn-10.png
+|   |   |   |           |       wpn-11.png
+|   |   |   |           |       wpn-12.png
+|   |   |   |           |       wpn-13.png
+|   |   |   |           |       wpn-2.png
+|   |   |   |           |       wpn-3.png
+|   |   |   |           |       wpn-4.png
+|   |   |   |           |       wpn-5.png
+|   |   |   |           |       wpn-6.png
+|   |   |   |           |       wpn-7.png
+|   |   |   |           |       wpn-8.png
+|   |   |   |           |       wpn-9.png
+|   |   |   |           |       
+|   |   |   |           +---weapon-2-transparent
+|   |   |   |           |       wpn-0.png
+|   |   |   |           |       wpn-1.png
+|   |   |   |           |       wpn-10.png
+|   |   |   |           |       wpn-11.png
+|   |   |   |           |       wpn-12.png
+|   |   |   |           |       wpn-13.png
+|   |   |   |           |       wpn-2.png
+|   |   |   |           |       wpn-3.png
+|   |   |   |           |       wpn-4.png
+|   |   |   |           |       wpn-5.png
+|   |   |   |           |       wpn-6.png
+|   |   |   |           |       wpn-7.png
+|   |   |   |           |       wpn-8.png
+|   |   |   |           |       wpn-9.png
+|   |   |   |           |       
+|   |   |   |           +---weapon-3
+|   |   |   |           |       wpn-0.png
+|   |   |   |           |       wpn-1.png
+|   |   |   |           |       wpn-10.png
+|   |   |   |           |       wpn-11.png
+|   |   |   |           |       wpn-12.png
+|   |   |   |           |       wpn-13.png
+|   |   |   |           |       wpn-2.png
+|   |   |   |           |       wpn-3.png
+|   |   |   |           |       wpn-4.png
+|   |   |   |           |       wpn-5.png
+|   |   |   |           |       wpn-6.png
+|   |   |   |           |       wpn-7.png
+|   |   |   |           |       wpn-8.png
+|   |   |   |           |       wpn-9.png
+|   |   |   |           |       
+|   |   |   |           +---weapon-3-transparent
+|   |   |   |           |       wpn-0.png
+|   |   |   |           |       wpn-1.png
+|   |   |   |           |       wpn-10.png
+|   |   |   |           |       wpn-11.png
+|   |   |   |           |       wpn-12.png
+|   |   |   |           |       wpn-13.png
+|   |   |   |           |       wpn-2.png
+|   |   |   |           |       wpn-3.png
+|   |   |   |           |       wpn-4.png
+|   |   |   |           |       wpn-5.png
+|   |   |   |           |       wpn-6.png
+|   |   |   |           |       wpn-7.png
+|   |   |   |           |       wpn-8.png
+|   |   |   |           |       wpn-9.png
+|   |   |   |           |       
+|   |   |   |           +---weapon-4
+|   |   |   |           |       wpn-0.png
+|   |   |   |           |       wpn-1.png
+|   |   |   |           |       wpn-10.png
+|   |   |   |           |       wpn-11.png
+|   |   |   |           |       wpn-12.png
+|   |   |   |           |       wpn-13.png
+|   |   |   |           |       wpn-2.png
+|   |   |   |           |       wpn-3.png
+|   |   |   |           |       wpn-4.png
+|   |   |   |           |       wpn-5.png
+|   |   |   |           |       wpn-6.png
+|   |   |   |           |       wpn-7.png
+|   |   |   |           |       wpn-8.png
+|   |   |   |           |       wpn-9.png
+|   |   |   |           |       
+|   |   |   |           \---weapon-4-transparent
+|   |   |   |                   wpn-0.png
+|   |   |   |                   wpn-1.png
+|   |   |   |                   wpn-10.png
+|   |   |   |                   wpn-11.png
+|   |   |   |                   wpn-12.png
+|   |   |   |                   wpn-13.png
+|   |   |   |                   wpn-2.png
+|   |   |   |                   wpn-3.png
+|   |   |   |                   wpn-4.png
+|   |   |   |                   wpn-5.png
+|   |   |   |                   wpn-6.png
+|   |   |   |                   wpn-7.png
+|   |   |   |                   wpn-8.png
+|   |   |   |                   wpn-9.png
+|   |   |   |                   
+|   |   |   +---momie
+|   |   |   |   +---sheets
+|   |   |   |   |   |   image_5c90b94e.jpg
+|   |   |   |   |   |   weapon-1-transparent.png
+|   |   |   |   |   |   
+|   |   |   |   |   \---weapons_cut
+|   |   |   |   |       \---weapon-1-transparent
+|   |   |   |   |               wpn-0.png
+|   |   |   |   |               wpn-1.png
+|   |   |   |   |               wpn-10.png
+|   |   |   |   |               wpn-11.png
+|   |   |   |   |               wpn-12.png
+|   |   |   |   |               wpn-13.png
+|   |   |   |   |               wpn-2.png
+|   |   |   |   |               wpn-3.png
+|   |   |   |   |               wpn-4.png
+|   |   |   |   |               wpn-5.png
+|   |   |   |   |               wpn-6.png
+|   |   |   |   |               wpn-7.png
+|   |   |   |   |               wpn-8.png
+|   |   |   |   |               wpn-9.png
+|   |   |   |   |               
+|   |   |   |   \---weapons
+|   |   |   |       \---weapons_cut
+|   |   |   |           \---weapon-1-transparent
+|   |   |   |                   wpn-0.png
+|   |   |   |                   wpn-1.png
+|   |   |   |                   wpn-10.png
+|   |   |   |                   wpn-11.png
+|   |   |   |                   wpn-12.png
+|   |   |   |                   wpn-13.png
+|   |   |   |                   wpn-2.png
+|   |   |   |                   wpn-3.png
+|   |   |   |                   wpn-4.png
+|   |   |   |                   wpn-5.png
+|   |   |   |                   wpn-6.png
+|   |   |   |                   wpn-7.png
+|   |   |   |                   wpn-8.png
+|   |   |   |                   wpn-9.png
+|   |   |   |                   
+|   |   |   +---samourai
+|   |   |   |   \---weapons
+|   |   |   |       \---weapons_cut
+|   |   |   |           \---weapon-1-transparent
+|   |   |   |                   wpn-0.png
+|   |   |   |                   wpn-1.png
+|   |   |   |                   wpn-10.png
+|   |   |   |                   wpn-11.png
+|   |   |   |                   wpn-12.png
+|   |   |   |                   wpn-13.png
+|   |   |   |                   wpn-2.png
+|   |   |   |                   wpn-3.png
+|   |   |   |                   wpn-4.png
+|   |   |   |                   wpn-5.png
+|   |   |   |                   wpn-6.png
+|   |   |   |                   wpn-7.png
+|   |   |   |                   wpn-8.png
+|   |   |   |                   wpn-9.png
+|   |   |   |                   
+|   |   |   \---zeus
+|   |   |       |   image_c4798b7.jpg
+|   |   |       |   
+|   |   |       \---weapons
+|   |   |           \---weapons_cut
+|   |   |               \---weapon-1-transparent
+|   |   |                       wpn-0.png
+|   |   |                       wpn-1.png
+|   |   |                       wpn-10.png
+|   |   |                       wpn-11.png
+|   |   |                       wpn-12.png
+|   |   |                       wpn-13.png
+|   |   |                       wpn-2.png
+|   |   |                       wpn-3.png
+|   |   |                       wpn-4.png
+|   |   |                       wpn-5.png
+|   |   |                       wpn-6.png
+|   |   |                       wpn-7.png
+|   |   |                       wpn-8.png
+|   |   |                       wpn-9.png
+|   |   |                       
+|   |   \---companion
+|   |       +---empereur
+|   |       |       image_f6603f04.jpg
+|   |       |       
+|   |       +---frankenstein
+|   |       |       image_f9788fbd.jpg
+|   |       |       
+|   |       +---general
+|   |       |       image_4ee21b13.jpg
+|   |       |       
+|   |       +---hazmat
+|   |       |       image_28a77d2c.jpg
+|   |       |       
+|   |       +---momie
+|   |       |       image_b48401da.jpg
+|   |       |       
+|   |       +---samourai
+|   |       |       image_319e839.jpg
+|   |       |       
+|   |       \---zeus
+|   |               image_aa95009f.jpg
+|   |               
+|   +---form-1raw
+|   |       aqua.jpeg
+|   |       beetle.jpeg
+|   |       bird.jpeg
+|   |       bull.jpeg
+|   |       cat.jpeg
+|   |       dog.jpeg
+|   |       eagle.jpeg
+|   |       lizard.jpeg
+|   |       ours.jpeg
+|   |       racoon.jpeg
+|   |       snake.jpeg
+|   |       spectre.jpeg
+|   |       wolf.jpeg
+|   |       
+|   +---form-2raw
+|   |       aqua.jpeg
+|   |       beetle.jpeg
+|   |       bird.jpeg
+|   |       bull.jpeg
+|   |       cat.jpeg
+|   |       dog.jpeg
+|   |       eagle.jpeg
+|   |       lizard.jpeg
+|   |       ours.jpeg
+|   |       racoon.jpeg
+|   |       snake.jpeg
+|   |       spectre.jpeg
+|   |       wolf.jpeg
+|   |       
+|   +---form-3raw
+|   |       aqua.jpeg
+|   |       beetle.jpeg
+|   |       bird.jpeg
+|   |       bull.jpeg
+|   |       cat.jpeg
+|   |       dog.jpeg
+|   |       eagle.jpeg
+|   |       lizard.jpeg
+|   |       ours-3.jpeg
+|   |       ours.jpeg
+|   |       racoon.jpeg
+|   |       snake.jpeg
+|   |       spectre.jpeg
+|   |       wolf.jpeg
+|   |       
+|   +---Nouveau dossier
+|   |       Capture d’écran 2026-11-15 004800.png
+|   |       heavy.txt
+|   |       light.txt
+|   |       
+|   +---rawcharacter
+|   |       435.png
+|   |       cszrc.png
+|   |       erg.png
+|   |       ger.png
+|   |       gre.png
+|   |       rzegz.png
+|   |       sprite.png
+|   |       zefr.png
+|   |       zefzef.png
+|   |       zerfdz.png
+|   |       
+|   +---screenshots
+|   |       human-style-description.png
+|   |       
+|   +---sheety
+|   |   |   battleaxe.jpg
+|   |   |   bone.jpg
+|   |   |   dagger.jpg
+|   |   |   dummy.jpg
+|   |   |   hammrt.jpg
+|   |   |   hand-saw.jpg
+|   |   |   hunter-knife.jpg
+|   |   |   pickaxe.jpg
+|   |   |   pillar1.jpg
+|   |   |   pillar2.jpg
+|   |   |   pillar3.jpg
+|   |   |   pillar4.jpg
+|   |   |   sword.jpg
+|   |   |   
+|   |   \---momie
+|   +---weapon
+|   |       image_166d7294.jpg
+|   |       image_92b85493.jpg
+|   |       image_9abc1211.jpg
+|   |       image_a2a6b3f9.jpg
+|   |       image_d12e1bcc.jpg
+|   |       image_d6b42463.jpg
+|   |       image_ec18278.jpg
+|   |       
 |   \---weapons_cut
 |       |   greybox-weapons.png
 |       |   prompt-heavy.txt
@@ -744,184 +2093,9 @@ C:.
 |                   wpn-8-boomerang.png
 |                   wpn-9-arc.png
 |                   
-+---css
-|       character-select.css
-|       game-frame.css
-|       styles.css
-|       
-+---docs
-|   |   enquete_economie.txt
-|   |   enquete_gold.txt
-|   |   enquete_ressources.txt
-|   |   enquete_variables.txt
-|   |   PROJECT_STRUCTURE.txt
-|   |   
-|   +---.md
-|   |       game designer.txt
-|   |       senior developer.txt
-|   |       
-|   +---econ
-|   |       Nouveau Document texte.txt
-|   |       
-|   \---prompt
-|       |   cell.paint
-|       |   
-|       +---Nouveau dossier
-|       |       compagnon cell.txt
-|       |       image_ff637b67.jpg
-|       |       
-|       +---prompt background stats
-|       |       image (26).jpg
-|       |       image (27).jpg
-|       |       image (28).jpg
-|       |       image (29).jpg
-|       |       
-|       \---spritesheet
-|           |   prompt boss.txt
-|           |   prompt PLANCHE 1.txt
-|           |   prompt PLANCHE 2.txt
-|           |   prompt PLANCHE 3.txt
-|           |   prompt PLANCHE 4.txt
-|           |   sprite nomenclature.txt
-|           |   
-|           \---companion
-|                   &.png
-|                   &é.png
-|                   '.png
-|                   (.png
-|                   Prompt compagnon.txt
-|                   
-+---js
-|   +---core
-|   |       data.js
-|   |       main.js
-|   |       state.js
-|   |       
-|   +---systems
-|   |       afk.js
-|   |       combat.js
-|   |       pvp.js
-|   |       raids.js
-|   |       simulateur.js
-|   |       
-|   \---ui
-|           armurerie.js
-|           caserne.js
-|           character-select.js
-|           compagnons.js
-|           devlayout.js
-|           game-frame.js
-|           recorder.js
-|           renderer.js
-|           stats.js
-|           ui-core.js
-|           
-+---raw
-|   |   A UTILISER.jpeg
-|   |   background.jpeg
-|   |   background.jpg
-|   |   ezfzf.jpg
-|   |   image_3488da6e.jpeg
-|   |   image_6d6b5f1a.jpeg
-|   |   mockup-simulator.jpg
-|   |   starter.jpeg
-|   |   
-|   +---avif
-|   |       frankenstein.avif
-|   |       hazmat.avif
-|   |       inversebrah.avif
-|   |       momie.avif
-|   |       samourai.avif
-|   |       zeus.avif
-|   |       
-|   +---boss
-|   |   |   image_207d3a66.jpeg
-|   |   |   
-|   |   +---pet
-|   |   |       image_65816223-transparent.png
-|   |   |       image_65816223.jpeg
-|   |   |       image_667026fd.jpeg
-|   |   |       
-|   |   \---weapon
-|   |           image_19cef7c8-transparent.png
-|   |           image_19cef7c8.jpeg
-|   |           image_ddd92bc8.jpeg
-|   |           image_f6ccc56b-transparent.png
-|   |           image_f6ccc56b.jpeg
-|   |           
-|   +---form-1raw
-|   |       aqua.jpeg
-|   |       beetle.jpeg
-|   |       bird.jpeg
-|   |       bull.jpeg
-|   |       cat.jpeg
-|   |       dog.jpeg
-|   |       eagle.jpeg
-|   |       lizard.jpeg
-|   |       ours.jpeg
-|   |       racoon.jpeg
-|   |       snake.jpeg
-|   |       spectre.jpeg
-|   |       wolf.jpeg
-|   |       
-|   +---form-2raw
-|   |       aqua.jpeg
-|   |       beetle.jpeg
-|   |       bird.jpeg
-|   |       bull.jpeg
-|   |       cat.jpeg
-|   |       dog.jpeg
-|   |       eagle.jpeg
-|   |       lizard.jpeg
-|   |       ours.jpeg
-|   |       racoon.jpeg
-|   |       snake.jpeg
-|   |       spectre.jpeg
-|   |       wolf.jpeg
-|   |       
-|   +---form-3raw
-|   |       aqua.jpeg
-|   |       beetle.jpeg
-|   |       bird.jpeg
-|   |       bull.jpeg
-|   |       cat.jpeg
-|   |       dog.jpeg
-|   |       eagle.jpeg
-|   |       lizard.jpeg
-|   |       ours-3.jpeg
-|   |       ours.jpeg
-|   |       racoon.jpeg
-|   |       snake.jpeg
-|   |       spectre.jpeg
-|   |       wolf.jpeg
-|   |       
-|   +---screenshots
-|   |       human-style-description.png
-|   |       
-|   \---weapon
-|           image_166d7294.jpg
-|           image_92b85493.jpg
-|           image_9abc1211.jpg
-|           image_a2a6b3f9.jpg
-|           image_d12e1bcc.jpg
-|           image_d6b42463.jpg
-|           image_ec18278.jpg
-|           
-\---sheety
-    |   battleaxe.jpg
-    |   bone.jpg
-    |   dagger.jpg
-    |   dummy.jpg
-    |   hammrt.jpg
-    |   hand-saw.jpg
-    |   hunter-knife.jpg
-    |   pickaxe.jpg
-    |   pillar1.jpg
-    |   pillar2.jpg
-    |   pillar3.jpg
-    |   pillar4.jpg
-    |   sword.jpg
-    |   
-    \---momie
-            image_5c90b94e.jpg
-            
+\---tools
+        cut.py
+        cut_weapons - Copie.py
+        cut_weapons.py
+        Structure-update.cmd
+        

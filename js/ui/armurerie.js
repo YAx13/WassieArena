@@ -288,8 +288,8 @@ function fitWeaponRack(rack){
 const weaponRackObserver=typeof ResizeObserver==="undefined"?null:new ResizeObserver(entries=>entries.forEach(({target})=>fitWeaponRack(target)));
 const ARMORY_DEFAULT_LAYOUT=[{"id":0,"x":89.76,"y":50.13,"size":18,"angle":325,"flip":true},{"id":1,"x":10.12,"y":48.85,"size":15.5,"angle":35,"flip":false},{"id":2,"x":17.37,"y":38.34,"size":15.5,"angle":40,"flip":false},{"id":3,"x":25.96,"y":24.58,"size":20.5,"angle":65,"flip":true},{"id":4,"x":93.64,"y":34.3,"size":18.5,"angle":75,"flip":true},{"id":5,"x":82.95,"y":26.66,"size":16.5,"angle":-20,"flip":false},{"id":6,"x":82.89,"y":39.92,"size":16.5,"angle":75,"flip":false},{"id":7,"x":7,"y":35.58,"size":18.5,"angle":-72,"flip":false},{"id":8,"x":22.14,"y":78.19,"size":16,"angle":68,"flip":true},{"id":9,"x":81.49,"y":71.96,"size":21.5,"angle":297,"flip":true},{"id":10,"x":74.11,"y":22.56,"size":29,"angle":-10,"flip":false},{"id":11,"x":17.75,"y":94.21,"size":10,"angle":10,"flip":false},{"id":12,"x":23.28,"y":94.5,"size":10,"angle":-6,"flip":false},{"id":13,"x":28.37,"y":89.2,"size":12.5,"angle":11,"flip":true}];
 
-const ARMORY_HERO_KEY="arene_armory_hero_pos_v2";
-const ARMORY_HERO_DEFAULT={x:54.00,y:32.65,size:22.5,flip:false};
+const ARMORY_HERO_KEY="arene_armory_hero_pos_v3";
+const ARMORY_HERO_DEFAULT={x:53.50,y:31.00,size:37.5,flip:false};
 let armoryHeroPos=null, armoryHeroDrag=null;
 
 function readArmoryHeroPos(){
@@ -388,12 +388,12 @@ function startArmoryHeroLoop(){
       }
       const animT=armoryShowcase.anim==="idle"?now:Math.max(0,now-armoryShowcase.animStart);
       const ctx=cv.getContext("2d");
-      ctx.clearRect(0,0,96,96);
+      ctx.clearRect(0,0,160,160);
       ctx.imageSmoothingEnabled=false;
       ctx.save();
       const wid=armoryShowcase.wid;
-      if(wid===10){ ctx.translate(10,36); ctx.scale(0.82,0.82); }
-      else { ctx.translate(16,28); }
+      if(wid===10){ ctx.translate(30,44); ctx.scale(1.55,1.55); }
+      else { ctx.translate(48,68); }
       renderer.drawBrute(ctx,b,animT,armoryShowcase.anim,null,wid);
       ctx.restore();
     }
@@ -415,14 +415,14 @@ function renderFiche(b){
 
   if(armoryShowcase.bruteId!==b.id){
     armoryShowcase.bruteId=b.id;
-    armoryShowcase.wid=b.weapons.length?b.weapons[0]:null;
+    armoryShowcase.wid=b.weapons.length?b.weapons:null;
     armoryShowcase.anim="idle";
     armoryShowcase.animStart=0;
   }
 
   rack.innerHTML=`
     <div class="fx-armory-stage ${weaponRackEditing?"is-editing":""}" id="fx-armory-stage">
-      <canvas id="fx-armory-hero" width="96" height="96"></canvas>
+      <canvas id="fx-armory-hero" width="160" height="160"></canvas>
     </div>
     <div class="fx-rack-grid">${D.WEAPONS.map(w=>{
       const own=b.weapons.includes(w.id), sel=armoryShowcase.wid===w.id;

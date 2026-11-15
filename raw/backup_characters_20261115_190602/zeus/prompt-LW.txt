@@ -1,0 +1,65 @@
+Here are the first 4 Light Weapon prompts (wpn-0 to wpn-3) for Zeus directly in chat so you can copy-paste them right away. (Attach Image 1: Dummy Greybox Sheet, Image 2: Zeus Base Sprite, Image 3: Zeus Weapon Sheet).
+
+1. wpn-0.png — Olympian Lightning Gladius (Row 1, Column 1)
+
+text
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) that strictly copies the exact character poses, frame-by-frame motion timing, grid cell placement, and energy slash smears from Image 1, replacing the greybox mannequin with the exact Zeus platypus god character from Image 2 and replacing the greybox sword with the exact golden-hilted Olympian gladius sword crackling with cyan lightning (Row 1, Column 1 of Image 3).
+
+STRICT POSE & TIMING LOCK:
+- Every single frame (Frames 1 to 16) must match the exact body posture, limb angles, sword orientation, and white/cyan slash smears of the corresponding frame in Image 1.
+- Keep the lightning gladius held in the right hand on every frame, and keep the hands empty on Frame 14 (Row 4, Column 2) while the sword flies mid-air, just like Image 1.
+
+CONSISTENCY & PIXEL ART RULES:
+- Apply the exact character proportions, glowing pure white eyes, silver-grey hair and beard with green olive laurel wreath, white toga with gold belt, golden armbands, orange-brown platypus bill and flat tail, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2 onto the poses of Image 1.
+- Apply the exact golden-hilted lightning sword design, silver blade, and proportional size from Image 3 onto the sword angles of Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+Utilisez le code avec précaution.
+
+2. wpn-1.png — Winged Sky Dagger (Row 1, Column 2)
+
+text
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) that strictly copies the exact character poses, frame-by-frame motion timing, grid cell placement, and energy slash smears from Image 1, replacing the greybox mannequin with the exact Zeus platypus god character from Image 2 and replacing the greybox dagger with the exact golden-winged sky dagger with cyan gem hilt (Row 1, Column 2 of Image 3).
+
+STRICT POSE & TIMING LOCK:
+- Every single frame (Frames 1 to 16) must match the exact body posture, limb angles, dagger orientation, and white/cyan thrust smears of the corresponding frame in Image 1.
+- Keep the winged dagger held in the right hand on every frame, and keep the hands empty on Frame 14 (Row 4, Column 2) while the dagger flies mid-air, just like Image 1.
+
+CONSISTENCY & PIXEL ART RULES:
+- Apply the exact character proportions, glowing pure white eyes, silver-grey hair and beard with green olive laurel wreath, white toga with gold belt, golden armbands, orange-brown platypus bill and flat tail, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2 onto the poses of Image 1.
+- Apply the exact winged dagger design, icy-blue blade, and proportional size from Image 3 onto the dagger angles of Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+Utilisez le code avec précaution.
+
+3. wpn-2.png — Olympian Hunting Knife (Row 1, Column 3)
+
+text
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) that strictly copies the exact character poses, frame-by-frame motion timing, grid cell placement, and energy slash smears from Image 1, replacing the greybox mannequin with the exact Zeus platypus god character from Image 2 and replacing the greybox knife with the exact silver-and-gold Olympian hunting knife (Row 1, Column 3 of Image 3).
+
+STRICT POSE & TIMING LOCK:
+- Every single frame (Frames 1 to 16) must match the exact body posture, limb angles, knife orientation, and white/cyan slash smears of the corresponding frame in Image 1.
+- Keep the hunting knife held in the right hand on every frame, and keep the hands empty on Frame 14 (Row 4, Column 2) while the knife flies mid-air, just like Image 1.
+
+CONSISTENCY & PIXEL ART RULES:
+- Apply the exact character proportions, glowing pure white eyes, silver-grey hair and beard with green olive laurel wreath, white toga with gold belt, golden armbands, orange-brown platypus bill and flat tail, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2 onto the poses of Image 1.
+- Apply the exact silver-and-gold hunting knife design, white wrapped grip, and proportional size from Image 3 onto the knife angles of Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+Utilisez le code avec précaution.
+
+4. wpn-3.png — Golden Temple Hand-Saw (Row 1, Column 4)
+
+text
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) that strictly copies the exact character poses, frame-by-frame motion timing, grid cell placement, and energy slash smears from Image 1, replacing the greybox mannequin with the exact Zeus platypus god character from Image 2 and replacing the greybox hand-saw with the exact golden-framed Olympian temple hand-saw with serrated steel blade (Row 1, Column 4 of Image 3).
+
+STRICT POSE & TIMING LOCK:
+- Every single frame (Frames 1 to 16) must match the exact body posture, limb angles, hand-saw orientation, and white/cyan grinding sparks of the corresponding frame in Image 1.
+- Keep the hand-saw held by its golden D-handle in the right hand on every frame, and keep the hands empty on Frame 14 (Row 4, Column 2) while the hand-saw flies mid-air, just like Image 1.
+
+CONSISTENCY & PIXEL ART RULES:
+- Apply the exact character proportions, glowing pure white eyes, silver-grey hair and beard with green olive laurel wreath, white toga with gold belt, golden armbands, orange-brown platypus bill and flat tail, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2 onto the poses of Image 1.
+- Apply the exact golden temple hand-saw design, filigree trim, serrated blade, and proportional size from Image 3 onto the hand-saw angles of Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+Utilisez le code avec précaution.

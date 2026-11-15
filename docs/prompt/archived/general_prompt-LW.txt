@@ -1,0 +1,65 @@
+Here is Batch 1 (wpn-0 to wpn-3) for yax (the bicorne-hat platypus officer in image_gaYmSj.png) wielding the military weapons from image_FJ1avG.png. Attach Image 1: Dummy Light Greybox Sheet, Image 2: yax Base Sprite (image_gaYmSj.png), Image 3: Military Weapon Sheet (image_FJ1avG.png).
+
+1. wpn-0.png — Golden-Basket Cavalry Saber (Row 1, Column 1)
+
+text
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) that strictly copies the exact character poses, frame-by-frame motion timing, grid cell placement, and energy slash smears from Image 1, replacing the greybox mannequin with the exact bicorne-hatted military officer platypus character from Image 2 and replacing the greybox sword with the exact steel cavalry saber featuring an ornate golden basket hilt guard and crimson pommel tassel (Row 1, Column 1 of Image 3).
+
+STRICT POSE & TIMING LOCK:
+- Every single frame (Frames 1 to 16) must match the exact body posture, limb angles, saber orientation, and white/cyan slash smears of the corresponding frame in Image 1.
+- Keep the cavalry saber held in the right hand on every frame, and keep the hands empty on Frame 14 (Row 4, Column 2) while the saber flies mid-air, just like Image 1.
+
+CONSISTENCY & PIXEL ART RULES:
+- Apply the exact character proportions, dark charcoal bicorne naval/general hat, white eyes, tan platypus bill and flat beaver tail, grey military tailcoat over a dark navy-and-red buttoned waistcoat, white trousers, dark boots, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2 onto the poses of Image 1.
+- Apply the exact steel-bladed cavalry saber design, golden basket guard, crimson pommel tassel, and proportional size from Image 3 onto the sword angles of Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright magenta (#FF00FF) with zero anti-aliasing, zero blur, and zero drop shadows.
+Utilisez le code avec précaution.
+
+2. wpn-1.png — Olive-Hilt Star-Pommel Trench Dagger (Row 1, Column 2)
+
+text
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) that strictly copies the exact character poses, frame-by-frame motion timing, grid cell placement, and energy thrust smears from Image 1, replacing the greybox mannequin with the exact bicorne-hatted military officer platypus character from Image 2 and replacing the greybox dagger with the exact dark-steel military stiletto dagger featuring an olive-green grip and a gold-star pommel cap (Row 1, Column 2 of Image 3).
+
+STRICT POSE & TIMING LOCK:
+- Every single frame (Frames 1 to 16) must match the exact body posture, limb angles, dagger orientation, and white/cyan thrust smears of the corresponding frame in Image 1.
+- Keep the military dagger held in the right hand on every frame, and keep the hands empty on Frame 14 (Row 4, Column 2) while the dagger flies mid-air, just like Image 1.
+
+CONSISTENCY & PIXEL ART RULES:
+- Apply the exact character proportions, dark charcoal bicorne naval/general hat, white eyes, tan platypus bill and flat beaver tail, grey military tailcoat over a dark navy-and-red buttoned waistcoat, white trousers, dark boots, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2 onto the poses of Image 1.
+- Apply the exact dark-steel military dagger design, olive-drab hilt, gold-star pommel, and proportional size from Image 3 onto the dagger angles of Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright magenta (#FF00FF) with zero anti-aliasing, zero blur, and zero drop shadows.
+Utilisez le code avec précaution.
+
+3. wpn-2.png — Olive-Drab Combat Hunting Knife (Row 1, Column 3)
+
+text
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) that strictly copies the exact character poses, frame-by-frame motion timing, grid cell placement, and energy slash smears from Image 1, replacing the greybox mannequin with the exact bicorne-hatted military officer platypus character from Image 2 and replacing the greybox knife with the exact olive-drab and steel tactical combat hunting knife with a ribbed olive-green grip (Row 1, Column 3 of Image 3).
+
+STRICT POSE & TIMING LOCK:
+- Every single frame (Frames 1 to 16) must match the exact body posture, limb angles, knife orientation, and white/cyan slash smears of the corresponding frame in Image 1.
+- Keep the combat hunting knife held in the right hand on every frame, and keep the hands empty on Frame 14 (Row 4, Column 2) while the knife flies mid-air, just like Image 1.
+
+CONSISTENCY & PIXEL ART RULES:
+- Apply the exact character proportions, dark charcoal bicorne naval/general hat, white eyes, tan platypus bill and flat beaver tail, grey military tailcoat over a dark navy-and-red buttoned waistcoat, white trousers, dark boots, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2 onto the poses of Image 1.
+- Apply the exact olive-and-steel tactical combat knife design, ribbed olive handle, and proportional size from Image 3 onto the knife angles of Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright magenta (#FF00FF) with zero anti-aliasing, zero blur, and zero drop shadows.
+Utilisez le code avec précaution.
+
+4. wpn-3.png — Olive-Handled Tactical Field Hand-Saw (Row 1, Column 4)
+
+text
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) that strictly copies the exact character poses, frame-by-frame motion timing, grid cell placement, and grinding sparks from Image 1, replacing the greybox mannequin with the exact bicorne-hatted military officer platypus character from Image 2 and replacing the greybox hand-saw with the exact dark-steel serrated field hand-saw featuring an olive-green D-handle (Row 1, Column 4 of Image 3).
+
+STRICT POSE & TIMING LOCK:
+- Every single frame (Frames 1 to 16) must match the exact body posture, limb angles, hand-saw orientation, and white/cyan grinding sparks of the corresponding frame in Image 1.
+- Keep the tactical hand-saw held by its olive-green D-handle in the right hand on every frame, and keep the hands empty on Frame 14 (Row 4, Column 2) while the hand-saw flies mid-air, just like Image 1.
+
+CONSISTENCY & PIXEL ART RULES:
+- Apply the exact character proportions, dark charcoal bicorne naval/general hat, white eyes, tan platypus bill and flat beaver tail, grey military tailcoat over a dark navy-and-red buttoned waistcoat, white trousers, dark boots, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2 onto the poses of Image 1.
+- Apply the exact dark-steel field hand-saw design, olive-drab D-handle, serrated blade, and proportional size from Image 3 onto the hand-saw angles of Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright magenta (#FF00FF) with zero anti-aliasing, zero blur, and zero drop shadows.
+Utilisez le code avec précaution.

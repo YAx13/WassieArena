@@ -1,0 +1,146 @@
+Here is Batch 3 (Empereur's Colossal Crowned Pillar wpn-10 + his 5 Special & Throwable Weapons: wpn-8, wpn-9, wpn-11, wpn-12, wpn-13).
+
+Part A: Colossal Crowned Marble Pillar (wpn-10.png — Four 2x2 Sheets)
+
+For each of the 4 sheets below, attach Image 1: pillar1.jpg (then pillar2.jpg, pillar3.jpg, pillar4.jpg), Image 2: Empereur Base Sprite, Image 3: Empereur Weapon Sheet (Row 3, Column 4).
+
+9A. wpn-10 Part 1 (2x2) — Idle & Equip (pillar1.jpg)
+
+text
+Create a square 1:1 2x2 pixel-art sprite sheet (strictly 4 large frames total: 2 columns by 2 rows) that strictly copies the exact poses, scale, and quadrant placement from Image 1, replacing the greybox mannequin with the exact Napoleon Emperor platypus character from Image 2 and replacing the grey stone pillar with the colossal fluted white marble imperial column with golden winged-scroll capital and a miniature crimson-and-gold royal crown finial on top (Row 3, Column 4 of Image 3).
+- Keep Empereur's exact chibi proportions, brown hair with golden laurel crown, white platypus bill, deep crimson imperial coat with white ermine fur trim and golden dots, dark boots, and 1-pixel pure black (#000000) outer outline from Image 2.
+- Every frame must stay strictly inside its quadrant with zero bleeding across the center dividers and a 100% flat solid chroma-key bright green (#00FF00) background with zero blur.
+Utilisez le code avec précaution.
+
+9B. wpn-10 Part 2 (2x2) — Standard Forward Slam (pillar2.jpg)
+
+text
+Create a square 1:1 2x2 pixel-art sprite sheet (strictly 4 large frames total: 2 columns by 2 rows) that strictly copies the exact poses, scale, white crescent impact arc, dust shockwave, and quadrant placement from Image 1, replacing the greybox mannequin with the exact Napoleon Emperor platypus character from Image 2 and replacing the grey stone pillar with the colossal fluted white marble imperial column with golden winged-scroll capital and a miniature crimson-and-gold royal crown finial on top (Row 3, Column 4 of Image 3).
+- Keep Empereur's exact chibi proportions, brown hair with golden laurel crown, white platypus bill, deep crimson imperial coat with white ermine fur trim and golden dots, dark boots, and 1-pixel pure black (#000000) outer outline from Image 2.
+- Every frame must stay strictly inside its quadrant with zero bleeding across the center dividers and a 100% flat solid chroma-key bright green (#00FF00) background with zero blur.
+Utilisez le code avec précaution.
+
+9C. wpn-10 Part 3 (2x2) — Critical Seismic Smash (pillar3.jpg)
+
+text
+Create a square 1:1 2x2 pixel-art sprite sheet (strictly 4 large frames total: 2 columns by 2 rows) that strictly copies the exact poses, scale, cyan lightning charge, seismic ground shockwave, and quadrant placement from Image 1, replacing the greybox mannequin with the exact Napoleon Emperor platypus character from Image 2 and replacing the grey stone pillar with the colossal fluted white marble imperial column with golden winged-scroll capital and a miniature crimson-and-gold royal crown finial on top (Row 3, Column 4 of Image 3).
+- Keep Empereur's exact chibi proportions, brown hair with golden laurel crown, white platypus bill, deep crimson imperial coat with white ermine fur trim and golden dots, dark boots, and 1-pixel pure black (#000000) outer outline from Image 2.
+- Every frame must stay strictly inside its quadrant with zero bleeding across the center dividers and a 100% flat solid chroma-key bright green (#00FF00) background with zero blur.
+Utilisez le code avec précaution.
+
+9D. wpn-10 Part 4 (2x2) — Caber-Toss Throw & Heavy Dash (pillar4.jpg)
+
+text
+Create a square 1:1 2x2 pixel-art sprite sheet (strictly 4 large frames total: 2 columns by 2 rows) that strictly copies the exact poses, scale, and quadrant placement from Image 1, replacing the greybox mannequin with the exact Napoleon Emperor platypus character from Image 2 and replacing the grey stone pillar with the colossal fluted white marble imperial column with golden winged-scroll capital and a miniature crimson-and-gold royal crown finial on top (Row 3, Column 4 of Image 3).
+- Keep Empereur's exact chibi proportions, brown hair with golden laurel crown, white platypus bill, deep crimson imperial coat with white ermine fur trim and golden dots, dark boots, and 1-pixel pure black (#000000) outer outline from Image 2.
+- Every frame must stay strictly inside its quadrant with zero bleeding across the center dividers and a 100% flat solid chroma-key bright green (#00FF00) background with zero blur.
+Utilisez le code avec précaution.
+
+Part B: Empereur's 5 Special & Throwable Weapons (Direct 4x4 Prompts)
+
+Attach Image 1: Empereur Base Sprite, Image 2: Empereur Weapon Sheet.
+
+10. wpn-8.png — Golden Eagle-Wing Boomerang (Row 3, Column 1)
+
+text
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) of the exact Napoleon Emperor platypus character from Image 1 wielding the exact ornate golden feathered wing boomerang with a laurel wreath emblem (Row 3, Column 1 of Image 2) in his right hand, in 3/4 side view, 2.5D beat-'em-up perspective, facing right. STRICT 16-FRAME SQUARE GRID & HIT-FRAME TIMING:
+- Row 1 (Frames 1-4): Frames 1-2 = proud imperial battle stance holding the curved golden wing boomerang angled forward; Frames 3-4 = spinning/equipping the golden boomerang into a ready guard stance.
+- Row 2 (Frames 5-8 — Close-Range Wing Swipe):
+  * Frame 5: pulling the golden boomerang back behind the shoulder.
+  * Frame 6 (HIT FRAME): stepping forward with a fast horizontal curved melee swipe and a crisp white-and-gold feather crescent smear.
+  * Frame 7: cross-body follow-through recoil.
+  * Frame 8: snapping back to guard stance.
+- Row 3 (Frames 9-12 — Imperial Gale Boomerang Ult):
+  * Frame 9: side-arm crouch charge holding the golden boomerang glowing with bright cyan energy.
+  * Frame 10 (CRITICAL HIT FRAME): explosive side-arm spin launch unleashing a glowing cyan-and-gold wind arc forward.
+  * Frame 11: follow-through recoil with outstretched arm.
+  * Frame 12: recovery back to guard stance.
+- Row 4 (Frames 13-16): Frames 13-14 = quick underhand boomerang toss (Frame 13 = low wind-up, Frame 14 = release follow-through with empty hand and spinning golden boomerang mid-air); Frames 15-16 = fast forward dash / dodge holding the golden boomerang.
+CONSISTENCY & PIXEL ART RULES:
+- Keep Empereur's exact chibi proportions, brown hair with golden laurel crown, white platypus bill, deep crimson imperial coat with white ermine fur trim and golden dots, dark boots, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns with zero cell bleeding and solid #00FF00 green background.
+Utilisez le code avec précaution.
+
+11. wpn-9.png — Royal Crown Scepter Trident (Row 3, Column 3)
+
+text
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) of the exact Napoleon Emperor platypus character from Image 1 wielding the exact heavy two-handed golden royal scepter polearm topped with a crimson-and-gold imperial crown head (Row 3, Column 3 of Image 2) with both hands, in 3/4 side view, 2.5D beat-'em-up perspective, facing right. STRICT 16-FRAME SQUARE GRID & HIT-FRAME TIMING:
+- Row 1 (Frames 1-4): Frames 1-2 = wide-legged imperial guard stance holding the long golden crown scepter angled forward with both hands; Frames 3-4 = hoisting/equipping the royal scepter polearm into a ready two-handed guard stance.
+- Row 2 (Frames 5-8 — Heavy Long-Reach Scepter Thrust):
+  * Frame 5: leaning back and pulling the golden scepter shaft far behind the shoulder with both hands.
+  * Frame 6 (HIT FRAME): explosive two-handed forward lunge thrusting the royal crown scepter horizontally at maximum reach with a sharp triple-pronged white shockwave cone.
+  * Frame 7: bracing feet against the heavy follow-through recoil.
+  * Frame 8: stepping back into two-handed guard stance.
+- Row 3 (Frames 9-12 — Sovereign Triple-Impale Ult):
+  * Frame 9: low crouched charge stance holding the scepter back, the crimson-and-gold crown head blazing with bright cyan energy.
+  * Frame 10 (CRITICAL HIT FRAME): devastating rapid multi-hit forward skewer thrust showing three overlapping cyan-and-gold scepter afterimages and a piercing energy burst.
+  * Frame 11: heavy recoil bounce backward while gripping the shaft with both hands.
+  * Frame 12: recovery back to two-handed guard stance.
+- Row 4 (Frames 13-16): Frames 13-14 = overhead heavy javelin throw (Frame 13 = deep back-leaning overhead aim wind-up, Frame 14 = full-extension release with empty hands and flying royal scepter mid-air); Frames 15-16 = heavy forward charging sprint carrying the golden scepter horizontally with both hands.
+CONSISTENCY & PIXEL ART RULES:
+- Keep Empereur's exact chibi proportions, brown hair with golden laurel crown, white platypus bill, deep crimson imperial coat with white ermine fur trim and golden dots, dark boots, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns with zero cell bleeding and solid #00FF00 green background.
+Utilisez le code avec précaution.
+
+12. wpn-11.png — Crowned Emerald-Inlaid Star Shuriken (Row 4, Column 1)
+
+text
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) of the exact Napoleon Emperor platypus character from Image 1 wielding the exact four-pointed golden throwing star inlaid with emerald gems and a central crown emblem (Row 4, Column 1 of Image 2) in his right hand, in 3/4 side view, 2.5D beat-'em-up perspective, facing right. STRICT 16-FRAME SQUARE GRID & HIT-FRAME TIMING:
+- Row 1 (Frames 1-4): Frames 1-2 = agile imperial battle stance holding the golden emerald-inlaid star poised between fingers; Frames 3-4 = flicking/drawing the golden star into a ready guard stance.
+- Row 2 (Frames 5-8 — Rapid Sovereign Star Flick):
+  * Frame 5: quick cross-body wrist cock back holding the golden star near the chest.
+  * Frame 6 (HIT FRAME): snappy side-step flick launching a crisp spinning white-and-gold shuriken motion streak forward.
+  * Frame 7: balanced follow-through pose.
+  * Frame 8: returning to agile guard stance.
+- Row 3 (Frames 9-12 — Giant Imperial Buzzsaw Ult):
+  * Frame 9: low crouched charge holding the golden star overhead, star blazing with bright cyan energy.
+  * Frame 10 (CRITICAL HIT FRAME): leaping side-arm hurl unleashing a massive, oversized spinning cyan-and-gold energy buzzsaw projectile forward.
+  * Frame 11: nimble landing recoil crouch.
+  * Frame 12: rising back into agile guard stance.
+- Row 4 (Frames 13-16): Frames 13-14 = overhand shuriken throw (Frame 13 = high over-the-shoulder aim wind-up, Frame 14 = release follow-through with empty hand and spinning golden star mid-air); Frames 15-16 = fast low sprint dash holding the golden star ready.
+CONSISTENCY & PIXEL ART RULES:
+- Keep Empereur's exact chibi proportions, brown hair with golden laurel crown, white platypus bill, deep crimson imperial coat with white ermine fur trim and golden dots, dark boots, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns with zero cell bleeding and solid #00FF00 green background.
+Utilisez le code avec précaution.
+
+13. wpn-12.png — Holy Hand Grenade Orb (Row 4, Column 2)
+
+text
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) of the exact Napoleon Emperor platypus character from Image 1 wielding the exact golden Holy Hand Grenade globus cruciger orb topped with a golden cross, jeweled bands, and a crimson tassel on the pull-ring (Row 4, Column 2 of Image 2) in his right hand, in 3/4 side view, 2.5D beat-'em-up perspective, facing right. STRICT 16-FRAME SQUARE GRID & HIT-FRAME TIMING:
+- Row 1 (Frames 1-4): Frames 1-2 = proud combat idle stance holding the golden Holy Hand Grenade orb in the right hand; Frames 3-4 = pulling the tasseled pin / prepping the golden orb into a ready guard stance.
+- Row 2 (Frames 5-8 — Underhand Imperial Orb Lob):
+  * Frame 5: swinging the right arm low behind the hip for an underhand pitch.
+  * Frame 6 (HIT FRAME): stepping forward and lobbing the golden Holy Hand Grenade upward along a crisp white-and-gold arc trail.
+  * Frame 7: high follow-through arm extension.
+  * Frame 8: returning to ready guard stance.
+- Row 3 (Frames 9-12 — Holy Cataclysm Pitch Ult):
+  * Frame 9: leaning far back in a pitcher's wind-up, the golden orb crackling intensely with bright cyan energy.
+  * Frame 10 (CRITICAL HIT FRAME): explosive full-body fastball throw launching a blazing cyan-and-gold energy comet trail straight ahead.
+  * Frame 11: crouched blast-bracing follow-through shielding face with left arm.
+  * Frame 12: recovering back to ready guard stance.
+- Row 4 (Frames 13-16): Frames 13-14 = standard overhand grenade throw (Frame 13 = overhead wind-up, Frame 14 = release follow-through with empty hand and flying golden orb mid-air); Frames 15-16 = fast forward tactical sprint holding the golden orb.
+CONSISTENCY & PIXEL ART RULES:
+- Keep Empereur's exact chibi proportions, brown hair with golden laurel crown, white platypus bill, deep crimson imperial coat with white ermine fur trim and golden dots, dark boots, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns with zero cell bleeding and solid #00FF00 green background.
+Utilisez le code avec précaution.
+
+14. wpn-13.png — Crimson-Ribbon Crystal Molotov (Row 4, Column 3)
+
+text
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) of the exact Napoleon Emperor platypus character from Image 1 wielding the exact clear glass Molotov bottle tied with a flowing crimson royal ribbon wick (Row 4, Column 3 of Image 2) in his right hand, in 3/4 side view, 2.5D beat-'em-up perspective, facing right. STRICT 16-FRAME SQUARE GRID & HIT-FRAME TIMING:
+- Row 1 (Frames 1-4): Frames 1-2 = imperial brawler idle stance holding the crimson-ribbon glass bottle angled up; Frames 3-4 = lighting/prepping the crimson ribbon wick into a ready guard stance.
+- Row 2 (Frames 5-8 — High-Arc Firebomb Sling):
+  * Frame 5: winding the glass bottle back overhead with elbow bent.
+  * Frame 6 (HIT FRAME): whipping the arm forward to sling the Molotov bottle along a bright white-and-orange flame arc trail.
+  * Frame 7: low cross-body follow-through.
+  * Frame 8: snapping back to ready guard stance.
+- Row 3 (Frames 9-12 — Imperial Wildfire Smash Ult):
+  * Frame 9: hoisting the glass bottle high with both hands, bottle erupting with intense cyan-white volatile fire.
+  * Frame 10 (CRITICAL HIT FRAME): leaping downward hurl smashing the bottle forward with a massive cyan-and-white fiery shockwave cone.
+  * Frame 11: low landing crouch shielding eyes from the flash.
+  * Frame 12: rising back into ready guard stance.
+- Row 4 (Frames 13-16): Frames 13-14 = side-arm bottle toss (Frame 13 = side-body wind-up, Frame 14 = release follow-through with empty hand and spinning crimson-ribbon bottle mid-air); Frames 15-16 = fast forward sprint dash holding the glass bottle tucked low.
+CONSISTENCY & PIXEL ART RULES:
+- Keep Empereur's exact chibi proportions, brown hair with golden laurel crown, white platypus bill, deep crimson imperial coat with white ermine fur trim and golden dots, dark boots, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns with zero cell bleeding and solid #00FF00 green background.
+Utilisez le code avec précaution.

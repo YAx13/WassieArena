@@ -1,0 +1,65 @@
+Here is Batch 1 (Frankenstein's 4 Light Weapons: wpn-0 to wpn-3). Attach Image 1: Dummy Light Greybox Sheet, Image 2: Frankenstein Base Sprite, Image 3: Frankenstein Weapon Sheet.
+
+1. wpn-0.png — Stitched Butcher Cleaver (Row 1, Column 1)
+
+text
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) that strictly copies the exact character poses, frame-by-frame motion timing, grid cell placement, and energy slash smears from Image 1, replacing the greybox mannequin with the exact Frankenstein monster platypus character from Image 2 and replacing the greybox sword with the exact heavy steel butcher cleaver with a dark stitched-leather grip (Row 1, Column 1 of Image 3).
+
+STRICT POSE & TIMING LOCK:
+- Every single frame (Frames 1 to 16) must match the exact body posture, limb angles, cleaver orientation, and white/cyan slash smears of the corresponding frame in Image 1.
+- Keep the butcher cleaver held in the right hand on every frame, and keep the hands empty on Frame 14 (Row 4, Column 2) while the cleaver flies mid-air, just like Image 1.
+
+CONSISTENCY & PIXEL ART RULES:
+- Apply the exact character proportions, flat-top black hair, stitched green monster skin, silver neck bolts, brown platypus bill with small lower fangs, purple open jacket over an orange shirt, dark torn pants, brown boots, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2 onto the poses of Image 1.
+- Apply the exact broad steel butcher cleaver design, black stitched handle, and proportional size from Image 3 onto the sword angles of Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+Utilisez le code avec précaution.
+
+2. wpn-1.png — Copper-Ringed Bayonet Dagger (Row 1, Column 2)
+
+text
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) that strictly copies the exact character poses, frame-by-frame motion timing, grid cell placement, and energy thrust smears from Image 1, replacing the greybox mannequin with the exact Frankenstein monster platypus character from Image 2 and replacing the greybox dagger with the exact steel bayonet dagger featuring a copper ring guard, brown wrapped grip, and grey pommel (Row 1, Column 2 of Image 3).
+
+STRICT POSE & TIMING LOCK:
+- Every single frame (Frames 1 to 16) must match the exact body posture, limb angles, dagger orientation, and white/cyan thrust smears of the corresponding frame in Image 1.
+- Keep the bayonet dagger held in the right hand on every frame, and keep the hands empty on Frame 14 (Row 4, Column 2) while the dagger flies mid-air, just like Image 1.
+
+CONSISTENCY & PIXEL ART RULES:
+- Apply the exact character proportions, flat-top black hair, stitched green monster skin, silver neck bolts, brown platypus bill with small lower fangs, purple open jacket over an orange shirt, dark torn pants, brown boots, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2 onto the poses of Image 1.
+- Apply the exact steel bayonet dagger design, copper ring guard, wrapped grip, and proportional size from Image 3 onto the dagger angles of Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+Utilisez le code avec précaution.
+
+3. wpn-2.png — Leather-Wrapped Trench Hunting Knife (Row 1, Column 3)
+
+text
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) that strictly copies the exact character poses, frame-by-frame motion timing, grid cell placement, and energy slash smears from Image 1, replacing the greybox mannequin with the exact Frankenstein monster platypus character from Image 2 and replacing the greybox knife with the exact heavy survival hunting knife with a brown leather-sheathed spine, steel clip-point edge, and ribbed brown handle (Row 1, Column 3 of Image 3).
+
+STRICT POSE & TIMING LOCK:
+- Every single frame (Frames 1 to 16) must match the exact body posture, limb angles, knife orientation, and white/cyan slash smears of the corresponding frame in Image 1.
+- Keep the survival hunting knife held in the right hand on every frame, and keep the hands empty on Frame 14 (Row 4, Column 2) while the knife flies mid-air, just like Image 1.
+
+CONSISTENCY & PIXEL ART RULES:
+- Apply the exact character proportions, flat-top black hair, stitched green monster skin, silver neck bolts, brown platypus bill with small lower fangs, purple open jacket over an orange shirt, dark torn pants, brown boots, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2 onto the poses of Image 1.
+- Apply the exact brown-wrapped survival knife design, steel edge, ribbed leather handle, and proportional size from Image 3 onto the knife angles of Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+Utilisez le code avec précaution.
+
+4. wpn-3.png — Blood-Stained Rusty Bone-Saw (Row 1, Column 4)
+
+text
+Create a square 1:1 4x4 pixel-art sprite sheet (strictly 16 frames total: 4 columns by 4 rows) that strictly copies the exact character poses, frame-by-frame motion timing, grid cell placement, and grinding sparks from Image 1, replacing the greybox mannequin with the exact Frankenstein monster platypus character from Image 2 and replacing the greybox hand-saw with the exact heavy surgical bone-saw featuring a brown wooden D-handle, riveted steel spine, and rusty blood-stained serrated teeth (Row 1, Column 4 of Image 3).
+
+STRICT POSE & TIMING LOCK:
+- Every single frame (Frames 1 to 16) must match the exact body posture, limb angles, hand-saw orientation, and white/cyan grinding sparks of the corresponding frame in Image 1.
+- Keep the rusty bone-saw held by its brown wooden D-handle in the right hand on every frame, and keep the hands empty on Frame 14 (Row 4, Column 2) while the hand-saw flies mid-air, just like Image 1.
+
+CONSISTENCY & PIXEL ART RULES:
+- Apply the exact character proportions, flat-top black hair, stitched green monster skin, silver neck bolts, brown platypus bill with small lower fangs, purple open jacket over an orange shirt, dark torn pants, brown boots, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 2 onto the poses of Image 1.
+- Apply the exact rusty surgical bone-saw design, wooden D-handle, stained serrated teeth, and proportional size from Image 3 onto the hand-saw angles of Image 1.
+- Output must be a strict 1:1 square image divided into 4 equal rows and 4 equal columns. Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with zero anti-aliasing, zero blur, and zero drop shadows.
+Utilisez le code avec précaution.

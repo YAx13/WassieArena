@@ -180,6 +180,16 @@ class CanvasRenderer {
   loadImg(src){ if(!src) return null; const k="u|"+src; if(!this.imgs[k]){ const i=new Image(); i.onerror=()=>{i.failed=true}; i.src=encodeURI(src); this.imgs[k]=i; } const i=this.imgs[k]; return i.complete&&i.naturalWidth&&!i.failed?i:null; }
   pvpPreviewImg(){ const b=GameState.brute, k=b&&b.sprite; return this.loadImg(assetPath.pvpPreview(k||"general"))||this.loadImg(assetPath.pvpPreview("general")); }
   weaponSprite(b,id,onload=null){
+    if(b&&b.sprite&&Number.isInteger(id)&&id>=0&&id<=13){
+      const directSrc=`assets/characters/${b.sprite}/weapons/wpn-${id}.png`;
+      const directImg=this.loadImg(directSrc);
+      if(directImg) return {sheet:directImg,x:0,y:0,width:directImg.naturalWidth,height:directImg.naturalHeight};
+      const pending=this.imgs["u|"+directSrc];
+      if(onload&&pending&&!pending.failed&&!this.weaponSheets["pend|"+directSrc]){
+        this.weaponSheets["pend|"+directSrc]=true;
+        pending.addEventListener("load",()=>{ delete this.weaponSheets["pend|"+directSrc]; onload(); },{once:true});
+      }
+    }
     const skins=DataEngine.WEAPON_SKINS[b&&b.sprite];
     const key=String((b&&(b.id||b.sprite))||"general"), hash=[...key].reduce((n,c)=>(n*31+c.charCodeAt(0))>>>0,7);
     let src=(skins&&skins.length)?skins[hash%skins.length]:DataEngine.GREYBOX_WEAPONS;
@@ -348,7 +358,65 @@ class CanvasRenderer {
         }
       }
     });
-    const pj=A.proj; if(pj&&c>=pj.t0&&c<=pj.t1){ const k=(c-pj.t0)/(pj.t1-pj.t0), sz=pj.id===10?36:26; ctx.save(); ctx.translate(pj.x0+(pj.x1-pj.x0)*k,pj.y0+(pj.y1-pj.y0)*k-Math.sin(Math.PI*k)*(pj.id===10?24:18)); ctx.rotate(c/(pj.id===10?90:45)); const skin=pj.b&&Number.isInteger(pj.id)?this.weaponSprite(pj.b,pj.id):null; if(skin){ ctx.drawImage(skin.sheet,skin.x,skin.y,skin.width,skin.height,-sz/2,-sz/2,sz,sz); } else { ctx.font=(pj.id===10?"28px":"19px")+" serif"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText(pj.ic,0,0); } ctx.restore(); }
+    const pj=A.proj;
+    if(pj&&c>=pj.t0&&c<=pj.t1){
+      const k=(c-pj.t0)/Math.max(1,pj.t1-pj.t0), wid=pj.id;
+      const isSpear=wid===9, isLob=wid===12||wid===13, isSpin=wid===8||wid===11, isPillar=wid===10;
+      const arc=isSpear?4:isLob?44:isPillar?32:18;
+      const px=pj.x0+(pj.x1-pj.x0)*k, py=pj.y0+(pj.y1-pj.y0)*k-Math.sin(Math.PI*k)*arc;
+      const dir=(pj.x1>=pj.x0)?1:-1;
+      const rot=isSpear?(dir>0?0.78:-2.35):isSpin?(c/20)*dir:isPillar?(c/105)*dir:(c/42)*dir;
+      const sz=isPillar?38:isSpear?32:26;
+      // Traînée visuelle selon l'arme
+      ctx.save();
+      if(wid===13){
+        for(let t=1;t<=4;t++){ const tk=Math.max(0,k-t*0.045), tx=pj.x0+(pj.x1-pj.x0)*tk, ty=pj.y0+(pj.y1-pj.y0)*tk-Math.sin(Math.PI*tk)*arc;
+          ctx.fillStyle=t%2?"rgba(255,140,20,"+(0.65-t*0.12)+")":"rgba(255,225,70,"+(0.65-t*0.12)+")";
+          ctx.beginPath(); ctx.arc(tx,ty,5-t*0.8,0,7); ctx.fill();
+        }
+      } else if(wid===12){
+        for(let t=1;t<=3;t++){ const tk=Math.max(0,k-t*0.05), tx=pj.x0+(pj.x1-pj.x0)*tk, ty=pj.y0+(pj.y1-pj.y0)*tk-Math.sin(Math.PI*tk)*arc;
+          ctx.fillStyle="rgba(200,205,215,"+(0.45-t*0.1)+")"; ctx.beginPath(); ctx.arc(tx,ty,3.5,0,7); ctx.fill();
+        }
+      } else if(isSpear||isSpin){
+        const tk=Math.max(0,k-0.14), tx=pj.x0+(pj.x1-pj.x0)*tk, ty=pj.y0+(pj.y1-pj.y0)*tk-Math.sin(Math.PI*tk)*arc;
+        ctx.strokeStyle=wid===8?"rgba(110,245,255,0.65)":"rgba(255,255,255,0.55)"; ctx.lineWidth=isSpear?3:4; ctx.lineCap="round";
+        ctx.beginPath(); ctx.moveTo(tx,ty); ctx.lineTo(px,py); ctx.stroke();
+      }
+      ctx.translate(px,py); ctx.rotate(rot);
+      const skin=pj.b&&Number.isInteger(wid)?this.weaponSprite(pj.b,wid):null;
+      if(skin){ ctx.drawImage(skin.sheet,skin.x,skin.y,skin.width,skin.height,-sz/2,-sz/2,sz,sz); }
+      else { ctx.font=(isPillar?"28px":"19px")+" serif"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText(pj.ic,0,0); }
+      if(wid===12&&Math.floor(c/60)%2===0){ ctx.fillStyle="#ff3b30"; ctx.beginPath(); ctx.arc(0,-8,2.5,0,7); ctx.fill(); }
+      ctx.restore();
+    }
+    if(A.vfx&&A.vfx.length){
+      A.vfx=A.vfx.filter(v=>c-v.t0<v.dur);
+      A.vfx.forEach(v=>{
+        const p=(c-v.t0)/v.dur; ctx.save();
+        if(v.kind==="molotov"){
+          ctx.globalAlpha=Math.max(0,1-p*0.85);
+          ctx.fillStyle="rgba(255,95,15,0.45)"; ctx.beginPath(); ctx.ellipse(v.x,v.y,18+p*16,5+p*3,0,0,7); ctx.fill();
+          for(let i=0;i<7;i++){ const fx=v.x-14+i*5+Math.sin(c/60+i)*2, fh=8+(1-p)*14+((i%3)*4);
+            ctx.fillStyle=i%2?"#ff6a00":"#ffd43b"; ctx.fillRect(Math.round(fx),Math.round(v.y-fh),3,Math.round(fh));
+          }
+        } else if(v.kind==="grenade"){
+          ctx.globalAlpha=Math.max(0,1-p);
+          ctx.strokeStyle="#ffb703"; ctx.lineWidth=3*(1-p)+1;
+          ctx.beginPath(); ctx.arc(v.x,v.y-22,8+p*34,0,7); ctx.stroke();
+          ctx.fillStyle="#fff3b0"; ctx.beginPath(); ctx.arc(v.x,v.y-22,Math.max(0,(1-p*1.6)*18),0,7); ctx.fill();
+        } else if(v.kind==="slam"){
+          ctx.globalAlpha=Math.max(0,1-p);
+          ctx.strokeStyle=v.crit?"#38e8ff":"#e6dcc8"; ctx.lineWidth=2.5*(1-p)+1;
+          ctx.beginPath(); ctx.ellipse(v.x,v.y-2,12+p*36,4+p*10,0,0,7); ctx.stroke();
+        } else if(v.kind==="crit"){
+          ctx.globalAlpha=Math.max(0,1-p); ctx.translate(v.x,v.y-34); ctx.rotate(p*1.2);
+          ctx.strokeStyle="#ffe23d"; ctx.lineWidth=2.5*(1-p)+1;
+          const r=10+p*22; ctx.beginPath(); ctx.moveTo(-r,0); ctx.lineTo(r,0); ctx.moveTo(0,-r); ctx.lineTo(0,r); ctx.stroke();
+        }
+        ctx.restore();
+      });
+    }
     ctx.textAlign="center";
     A.fl.forEach(t=>{                                   // nombres flottants
       const age=c-t.c0; if(age<0||age>1000) return;

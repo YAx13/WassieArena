@@ -1,0 +1,90 @@
+Yes—looking closely at your room backgrounds (image_MklRd6.png, image_ydvSeq.png, image_5Fkxko.png, image_vq9jAg.png), the top row of 7 pods IS slightly larger and wider than the bottom row of 6 pods, AND every character's room has differently colored glass (cyan, amber gold, dark grey).
+Here is how to make all 39 stasis sprites (assets/companion/stasis/<species>-form<1|2|3>.png) fit seamlessly inside every single brawler's room theme without ever re-generating them per character:
+
+1. Why Universal Theme-Seamless Sprites Work
+
+• Never tint the PNG itself with cyan or gold: Keep the creature in its true, natural, un-tinted colors on a pure #FF00FF magenta background.
+• Let the room background provide the glass color: Because your background images (empereur = amber gold glass, momie / samourai = emerald-cyan glass, dummy = dark grey glass) already have colored glass tubes, and compagnons.js renders a subtle translucent sheen on top, a natural-colored creature inside the pod automatically picks up the room's glass color!
+• Top Row (7 larger pods) vs. Bottom Row (6 standard pods): Put your 7 largest/most dangerous creatures (ours, taureau, chimere, serpent, aquatique, loup, tempete) in the 7 larger top-row pods, and your 6 sleeker/agile creatures (chien, felin, oiseau, arthropode, lezard, spectre) in the 6 bottom-row pods.
+• Progressive Cramping Across Forms 1 -> 2 -> 3: As a creature evolves from Form 1 -> Form 2 -> Form 3 inside its pod, its pose evolves from comfortable -> tight -> bursting/cramped against the glass!
+
+
+
+
+
+2. Code Update in js/ui/compagnons.js (Load stasis/<species>-form<1|2|3>.png)
+
+Update startCompIdleLoop() in js/ui/compagnons.js so each pod automatically loads the exact evolved stasis sprite for its current form (form 1, 2, or 3), and keeps heavy cramped creatures (ours, taureau, chimere, serpent) planted on the pod floor instead of bobbing:
+
+File: js/ui/compagnons.js
+
+
+A. Charger assets/companion/stasis/<famille>-form<1|2|3>.png selon le stade d'évolution
+
+• Type d'action : Replace
+• Ligne(s) concernée(s) : Lignes 188 à 218
+• Code à trouver (Find) :
+javascript
+    document.querySelectorAll(".fx-panel.fx-comp .comp-cv").forEach((cv, idx) => {
+      if (!cv.offsetParent) return;
+      const podBtn = cv.closest(".fx-comp-pet"), inPod = !!podBtn, locked = !!cv.closest(".locked");
+      const famKey = podBtn ? podBtn.dataset.fam : null;
+      const stasisSrc = famKey ? `assets/companion/stasis/${famKey}.png` : null;
+      const baseSrc = cv.dataset.art; if (!baseSrc) return;
+      let im = cache[baseSrc];
+      if (!im) { im = cache[baseSrc] = new Image(); im.src = baseSrc; }
+      let stIm = stasisSrc ? cache[stasisSrc] : null;
+      if (stasisSrc && !stIm) { stIm = cache[stasisSrc] = new Image(); stIm.onerror = () => { stIm.failed = true; }; stIm.src = stasisSrc; }
+      const useStasis = inPod && stIm && !stIm.failed && stIm.complete && stIm.naturalWidth > 0;
+      const drawIm = useStasis ? stIm : im;
+      if (!drawIm.complete || !drawIm.naturalWidth) return;
+      const fw = useStasis ? drawIm.naturalWidth : drawIm.naturalWidth / 4;
+      const fh = useStasis ? drawIm.naturalHeight : drawIm.naturalHeight / 4;
+      const ctx = cv.getContext("2d");
+      ctx.clearRect(0, 0, 64, 64);
+      ctx.imageSmoothingEnabled = false;
+      ctx.globalCompositeOperation = "source-over";
+      if (inPod) {
+        const ph = idx * 1.37;
+        const bob = Math.sin(now / 650 + ph) * 3.5;
+        const tilt = Math.sin(now / 950 + ph) * 0.08;
+        ctx.save();
+        ctx.translate(32, 32 + bob);
+        ctx.rotate(tilt);
+        ctx.drawImage(drawIm, 0, 0, fw, fh, -28, -28, 56, 56);
+        ctx.restore();
+Utilisez le code avec précaution.
+• Nouveau code (New Code) :
+javascript
+    document.querySelectorAll(".fx-panel.fx-comp .comp-cv").forEach((cv, idx) => {
+      if (!cv.offsetParent) return;
+      const podBtn = cv.closest(".fx-comp-pet"), inPod = !!podBtn, locked = !!cv.closest(".locked");
+      const famKey = podBtn ? podBtn.dataset.fam : null;
+      const curComp = S.cur && S.cur.companion;
+      const formNum = (podBtn && podBtn.classList.contains("owned") && curComp) ? (curComp.form || 1) : 1;
+      const stasisSrc = famKey ? `assets/companion/stasis/${famKey}-form${formNum}.png` : null;
+      const baseSrc = cv.dataset.art; if (!baseSrc) return;
+      let im = cache[baseSrc];
+      if (!im) { im = cache[baseSrc] = new Image(); im.src = baseSrc; }
+      let stIm = stasisSrc ? cache[stasisSrc] : null;
+      if (stasisSrc && !stIm) { stIm = cache[stasisSrc] = new Image(); stIm.onerror = () => { stIm.failed = true; }; stIm.src = stasisSrc; }
+      const useStasis = inPod && stIm && !stIm.failed && stIm.complete && stIm.naturalWidth > 0;
+      const drawIm = useStasis ? stIm : im;
+      if (!drawIm.complete || !drawIm.naturalWidth) return;
+      const fw = useStasis ? drawIm.naturalWidth : drawIm.naturalWidth / 4;
+      const fh = useStasis ? drawIm.naturalHeight : drawIm.naturalHeight / 4;
+      const ctx = cv.getContext("2d");
+      ctx.clearRect(0, 0, 64, 64);
+      ctx.imageSmoothingEnabled = false;
+      ctx.globalCompositeOperation = "source-over";
+      if (inPod) {
+        const ph = idx * 1.37;
+        const grounded = ["ours", "taureau", "chimere", "serpent"].includes(famKey);
+        const bob = grounded ? 0 : Math.sin(now / 650 + ph) * 3.0;
+        const tilt = grounded ? 0 : Math.sin(now / 950 + ph) * 0.06;
+        ctx.save();
+        ctx.translate(32, 32 + bob);
+        ctx.rotate(tilt);
+        ctx.drawImage(drawIm, 0, 0, fw, fh, -28, -28, 56, 56);
+        ctx.restore();
+

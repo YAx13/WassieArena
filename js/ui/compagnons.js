@@ -1,10 +1,10 @@
 "use strict";
 
 /* ================= Écurie / Compagnons (placement + projecteur d'évolution) ================= */
-const COMP_LAYOUT_KEY = "arene_companion_dev_layout_v1";
-const HOLO_LAYOUT_KEY = "arene_comp_holo_layout_v1";
+const COMP_LAYOUT_PREFIX = "arene_companion_dev_layout_v2_";
+const HOLO_LAYOUT_PREFIX = "arene_comp_holo_layout_v2_";
 let compEditing = false, compPositions = null, compDrag = null;
-let holoPositions = null, holoDrag = null;
+let holoPositions = null, holoDrag = null, activeCompSprite = null;
 
 const COMP_FROZEN = [
   { key: "chien", x: 16.65, y: 21.02, size: 10, angle: 0, flip: false },
@@ -30,28 +30,42 @@ const HOLO_FROZEN = [
   { id: "st3", x: 63.32, y: 68.47, size: 14.6, angle: 0, flip: false }
 ];
 
-function defaultCompPositions() {
+// Modèle de salle dédié au Dummy (à promouvoir dans COMP_FROZEN / HOLO_FROZEN après validation)
+const COMP_DUMMY_TEMPLATE = [];
+const HOLO_DUMMY_TEMPLATE = [];
+
+// Légers ajustements par personnage par-dessus le modèle global (ex: momie: [{ key: "serpent", x: 40.5, y: 21.5 }])
+const COMP_BRAWLER_OVERRIDES = {
+  dummy: COMP_DUMMY_TEMPLATE
+};
+const HOLO_BRAWLER_OVERRIDES = {
+  dummy: HOLO_DUMMY_TEMPLATE
+};
+
+function defaultCompPositions(spriteKey) {
   const cols = 7;
   const base = CompanionData.FAMILIES.map((f, i) => ({
     key: f.key, x: 10 + (i % cols) * 13.2, y: i < cols ? 34 : 74, size: 26, angle: 0, flip: false
   }));
   COMP_FROZEN.forEach(s => { const t = base.find(d => d.key === s.key); if (t) Object.assign(t, s); });
+  (COMP_BRAWLER_OVERRIDES[spriteKey] || []).forEach(s => { const t = base.find(d => d.key === s.key); if (t) Object.assign(t, s); });
   return base;
 }
 
-function readCompPositions() {
+function readCompPositions(spriteKey) {
   try {
-    const arr = JSON.parse(localStorage.getItem(COMP_LAYOUT_KEY) || "null");
+    const arr = JSON.parse(localStorage.getItem(COMP_LAYOUT_PREFIX + spriteKey) || "null");
     return Array.isArray(arr) && arr.length === CompanionData.FAMILIES.length ? arr : null;
   } catch (e) { return null; }
 }
 
 function saveCompPositions() {
-  if (!compPositions) return;
-  try { localStorage.setItem(COMP_LAYOUT_KEY, JSON.stringify(compPositions)); } catch (e) {}
+  if (!compPositions || !activeCompSprite) return;
+  try { localStorage.setItem(COMP_LAYOUT_PREFIX + activeCompSprite, JSON.stringify(compPositions)); } catch (e) {}
+  console.log(`COMP_OVERRIDE_${activeCompSprite.toUpperCase()} =`, JSON.stringify(compPositions.map(({ key, x, y, size, angle, flip }) => ({ key, x: +x.toFixed(2), y: +y.toFixed(2), size: +(size || 26).toFixed(2), angle: +(angle || 0).toFixed(1), flip: !!flip }))));
 }
 
-function defaultHoloPositions() {
+function defaultHoloPositions(spriteKey) {
   const base = [
     { id: "st1", x: 37.5, y: 75, size: 14, angle: 0, flip: false },
     { id: "ar1", x: 43.2, y: 75, size: 4.5, angle: 0, flip: false },
@@ -60,19 +74,21 @@ function defaultHoloPositions() {
     { id: "st3", x: 63.0, y: 70, size: 23, angle: 0, flip: false }
   ];
   HOLO_FROZEN.forEach(s => { const t = base.find(d => d.id === s.id); if (t) Object.assign(t, s); });
+  (HOLO_BRAWLER_OVERRIDES[spriteKey] || []).forEach(s => { const t = base.find(d => d.id === s.id); if (t) Object.assign(t, s); });
   return base;
 }
 
-function readHoloPositions() {
+function readHoloPositions(spriteKey) {
   try {
-    const arr = JSON.parse(localStorage.getItem(HOLO_LAYOUT_KEY) || "null");
+    const arr = JSON.parse(localStorage.getItem(HOLO_LAYOUT_PREFIX + spriteKey) || "null");
     return Array.isArray(arr) && arr.length === 5 ? arr : null;
   } catch (e) { return null; }
 }
 
 function saveHoloPositions() {
-  if (!holoPositions) return;
-  try { localStorage.setItem(HOLO_LAYOUT_KEY, JSON.stringify(holoPositions)); } catch (e) {}
+  if (!holoPositions || !activeCompSprite) return;
+  try { localStorage.setItem(HOLO_LAYOUT_PREFIX + activeCompSprite, JSON.stringify(holoPositions)); } catch (e) {}
+  console.log(`HOLO_OVERRIDE_${activeCompSprite.toUpperCase()} =`, JSON.stringify(holoPositions.map(({ id, x, y, size, angle, flip }) => ({ id, x: +x.toFixed(2), y: +y.toFixed(2), size: +(size || 14).toFixed(2), angle: +(angle || 0).toFixed(1), flip: !!flip }))));
 }
 
 function applyHoloItemPos(el, pos) {
@@ -106,16 +122,33 @@ function applyCompPosition(btn, pos) {
 function updateCompDevUI() {
   const compPanel = $(".fx-panel.fx-comp");
   if (!compPanel) return;
-  let edit = $("#fx-comp-edit");
-  if (!edit) {
-    edit = document.createElement("button");
-    edit.id = "fx-comp-edit"; edit.type = "button"; edit.className = "fx-btn";
-    compPanel.appendChild(edit);
+  let bar = $("#fx-comp-devbar");
+  if (!bar) {
+    bar = document.createElement("div");
+    bar.id = "fx-comp-devbar";
+    bar.style.cssText = "position:absolute;right:12px;bottom:12px;z-index:25;display:flex;gap:6px;align-items:center";
+    bar.innerHTML = `<button type="button" id="fx-comp-reset" class="fx-btn" style="position:static!important;width:auto!important;height:auto!important;padding:4px 8px!important;font-size:11px!important">↺ Reset (${activeCompSprite || "dummy"})</button><button type="button" id="fx-comp-edit" class="fx-btn" style="position:static!important;width:auto!important;height:auto!important;padding:4px 8px!important;font-size:11px!important"></button>`;
+    compPanel.appendChild(bar);
   }
-  const dev = !!$("#devbox");
-  edit.hidden = !dev;
-  edit.textContent = compEditing ? "Terminer le placement" : "Éditer les compagnons";
-  edit.onclick = () => { compEditing = !compEditing; renderFiche(S.cur); };
+  const dev = !!$("#devbox"), edit = $("#fx-comp-edit"), rst = $("#fx-comp-reset");
+  bar.style.display = dev ? "flex" : "none";
+  if (rst) {
+    rst.textContent = `↺ Reset (${activeCompSprite || "dummy"})`;
+    rst.onclick = () => {
+      if (!activeCompSprite) return;
+      try {
+        localStorage.removeItem(COMP_LAYOUT_PREFIX + activeCompSprite);
+        localStorage.removeItem(HOLO_LAYOUT_PREFIX + activeCompSprite);
+      } catch (e) {}
+      compPositions = defaultCompPositions(activeCompSprite);
+      holoPositions = defaultHoloPositions(activeCompSprite);
+      renderFiche(S.cur);
+    };
+  }
+  if (edit) {
+    edit.textContent = compEditing ? "Terminer le placement" : "Éditer les compagnons";
+    edit.onclick = () => { compEditing = !compEditing; renderFiche(S.cur); };
+  }
 }
 
 function attachCompEditor(stage) {
@@ -169,28 +202,61 @@ function startCompIdleLoop() {
   window._compIdleLoop = true;
   const cache = {};
   const tick = now => {
-    const frame = Math.floor(now / 180) % 4;
-    document.querySelectorAll(".fx-panel.fx-comp .comp-cv").forEach(cv => {
+    const holoFrame = Math.floor(now / 180) % 4;
+    document.querySelectorAll(".fx-panel.fx-comp .comp-cv").forEach((cv, idx) => {
       if (!cv.offsetParent) return;
       const src = cv.dataset.art; if (!src) return;
       let im = cache[src];
       if (!im) { im = cache[src] = new Image(); im.src = src; }
       if (!im.complete || !im.naturalWidth) return;
       const fw = im.naturalWidth / 4, fh = im.naturalHeight / 4, ctx = cv.getContext("2d");
+      const inPod = !!cv.closest(".fx-comp-pet"), locked = !!cv.closest(".locked");
       ctx.clearRect(0, 0, 64, 64);
       ctx.imageSmoothingEnabled = false;
       ctx.globalCompositeOperation = "source-over";
-      ctx.drawImage(im, frame * fw, 0, fw, fh, 0, 0, 64, 64);
-      if (cv.closest(".locked")) {
-        ctx.globalCompositeOperation = "source-atop";
-        const grd = ctx.createRadialGradient(32, 32, 4, 32, 32, 30);
-        grd.addColorStop(0, "rgba(8, 42, 54, 0.88)");
-        grd.addColorStop(1, "rgba(14, 116, 144, 0.94)");
-        ctx.fillStyle = grd;
-        ctx.fillRect(0, 0, 64, 64);
-        ctx.fillStyle = "rgba(56, 232, 255, 0.24)";
-        for (let y = 0; y < 64; y += 4) ctx.fillRect(0, y, 64, 1);
-        ctx.globalCompositeOperation = "source-over";
+      if (inPod) {
+        const ph = idx * 1.37;
+        const bob = Math.sin(now / 650 + ph) * 3.5;
+        const tilt = Math.sin(now / 950 + ph) * 0.08;
+        ctx.save();
+        ctx.translate(32, 32 + bob);
+        ctx.rotate(tilt);
+        ctx.drawImage(im, 0, 0, fw, fh, -28, -28, 56, 56);
+        ctx.restore();
+        if (locked) {
+          ctx.globalCompositeOperation = "source-atop";
+          const grd = ctx.createRadialGradient(32, 32, 4, 32, 32, 30);
+          grd.addColorStop(0, "rgba(8, 42, 54, 0.88)");
+          grd.addColorStop(1, "rgba(14, 116, 144, 0.94)");
+          ctx.fillStyle = grd;
+          ctx.fillRect(0, 0, 64, 64);
+          ctx.globalCompositeOperation = "source-over";
+        } else {
+          ctx.globalCompositeOperation = "source-atop";
+          ctx.fillStyle = "rgba(45, 212, 191, 0.14)";
+          ctx.fillRect(0, 0, 64, 64);
+          ctx.globalCompositeOperation = "source-over";
+        }
+        // Micro-bulles montantes dans le liquide
+        ctx.fillStyle = locked ? "rgba(56, 232, 255, 0.35)" : "rgba(186, 245, 255, 0.55)";
+        for (let b = 0; b < 3; b++) {
+          const by = 58 - (((now / 28) + idx * 19 + b * 21) % 54);
+          const bx = 18 + ((idx * 13 + b * 17) % 28) + Math.sin(now / 300 + b) * 2;
+          ctx.fillRect(Math.round(bx), Math.round(by), b === 0 ? 2 : 1, b === 0 ? 2 : 1);
+        }
+      } else {
+        ctx.drawImage(im, holoFrame * fw, 0, fw, fh, 0, 0, 64, 64);
+        if (locked) {
+          ctx.globalCompositeOperation = "source-atop";
+          const grd = ctx.createRadialGradient(32, 32, 4, 32, 32, 30);
+          grd.addColorStop(0, "rgba(8, 42, 54, 0.88)");
+          grd.addColorStop(1, "rgba(14, 116, 144, 0.94)");
+          ctx.fillStyle = grd;
+          ctx.fillRect(0, 0, 64, 64);
+          ctx.fillStyle = "rgba(56, 232, 255, 0.24)";
+          for (let y = 0; y < 64; y += 4) ctx.fillRect(0, y, 64, 1);
+          ctx.globalCompositeOperation = "source-over";
+        }
       }
     });
     requestAnimationFrame(tick);
@@ -207,9 +273,15 @@ function renderCompanionsPanel(b) {
     if (!fg) { fg = document.createElement("div"); fg.className = "comp-fg-layer"; compPanel.appendChild(fg); }
     fg.style.backgroundImage = `url("${DataEngine.getCompanionFg(b.sprite)}")`;
   }
+  const sp = b.sprite || "general";
+  if (activeCompSprite !== sp) {
+    activeCompSprite = sp;
+    compPositions = readCompPositions(sp) || defaultCompPositions(sp);
+    holoPositions = readHoloPositions(sp) || defaultHoloPositions(sp);
+  }
   $("#fx-ccount").textContent = (cf ? 1 : 0) + "/" + CompanionData.FAMILIES.length;
   updateCompDevUI();
-  if (!compPositions) compPositions = readCompPositions() || defaultCompPositions();
+  if (!compPositions) compPositions = readCompPositions(sp) || defaultCompPositions(sp);
   stage.classList.toggle("is-editing", compEditing);
   stage.innerHTML = CompanionData.FAMILIES.map(f => {
     const o = f === cf, form = o ? (c.form || 1) : 1, art = DataEngine.getCompanionArt(f.key, form);
@@ -223,7 +295,7 @@ function renderCompanionsPanel(b) {
   });
   attachCompEditor(stage);
 
-  if (!holoPositions) holoPositions = readHoloPositions() || defaultHoloPositions();
+  if (!holoPositions) holoPositions = readHoloPositions(sp) || defaultHoloPositions(sp);
   let holo = compPanel && compPanel.querySelector(".comp-holo-stage");
   const showHolo = key => {
     const f = CompanionData.FAMILIES.find(x => x.key === key); if (!f || !holo) return;

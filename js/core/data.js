@@ -9,15 +9,17 @@ const assetPath = {
   pillar: () => `assets/pillar.png`,
   starter: id => `assets/characters/${id}/starter.jpeg`,
   weapon: (id, n) => `assets/characters/${id}/weapons/weapon-${n}-transparent.png`,
-  weaponCut: (id, skin, wid) => `assets/weapons_cut/${id}/skin-${skin}/wpn-${wid}-${DataEngine.WEAPON_FILE_NAMES[wid] || "epee"}.png`,
+  weaponIcon: (id, wid) => `assets/characters/${id}/weapons/wpn-${wid}.png`,
+  weaponCut: (id, skin, wid) => `assets/characters/${id}/weapons/wpn-${wid}.png`,
   afk: (id, n, ext) => `assets/backgrounds/afk/${id}/afk-${n}.${ext}`,
   pvp: (biome, n) => `assets/backgrounds/pvp/${biome}-${n}.jpeg`,
-  pvpPreview: id => `assets/backgrounds/pvp/${id}/pvpPreview.jpeg`,  bossRoom: (boss, n) => `assets/backgrounds/boss/${boss}/bossroom-${n}.jpg`,
+  pvpPreview: id => `assets/backgrounds/pvp/${id}/pvpPreview.jpeg`,
+  bossRoom: (boss, n) => `assets/backgrounds/boss/${boss}/bossroom-${n}.jpg`,
   bossSheet: (boss, n) => `assets/bosses/${boss}/sheets/sheet-${n}.png`,
   trainBanner: id => `assets/backgrounds/train/${id}/trainBanner.png`,
   companionArt: (form, species) => `assets/companion/form-${form}/${species}.png`,
-  companionBg:  id => `assets/companion/${id}/background.jpeg`,
-  companionFg:  id => `assets/companion/${id}/foreground.png`,
+  companionBg: id => `assets/backgrounds/companion/${id}/background.${id === "dummy" ? "jpg" : "jpeg"}`,
+  companionFg: id => `assets/backgrounds/companion/${id}/foreground.png`,
   characterSelectBg: () => `assets/backgrounds/character-select/background.jpeg`,
   competenceBg: () => `assets/backgrounds/competence/background.jpeg`,
   equipementBg: () => `assets/backgrounds/equipement/background.jpeg`,
@@ -44,11 +46,11 @@ class DataEngine {
   static hasImages(k){ return !!this.spriteBase(k); }
   static readyKeys(){ const r=this.BRAWLERS.filter(k=>this.hasImages(k)); return r.length?r:this.BRAWLERS.filter(k=>this.SPRITES[k]); }
 
-  // Arène de l'écran principal selon la brute active
+  // Arène de l'écran principal selon la brute active (repli sur dummy)
   static getAfkBackground(k) {
     const s = this.SPRITES[k];
     const background = s ? (s.afkBackground || "") : "";
-    return background === "" ? assetPath.afk("general", 1, "jpeg") : background;
+    return background === "" ? assetPath.afk("dummy", 1, "jpg") : background;
   }
 
   static RARITIES = [
@@ -93,10 +95,10 @@ class DataEngine {
   }
 
   static getCompanionBg(brawlerId) {
-    return assetPath.companionBg(brawlerId || "empereur");
+    return assetPath.companionBg(brawlerId || "dummy");
   }
   static getCompanionFg(brawlerId) {
-    return assetPath.companionFg(brawlerId || "empereur");
+    return assetPath.companionFg(brawlerId || "dummy");
   }
 
   static PVP_BIOMES = [
@@ -170,14 +172,14 @@ class DataEngine {
   static PET_SHEETS = { "chien_friche:1":"", "chien_friche:2":"", "chien_friche:3":"", "ours_decharge:1":"", "ours_decharge:2":"", "ours_decharge:3":"", "aigle_veille:1":"", "aigle_veille:2":"", "aigle_veille:3":"" };
   static WEAPON_IMGS = {};   // id d'arme -> image 32x32 optionnelle
   // Nombre de skins d'arme présents dans assets/characters/<id>/weapons/
-  static WEAPON_COUNT = { dummy: 0, empereur: 1, frankenstein: 1, general: 1, hazmat: 1, human: 0, inversebrah: 0, momie: 1, samourai: 1, zeus: 1 };
+  static WEAPON_COUNT = { dummy: 1, empereur: 1, frankenstein: 1, general: 1, hazmat: 1, human: 0, inversebrah: 0, momie: 1, samourai: 1, zeus: 1 };
   static WEAPON_FILE_NAMES = ["epee", "dague", "couteau", "scie", "hache", "marteau", "pioche", "os", "boomerang", "trident", "pilier", "shuriken", "grenade", "molotov"];
   static WEAPON_SKINS = Object.fromEntries(Object.entries(this.WEAPON_COUNT).map(([k, n]) =>
     [k, Array.from({ length: n }, (_, i) => assetPath.weapon(k, i + 1))]));
   // Style d'attaque par arme : light (légère), heavy (lourde), throw (jet)
   static WEAPON_STYLE = ["light","light","light","light","heavy","heavy","heavy","heavy","throw","heavy","throw","throw","throw","throw"];
   static WEAPON_CELLS = new Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14);
-  static GREYBOX_WEAPONS = "assets/weapons_cut/greybox-weapons.png";
+  static GREYBOX_WEAPONS = "assets/characters/dummy/weapons/weapon-1-transparent.png";
   // Équipement : 4 armures (Casque=HP, Plastron=AGI, Bottes=SPD, Collier=STR) + 2 Anneaux (Stat ou Élément)
   static GEAR_BONUS=[1,3,6,10,15,20];
   static RING_STAT_BONUS=[2,5,9,14,20,28];
