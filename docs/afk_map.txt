@@ -1,0 +1,488 @@
+﻿=== HTML AFK & HUD ELEMENTS ===
+<div class="home-grid" id="home-grid">
+<div class="afk-stage" id="afk-stage">
+<div class="afk-wave-info"><span id="afk-wave">Vague 1</span></div>
+<div class="afk-power-banner" id="afk-power">⚔️ Puissance : 0</div>
+<div class="afk-field" id="afk-field">
+<div class="afk-hero" id="afk-hero"><canvas id="cv-afk-hero" width="64" height="64"></canvas></div>
+<div class="afk-companion" id="afk-companion"><img id="img-afk-companion" alt="Compagnon" draggable="false" hidden></div>          <!-- les sbires (carrés de couleur) sont injectés ici par AFKMode -->
+<div class="afk-menu" id="afk-menu">
+<button class="bub afk-dest" id="afk-dest-caserne" data-open="caserne" aria-label="Caserne" title="Caserne"><span class="bc">🛡️</span><span class="bl">Caserne</span></button>
+<button class="bub b-pvp afk-dest" id="afk-dest-pvp" data-open="pvp" aria-label="PvP" title="PvP"><span class="bc">⚔️</span><span class="bl">PvP</span></button>
+<button class="bub b-expe afk-dest" id="afk-dest-expe" data-open="expe" aria-label="Expéditions" title="Expéditions"><span class="bc">🗺️</span><span class="bl">Expéditions</span></button>
+<button class="bub b-world afk-dest" id="afk-dest-world" data-open="bossMondial" aria-label="Boss mondial" title="Boss mondial"><span class="bc">🌍</span><span class="bl">Boss mondial</span></button>
+<button class="bub b-sim afk-dest" id="afk-dest-sim" data-open="sim" aria-label="Simulateur" title="Simulateur"><span class="bc">🎯</span><span class="bl">Simulateur</span></button>
+<button class="afk-menu-toggle" id="afk-menu-toggle" type="button" aria-label="Ouvrir le menu" aria-expanded="false">☰</button>
+<button class="afk-dev-toggle" id="afk-dev-toggle" type="button" aria-label="Activer le mode développeur" aria-pressed="false" title="Activer le mode développeur">DEV</button>
+<div class="afk-loot-top"><span>💰</span><b id="afk-count">0 Or</b><span class="afk-capacity" id="afk-capacity">Capacité : —</span><small id="afk-rate">+0 Or / sec</small></div>
+<div class="afk-bar"><i id="afk-bar"></i></div>
+<button class="btn-cyber" id="btn-harvest" type="button" aria-label="Récolter le butin AFK">Collect</button>
+<div class="pane ov" id="g-combat">
+<div class="end hidden" id="endscreen"><h2 id="end-title"></h2><p id="end-rewards"></p>
+<div class="pane" id="g-fiche">
+<div id="fx-actions"></div>
+<nav class="fx-pager" id="fx-pager">
+<div class="fx-h"><span>Arsenal</span><small id="fx-wcount"></small><button class="fx-mini" id="fx-rack-edit" type="button" hidden>Éditer le râtelier</button></div>
+<div class="fx-weapon-rack" id="fx-wrack" aria-label="Râtelier des armes débloquées"></div>
+<div class="fx-h" style="justify-content:center"><small id="fx-ccount"></small></div>
+<div class="fx-wgrid fx-cgrid" id="fx-comp"></div>
+<div class="fx-name-row" id="fx-name-row"><div class="fx-name" id="fx-name"></div><button class="fx-rename" id="fx-rename" type="button" title="Renommer le personnage" aria-label="Renommer le personnage">✒️</button></div>
+<div class="fx-tag" id="fx-tag"></div>
+<div class="fx-lv"><span class="fx-lvt" id="fx-lv"></span><div class="fx-xp"><i id="fx-xpbar"></i><span id="fx-xptxt"></span></div></div>
+<div class="fx-pv" id="fx-pv"></div>
+<div class="fx-stats" id="fx-stats"></div>
+<div class="fx-gear" id="fx-gear"></div>
+<div class="fx-h"><span>Compétences</span><small id="fx-scount"></small></div>
+<div class="fx-sgrid" id="fx-sgrid"></div>
+<div class="fx-panel fx-equip-tab" id="cs-equip-panel">
+<div class="fx-h"><span>Équipement & Cargos</span><small id="cs-eqcount"></small></div>
+<div id="cs-equip-root"></div>
+<div class="pane ov ov-sub" id="g-forge">
+<div class="pane ov" id="g-shop">
+<div class="pane ov" id="g-train">
+<div class="pane ov ov-sub" id="g-expe">
+<div class="pane ov" id="g-boss">
+
+=== JS CLASSES, FUNCTIONS & CONSTANTS ===
+
+--- js\core\data.js ---
+4: const assetPath = {
+31: class DataEngine {
+275: class CompanionData {
+320: class ProfileManager {
+380: if(!CompanionData.SPECIES[f.species]){
+395: class ForgeSystem {
+460: class GachaShop {
+
+--- js\core\main.js ---
+3: function uiDialog(title,body,buttons,escVal){
+21: for(;;){ const s=DataEngine.SKILLS[k], can=left>0&&b.gold>=1;
+32: function beginCharacterRename(){
+59: function startAfkButtonEditing(){
+61: if(!afkMenuPositions){
+71: let devMenuWasOpen = false;
+73: function toggleDevMode() {
+75: if (p) {
+162: if (button) {
+
+--- js\core\state.js ---
+8: const GameState = {
+23: _vierge(){
+36: _reset(){
+45: slotsPourNiveau(n){ n = +n || 1; return n >= 10 ? 3 : n >= 5 ? 2 : 1; },
+46: defaultRessources(){ return { or: 300, caisses: 0, energie: this.ENERGIE_MAX, parchemins: 0, nourriture: 0, pierres: 0 }; },
+47: _n(v, def = 0){ v = Math.floor(+v); return Number.isFinite(v) && v >= 0 ? v : def; },
+48: xpMaxPour(niveau){ return Math.floor(100 * Math.pow(1.11, (+niveau || 1) - 1)); },
+49: _lire(k){ try { return localStorage.getItem(k); } catch (e) { return null; } },   // localStorage peut être bloqué (iframe sandbox)
+52: _jourLocal(){
+56: verifierReset(){
+64: cle(t){
+71: attach(b){
+83: _normBrute(b){
+95: snapshot(){
+100: save(){
+105: charger(){
+127: migrer(){            // ancienne sauvegarde (ProfileManager, 5 socles) → on garde UNE brute
+140: recruter(cand){
+159: effacer(){
+178: appliquerDecor(){
+192: tauxOrAfk(){ return Math.max(1, Math.round((1 + 0.5 * (this.brute ? this.brute.niveau : 1)) * (this.vip ? 1.5 : 1))); },
+193: majRate(){ const el = $("#afk-rate"); if (el) el.textContent = "+" + this.tauxOrAfk() + " Or / sec"; },
+196: headerHTML(){
+202: rafraichir(){
+207: gagnerXp(q){
+223: donnerEquipement(n, o = {}){
+237: sauverPreset(n){
+241: chargerPreset(n){
+248: validerPalier(mode, n){
+281: brancherCargos(){
+293: acheterCaisse(){
+297: ouvrirCaisse(){
+320: boot(){
+344: function donnerRecompense(type, quantite, options){
+355: function depenserRessource(type, quantite){
+367: function calculerPuissance(b = GameState.brute){
+
+--- js\systems\afk.js ---
+3: const AFK_ASSETS={
+8: const AFKMode={
+15: centerX(){ return Math.max(0,(this.W-AFK_ASSETS.HERO_SIZE)/2); },
+16: moveHero(phase,to,speed){
+24: updateHero(c){
+34: drawHero(ctx,t){
+40: chooseAttack(){
+47: beginAttack(){
+53: resolveAttack(){
+62: fitStage(){
+72: setBg(b=S.cur){
+94: init(){
+102: initBrute(b){                                              // champs ajoutés aux anciennes sauvegardes
+106: harvest(){
+111: hud(){
+122: measure(){ if(this.field) this.W=this.field.clientWidth||300; },
+124: start(){
+133: stop(){ this.run=false; cancelAnimationFrame(this.raf); this.clearMinions(); },
+134: clearMinions(){
+138: spawnWave(){
+163: drawMinion(m,c){
+168: loop(t){
+174: rel(el,parent){                                            // rect de el relatif à la padding-box de parent
+179: at(d,x,y){                                                 // centre de d (layout) + translate x/y, dans le repère de son offsetParent
+183: fx(parent,x,y,css,to,ms){                                  // particule pixel : état initial css -> état final to
+191: step(dt){
+210: if (!d.initialized) {
+233: if (elapsed < freeze) {
+242: if (p >= 1) {
+250: if (d.mode === "rocket") {
+312: const BOSS_MODES={
+322: const BossModes={
+324: prepare(k){                                   // applique fond + textes du mode, appelée à l'ouverture
+333: showBoss(k,level=1){
+342: start(k){ /* TODO étapes suivantes : lancer le combat de boss k (Energy.spend(S.cur,BOSS_MODES[k].energyCost)) */ },
+343: stop(){ /* TODO : nettoyer le combat de boss en cours */ }
+
+--- js\systems\combat.js ---
+12: class BattleEngine {
+22: constructor(a,b,buffs=null){
+34: on(e,fn){ (this.h[e]=this.h[e]||[]).push(fn); return this; }
+35: emit(e,p){ p.type=e; (this.h[e]||[]).forEach(fn=>fn(p)); }
+37: useless(k,A,D){ const f=k.fx,s=A.st;
+40: step(){
+192: run(){ while(this.step()); return this.winner; }
+196: const Combat={
+199: lg(m,c){ const L=$("#log"),d=document.createElement("div"); d.textContent="> "+m; if(c) d.className=c; L.appendChild(d); while(L.children.length>400) L.removeChild(L.firstChild); L.scrollTop=L.scrollHeight; },
+200: cls(e){ return e.type==="on_hit"&&e.crit?"crit":e.type==="on_end"?"win":""; },
+201: setA(f,n,c){ if(f.anim!==n||n==="hit"||n==="dodge"){ f.anim=n; f.t0=c; } },
+203: lancer(cfg){
+233: startReady(competencesBonus=[]){
+241: relancer(){ if(this.cfg) this.lancer(this.cfg); },
+242: showPreview(){
+257: fondCanvas(fond,secours="#14110d"){
+270: creerEnnemi(def,niv,mult,role){
+277: construireFile(cfg){
+289: spawn(c,first){
+307: titre(){
+314: majTitre(){ $("#arena-title").textContent=this.titre(); },
+315: annonce(first){ this.majTitre(); this.lg((first?"Combat engagé : ":"Nouvel adversaire : ")+S.cur.name+" contre "+this.file[this.idx].brute.name+"."); },
+317: stepEng(){
+328: stop(){ this.act=false; this.ready=false; this.preview=false; this.ph=null; $("#g-combat").classList.remove("world-boss-screen","expedition-screen"); },
+347: next(c){
+372: impact(p,c){
+399: tick(c){
+436: tickPet(p,c,e,a){
+447: after(c){
+461: prop(p,c){   // propulsion critique : vol hors cadre, fondu au noir, arène secrète voisine
+473: skip(){
+490: rollDrop(b,en){
+501: finish(){
+543: init(){
+566: vitesse(){ let sp=ProfileManager.getSpeed(); if(sp===4&&!GameState.illimite){ sp=2; ProfileManager.setSpeed(2); } return sp; },
+568: majMonetisation(){
+578: patchRenderer(){
+595: initDevGroupUI(){
+680: const ENNEMIS_COMBAT={
+690: function placeholderEnnemi(ctx,b,t,anim,fi){            // dessin 64x64 : mêmes poses simulées que le cube d'origine
+697: if(b.placeholder==="boss"){
+722: function lancerCombat(config){ return Combat.lancer(config); }
+
+--- js\systems\pvp.js ---
+13: const PvP = {
+36: Q(s){ return document.querySelector(s); },
+39: elo(){ return GameState.reputation > 0 ? GameState.reputation : this.ELO_DEPART; },
+41: niveau(){ const b = GameState.brute; return Math.max(1, (b && (b.niveau || b.level)) || 1); },
+42: proba(eloJ, eloAdv){ return 1 / (1 + Math.pow(10, (eloAdv - eloJ) / 400)); },     // probabilité de victoire attendue du joueur
+43: deltaElo(victoire, eloJ, eloAdv){
+49: tickets(){
+55: bot(eloAdv, diff){
+75: tirerCibles(){
+86: lancer(k){
+96: fin(r){
+123: restant(){ return Math.max(0, GameState.saisonDebut + this.SAISON_MS - Date.now()); },
+144: fmt(ms){ const s = Math.floor(ms / 1000), h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60; return h + "h " + String(m).padStart(2, "0") + "m " + String(x).padStart(2, "0") + "s"; },
+145: majTimer(){
+149: majPanneau(){
+163: classementBracket(){
+175: ouvrirClassementBracket(){
+185: majActionsFin(){
+213: init(){
+
+--- js\systems\raids.js ---
+9: const Raids = {
+44: palierMax(mode){ return Math.min(this.PALIERS, GameState.boss[mode] + 1); },
+45: mur(p){ return p % 5 === 0; },                                                      // murs : paliers 5, 10, 15, 20
+46: niveauReco(p){ return Math.round(this.NIV_MIN + (p - 1) * (this.NIV_MAX - this.NIV_MIN) / (this.PALIERS - 1)); },
+47: statsPalier(p){                                                                     // points de stats des PNJ
+51: bossPalier(mode, p){
+58: puissanceReco(mode, p){
+62: lancerExpe(mode){
+75: finExpe(mode, p, r){
+105: dayNum(){ const d = new Date(); return Math.floor((d.getTime() - d.getTimezoneOffset() * 60000) / 86400000); },   // jour local
+106: ouvert(){ return new Date().getDay() !== 0; },                                                                  // fermé le dimanche
+107: rotation(){ return Math.floor(this.dayNum() / 3); },                                                            // change tous les 3 jours
+108: bossMondial(){ return this.MONDIAL[this.rotation() % this.MONDIAL.length]; },
+109: joursAvantRotation(){ return 3 - (this.dayNum() % 3); },
+110: monde(){                                                                                                        // clés (minuit) gérées par GameState ; ici : record par rotation
+116: classement(){
+122: tirer(n, exclu){                                                                                                // n compétences au hasard hors « exclu »
+127: carte(titre, ids, ov, cancellable=true){                                                                        // 3 cartes ; renvoie l'id choisi (null = annulé)
+195: finMondial(r){
+204: updateWorldBossEndActions(){
+210: ouvrirClassement(){
+231: fermerClassement(){
+238: ouvrir(mode){
+257: updateExpeEndActions(mode, p, premiereVictoire){
+295: rendre(){
+324: rendreMondial(box){
+
+--- js\systems\simulateur.js ---
+3: const TRAIN={
+17: keyName(k){ return this.NAMES[k]||(k[0].toUpperCase()+k.slice(1)); },
+18: hasSheet(k,sh){ const wid=this.F?.wpn?this.F.wpn.id:null; if(wid!==null&&wid>=0&&wid<=13) return !!renderer.loadImg(DataEngine.spriteBase(k,wid)); if(sh==="base") return true; return !!DataEngine.spriteSheet(k,sh); },
+19: mk(key,x,flip){ return {b:{sprite:key,hue:200,name:this.keyName(key),weapons:[]},name:this.keyName(key),x,bx:x,y:188,flip0:flip,flip,anim:"idle",t0:0,flash0:-1e6,hp:100,dh:100,lastHp:100,hit0:-1e6,max:100,win:false,air:0,wpn:null}; },
+24: build(){
+82: open(){
+86: stepChar(delta){
+96: syncTopbar(){
+104: pick(i){
+112: setDummy(){
+117: getWpnAnims(){
+123: triggerAction(kind){
+127: setWpn(){
+134: play(a){
+138: pickDecor(i){
+177: tick(t){
+
+--- js\ui\armurerie.js ---
+3: function enterGame(b){
+13: function persist(){ GameState.save(); renderGame(); GameState.majRate(); }
+14: function renderGame(){
+22: const FX={
+37: effects(fx){
+68: function fxFam(c){ return CompanionData.family(c)||{key:"?",icon:"🐾",name:c.name,stages:[c.name,c.name,c.name],spec:"Compagnon polyvalent"}; }
+69: function fxBuffs(){ try{ return ProfileManager.getBuffs(); }catch(e){ return null; } }
+72: function tipHTML(code){
+76: if(k==="w"){
+84: if(k==="s"){
+95: if(k==="c"){
+107: if(k==="f"){
+113: if(k==="st"){
+119: if(k==="g"){
+126: function hideTip(){ $("#wtip").classList.add("hidden"); }
+127: function showTip(el){
+147: const WEAPON_RACK_LAYOUT_KEY="arene_armory_layout_global_v2";
+148: let weaponRackEditing=false, weaponRackPositions=null, weaponRackDrag=null;
+149: function validRackPositions(p){
+152: function readWeaponRackPositions(){
+162: function saveWeaponRackPositions(){
+167: function rackPositionBounds(position,grid){
+173: function clampRackPosition(position,grid){
+180: function applyRackPosition(button,position,grid){
+191: function beginWeaponRackEditing(grid){
+194: if(!weaponRackPositions){
+201: function attachWeaponRackEditor(grid){
+246: function updateWeaponRackDevUI(){
+250: if(!bar){
+281: function fitWeaponRack(rack){
+288: const weaponRackObserver=typeof ResizeObserver==="undefined"?null:new ResizeObserver(entries=>entries.forEach(({target})=>fitWeaponRack(target)));
+289: const ARMORY_DEFAULT_LAYOUT=[{"id":0,"x":89.76,"y":50.13,"size":18,"angle":325,"flip":true},{"id":1,"x":10.12,"y":48.85,"size":15.5,"angle":35,"flip":false},{"id":2,"x":17.37,"y":38.34,"size":15.5,"angle":40,"flip":false},{"id":3,"x":25.96,"y":24.58,"size":20.5,"angle":65,"flip":true},{"id":4,"x":93.64,"y":34.3,"size":18.5,"angle":75,"flip":true},{"id":5,"x":82.95,"y":26.66,"size":16.5,"angle":-20,"flip":false},{"id":6,"x":82.89,"y":39.92,"size":16.5,"angle":75,"flip":false},{"id":7,"x":7,"y":35.58,"size":18.5,"angle":-72,"flip":false},{"id":8,"x":22.14,"y":78.19,"size":16,"angle":68,"flip":true},{"id":9,"x":81.49,"y":71.96,"size":21.5,"angle":297,"flip":true},{"id":10,"x":74.11,"y":22.56,"size":29,"angle":-10,"flip":false},{"id":11,"x":17.75,"y":94.21,"size":10,"angle":10,"flip":false},{"id":12,"x":23.28,"y":94.5,"size":10,"angle":-6,"flip":false},{"id":13,"x":28.37,"y":89.2,"size":12.5,"angle":11,"flip":true}];
+291: const ARMORY_HERO_KEY="arene_armory_hero_pos_v3";
+292: const ARMORY_HERO_DEFAULT={x:53.50,y:31.00,size:37.5,flip:false};
+293: let armoryHeroPos=null, armoryHeroDrag=null;
+295: function readArmoryHeroPos(){
+302: function saveArmoryHeroPos(){
+307: function applyArmoryHeroStage(stage){
+315: function attachArmoryHeroEditor(stage,rack){
+351: const armoryShowcase={bruteId:null,wid:null,anim:"idle",animStart:0,duration:900,loopRunning:false,lastToggle:false};
+353: function getArmoryWeaponAnim(w){
+354: if(!w){ armoryShowcase.lastToggle=!armoryShowcase.lastToggle; return armoryShowcase.lastToggle?"punch":"uppercut"; }
+365: function triggerArmoryWeaponPreview(b,wid){
+379: function startArmoryHeroLoop(){
+405: function renderFiche(b){
+416: if(armoryShowcase.bruteId!==b.id){
+434: if(armoryStage){
+
+--- js\ui\caserne.js ---
+11: const CaserneUI = {
+15: Q(s){ return document.querySelector(s); },
+16: esc(s){ return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); },
+19: slotsOuverts(){ return S.cur.slotsCompetences; },                       // 1 / 2 / 3 selon le niveau (state.js)
+20: equipees(){                                                             // liste équipée normalisée (possédées, uniques, ≤ slots, ≥ 1)
+36: preset(n, action){
+42: coutParchemin(){ return 1 + Math.floor(GameState.tentativesParchemins * 1.5); },  // 1, 2, 4, 5, 7, 8…
+69: actionCaisse(count = 1){
+105: equiperPiece(sig){
+146: render(){
+206: majUnlock(){
+212: describeGear(g){
+226: renderEquipementTab(){
+335: nourrir(key){
+345: peutForme3(c){ return c && c.form === 2 && c.level >= CompanionData.LEVEL_CAP && GameState.ressources.pierres >= 1; },  evoluerForme3(key){
+354: attacherEvo(key){                                                           // ajoute le panneau sous la frise existante
+382: init(){
+424: defaultSkillsPositions(){
+466: saveSkillsPositions(){
+474: applySkillItemPos(el, pos, stage){
+499: applySkillsLayout(){
+507: initSkillsDevUI(){
+602: defaultEquipPositions(){
+615: getEquipPositions(){
+630: saveEquipPositions(){
+638: applyEquipItemPos(el, pos, stage){
+656: applyEquipLayout(){
+664: initEquipDevUI(){
+767: function renderForge(){
+
+--- js\ui\character-select.js ---
+10: const CharacterSelect = (() => {
+138: function rollLoot(b){
+227: function genBrute(){ return CharacterSelect.genBrute(); }   // compat : combat.js et pvp.js l'appellent en global
+
+--- js\ui\compagnons.js ---
+4: const COMP_LAYOUT_PREFIX = "arene_companion_dev_layout_v2_";
+5: const HOLO_LAYOUT_PREFIX = "arene_comp_holo_layout_v2_";
+6: let compEditing = false, compPositions = null, compDrag = null;
+7: let holoPositions = null, holoDrag = null, activeCompSprite = null;
+9: const COMP_FROZEN = [
+25: const HOLO_FROZEN = [
+34: const COMP_DUMMY_TEMPLATE = [];
+35: const HOLO_DUMMY_TEMPLATE = [];
+38: const COMP_BRAWLER_OVERRIDES = {
+41: const HOLO_BRAWLER_OVERRIDES = {
+45: function defaultCompPositions(spriteKey) {
+55: function readCompPositions(spriteKey) {
+62: function saveCompPositions() {
+68: function defaultHoloPositions(spriteKey) {
+81: function readHoloPositions(spriteKey) {
+88: function saveHoloPositions() {
+94: function applyHoloItemPos(el, pos) {
+100: if (cv) {
+110: function applyCompPosition(btn, pos) {
+122: function updateCompDevUI() {
+126: if (!bar) {
+135: if (rst) {
+148: if (edit) {
+154: function attachCompEditor(stage) {
+200: function startCompIdleLoop() {
+267: function renderCompanionsPanel(b) {
+270: if (compPanel) {
+277: if (activeCompSprite !== sp) {
+302: const curComp = S.cur && S.cur.companion;
+303: const unlockedForm = (curComp && CompanionData.family(curComp) === f) ? (curComp.form || 1) : 0;
+315: const pos = holoPositions.find(p => p.id === el.dataset.holo);
+326: const btn = ev.target.closest("[data-fam]");
+329: const key = btn.dataset.fam;
+335: const el = ev.target.closest("[data-holo]"); if (!el) return;
+337: const pos = holoPositions.find(p => p.id === el.dataset.holo); if (!pos) return;
+343: const rect = compPanel.getBoundingClientRect();
+348: const endHolo = ev => { if (holoDrag && ev.pointerId === holoDrag.pointerId) { holoDrag = null; saveHoloPositions(); } };
+353: const el = ev.target.closest("[data-holo]"); if (!el) return;
+355: const pos = holoPositions.find(p => p.id === el.dataset.holo);
+360: const el = ev.target.closest("[data-holo]"); if (!el) return;
+362: const pos = holoPositions.find(p => p.id === el.dataset.holo); if (!pos) return;
+
+--- js\ui\devlayout.js ---
+9: const DevLayout = {
+11: isDev(){ return !!document.getElementById("devbox") || (typeof GameState !== "undefined" && !!GameState.illimite) || /[?&]dev\b/.test(location.search); },
+12: _init(){
+28: create(opt){
+
+--- js\ui\game-frame.js ---
+3: const GameFrame = (() => {
+
+--- js\ui\recorder.js ---
+3: const Recorder={
+5: init(){
+12: sync(){                                                    // accroche le bouton au panneau dev (recréé à chaque ouverture)
+26: label(){
+50: stop(){ if(this.rec&&this.rec.state!=="inactive") this.rec.stop(); },
+51: save(){
+
+--- js\ui\renderer.js ---
+3: class CanvasRenderer {
+85: constructor(){
+90: bind(canvas,getBrute){ canvas.getContext("2d").imageSmoothingEnabled=false; this.targets.push({canvas,getBrute}); }
+91: setSpeed(s){ this.speed=[1,2,4].includes(s)?s:1; }
+92: skip(){ if(this.arena) this.arena.skip(); }
+93: sprite(key,allowEnemy=false,wid=null){
+116: keyedSheet(src){
+149: drawBrute(ctx,b,t,anim="idle",fi=null,wid=null){
+180: loadImg(src){ if(!src) return null; const k="u|"+src; if(!this.imgs[k]){ const i=new Image(); i.onerror=()=>{i.failed=true}; i.src=encodeURI(src); this.imgs[k]=i; } const i=this.imgs[k]; return i.complete&&i.naturalWidth&&!i.failed?i:null; }
+181: pvpPreviewImg(){ const b=GameState.brute, k=b&&b.sprite; return this.loadImg(assetPath.pvpPreview(k||"general"))||this.loadImg(assetPath.pvpPreview("general")); }
+182: weaponSprite(b,id,onload=null){
+249: drawBossPortrait(ctx,img,x,y,size,bounds={x:88,y:12,w:104,h:108}){
+256: sheet(spr,s,wt=null){ return this.loadImg(DataEngine.spriteSheet(spr,s,wt)); }
+258: drawPet(ctx,f,an,n){
+266: freeze(ms){ this.frozen=performance.now()+ms; }   // freeze frame : l'horloge de jeu s'arrête
+267: animFrame(f,c){
+276: blit(ctx,f,c){
+287: drawArena(ctx,A,c){
+469: loop(t){
+
+--- js\ui\stats.js ---
+2: const StatsUI = {
+35: Q(s){ return document.querySelector(s); },
+38: coutEntrainement(){ return Math.floor(40 * Math.pow(1.08, GameState.achatsStats)); },
+39: entrainementMax(){ return GameState.achatsStats >= this.MAX_ACHATS_STATS; },
+40: entrainer(){
+52: initTrainRoom(t, b){
+66: lancerAnimTrain(stat){
+70: drawTrainRoom(ctx, b, now){
+156: render(){
+206: const rf = window.renderFiche;
+208: window.renderFiche = b => { rf(b); StatsUI.render(); };
+210: const st = document.createElement("style");
+340: getStatsCharKey(){
+344: loadStatsStore(){
+358: getStatsLayoutFor(charKey){
+371: saveStatsOverride(charKey, id, data){
+377: computeMatrix3d(w, h, pts){
+401: applyStatsItemPos(el, id, cfg, stage){
+433: renderStatsHandles(){
+453: applyStatsLayout(){
+462: initStatsDevUI(){
+568: const endDrag = ev => {
+583: const el = ev.target.closest("[data-st-item]"); if (!el) return;
+585: const ck = this.getStatsCharKey(), id = el.dataset.stItem;
+586: const cfg = this.getStatsLayoutFor(ck)[id]; if (!cfg) return;
+587: const d = (ev.deltaY || ev.deltaX) < 0 ? 1.03 : 0.97;
+589: const cx = cfg.quad.reduce((s, p) => s + p[0], 0) / 4;
+590: const cy = cfg.quad.reduce((s, p) => s + p[1], 0) / 4;
+
+--- js\ui\ui-core.js ---
+3: const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+4: const renderer=new CanvasRenderer();
+6: const S={cur:null,forgeKey:null};
+8: function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove("show"),2200)}
+9: function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+10: function seg(v,max,cls){let h=`<div class="seg ${cls}">`;const n=14,f=Math.ceil(v/max*n);for(let i=0;i<n;i++)h+=`<i class="${i<f?"on":""}"></i>`;return h+"</div>"}
+17: const OV={
+31: open(key){
+41: close(key){
+50: closeTop(){ const k=this.stack[this.stack.length-1]; if(k) this.close(k); },
+51: closeAll(){ while(this.stack.length) this.closeTop(); }
+54: const AFK_MENU_LAYOUT_KEY="arene_brutes_afk_menu_layout_v1";
+55: const AFK_MENU_FROZEN={
+65: const afkLayoutButtons=()=>Array.from($("#afk-menu")?.querySelectorAll(":scope > button")||[]).concat($("#btn-harvest")||[]);
+66: function validAfkMenuPositions(saved){
+72: function loadAfkMenuPositions(){
+83: let afkMenuPositions=loadAfkMenuPositions(), afkButtonDrag=null, afkClickToSuppress=null, afkLastOpenTs=0;function setAfkMenuOpen(open){
+89: function applyAfkButtonPosition(button,position){
+90: if(button.id==="btn-harvest"){
+99: function applyAfkMenuPositions(){
+107: function saveAfkMenuPositions(){
+109: catch(error){ console.error("Impossible de sauvegarder la disposition des boutons AFK.",error); }
+133: if(afkButtonDrag.moved){
+152: if(devToggle){ toggleDevMode(); return; }
+154: if(toggle){
+167: function gameTab(n){ const k={combat:"pvp",fiche:"caserne",forge:"forge",shop:"cargos",train:"sim"}[n]; if(k) OV.open(k); else OV.closeAll(); }
+171: const Caserne={
+173: portrait(){ return matchMedia("(orientation:portrait)").matches; },
+174: init(){
+201: layout(){
+204: go(d){ this.idx=(this.idx+d+this.N)%this.N; hideTip(); this.layout(); },
+205: snap(i){ this.idx=Math.max(0,Math.min(this.N-1,+i||0)); hideTip(); this.layout(); }
+208: function setTab(i){
+219: const Energy={
+221: init(b){ return this.sync(b); },  sync(b,now=Date.now()){
+232: fmt(ms){ const t=Math.ceil(ms/1000), m=Math.floor(t/60), s=t%60; return m+":"+String(s).padStart(2,"0"); },
+234: spend(b,n=1){
