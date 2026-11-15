@@ -266,6 +266,8 @@ function startCompIdleLoop() {
 
 function renderCompanionsPanel(b) {
   const E = FX.esc, c = b.companion, cf = c ? CompanionData.family(c) : null;
+  const roster = Array.isArray(b.companions) ? b.companions : (c ? [c] : []);
+  const findOwned = f => roster.find(x => x && CompanionData.family(x) === f) || null;
   const compPanel = $(".fx-panel.fx-comp"), stage = $("#fx-comp");
   if (compPanel) {
     compPanel.style.background = `url("${DataEngine.getCompanionBg(b.sprite)}") center/cover no-repeat`;
@@ -279,13 +281,30 @@ function renderCompanionsPanel(b) {
     compPositions = readCompPositions(sp) || defaultCompPositions(sp);
     holoPositions = readHoloPositions(sp) || defaultHoloPositions(sp);
   }
-  $("#fx-ccount").textContent = (cf ? 1 : 0) + "/" + CompanionData.FAMILIES.length;
+  const caps = (GameState.ressources && GameState.ressources.capsules) || 0;
+  const shards = b.dnaShards || 0;
+  const ccEl = $("#fx-ccount");
+  if (ccEl) ccEl.textContent = `${roster.length}/${CompanionData.FAMILIES.length}`;
+  if (compPanel) {
+    let incBar = compPanel.querySelector("#comp-incubate-bar");
+    if (!incBar) {
+      incBar = document.createElement("div");
+      incBar.id = "comp-incubate-bar";
+      Object.assign(incBar.style, { position: "absolute", left: "12px", bottom: "12px", zIndex: "30", display: "flex", alignItems: "center", gap: "6px" });
+      compPanel.appendChild(incBar);
+    }
+    incBar.innerHTML = `<button type="button" id="btn-incubate-cap" class="fx-btn" ${caps < 1 ? "disabled" : ""} style="padding:5px 10px;font-size:11px;cursor:pointer">🥚 Incuber (${caps})</button>`
+      + (shards > 0 ? `<span style="background:rgba(10,14,22,.85);border:1px solid #38bdf8;border-radius:4px;padding:4px 7px;font:bold 11px monospace;color:#7ffcf4" title="3 Éclats = 1 familier garanti">🧬 ${shards}/3</span>` : "");
+    const incBtn = incBar.querySelector("#btn-incubate-cap");
+    if (incBtn) incBtn.onclick = e => { e.stopPropagation(); if (typeof CaserneUI !== "undefined") CaserneUI.incuberCapsule(); };
+  }
   updateCompDevUI();
   if (!compPositions) compPositions = readCompPositions(sp) || defaultCompPositions(sp);
   stage.classList.toggle("is-editing", compEditing);
   stage.innerHTML = CompanionData.FAMILIES.map(f => {
-    const o = f === cf, form = o ? (c.form || 1) : 1, art = DataEngine.getCompanionArt(f.key, form);
-    return `<button class="fx-comp-pet ${o ? "owned" : "locked"}" data-fam="${f.key}" title="${E(f.name)}" aria-label="${o ? E(f.name) : "Famille inconnue"}"><canvas class="comp-cv" width="64" height="64" data-art="${E(art)}"></canvas></button>`;
+    const ownedObj = findOwned(f);
+    const o = !!ownedObj, eq = f === cf, form = o ? (ownedObj.form || 1) : 1, art = DataEngine.getCompanionArt(f.key, form);
+    return `<button class="fx-comp-pet ${o ? "owned" : "locked"} ${eq ? "equipped" : ""}" data-fam="${f.key}" title="${E(f.name)} — ${E(f.spec)}" aria-label="${o ? E(f.name) : "Famille inconnue"}"><canvas class="comp-cv" width="64" height="64" data-art="${E(art)}"></canvas></button>`;
   }).join("");
   requestAnimationFrame(() => {
     stage.querySelectorAll(".fx-comp-pet").forEach(btn => {
@@ -299,8 +318,8 @@ function renderCompanionsPanel(b) {
   let holo = compPanel && compPanel.querySelector(".comp-holo-stage");
   const showHolo = key => {
     const f = CompanionData.FAMILIES.find(x => x.key === key); if (!f || !holo) return;
-const curComp = S.cur && S.cur.companion;
-const unlockedForm = (curComp && CompanionData.family(curComp) === f) ? (curComp.form || 1) : 0;
+    const ownedObj = findOwned(f);
+    const unlockedForm = ownedObj ? (ownedObj.form || 1) : 0;
 holo.dataset.fam = key;
 holo.innerHTML = [
   `<div class="holo-step st1 ${unlockedForm > 0 ? "owned" : "locked"}" data-holo="st1"><canvas class="comp-cv" width="64" height="64" data-art="${E(DataEngine.getCompanionArt(key, 1))}"></canvas><span class="holo-lbl">${E(f.stages[0])}<small>Niv. ${CompanionData.EVO_LEVELS[0]}</small></span></div>`,

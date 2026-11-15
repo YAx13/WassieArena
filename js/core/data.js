@@ -262,11 +262,11 @@ class DataEngine {
     return st;
   }
 }
-// Chemins des brutes générés depuis assetPath
+// Chemins des brutes générés depuis assetPath (planches 1 à 4 uniquement)
 DataEngine.BRAWLERS.forEach(k => {
   DataEngine.SPRITES[k] = {
-    portrait: assetPath.portrait(k),
-    sprite:   assetPath.sprite(k),
+    portrait: "",
+    sprite:   "",
     planches: [1, 2, 3, 4].map(n => assetPath.sheet(k, n))
   };
 });
@@ -320,13 +320,9 @@ class CompanionData {
 class ProfileManager {
   static KEY = "arene_brutes_v1";
   static MAX = 5; static mem = null;
-  // Variables permanentes (hors slots) : elles survivent aux réinitialisations de niveau d'une Brute
   static norm(d){
     while(d.slots.length<this.MAX) d.slots.push(null);
     d.version=2;
-    if(typeof d.mutant_souls!=="number"||!isFinite(d.mutant_souls)||d.mutant_souls<0) d.mutant_souls=0;
-    const ab=(d.ascension_buffs&&typeof d.ascension_buffs==="object")?d.ascension_buffs:{};
-    d.ascension_buffs={hp:+ab.hp||1,str:+ab.str||1,agi:+ab.agi||1,spd:+ab.spd||1};   // multiplicateurs (1 = aucun bonus)
     const s=(d.settings&&typeof d.settings==="object")?d.settings:{};
     d.settings={speed:[1,2,4].includes(+s.speed)?+s.speed:1};
     return d;
@@ -338,10 +334,7 @@ class ProfileManager {
     }catch(e){}
     return this.norm(this.mem ? JSON.parse(JSON.stringify(this.mem)) : {slots:Array(this.MAX).fill(null)});
   }
-  static getSouls(){ return this.load().mutant_souls; }
-  static addSouls(n){ const d=this.load(); d.mutant_souls=Math.max(0,d.mutant_souls+Math.round(n)); this.save(d); return d.mutant_souls; }
-  static getBuffs(){ return this.load().ascension_buffs; }
-  static setBuff(stat,mult){ const d=this.load(); if(stat in d.ascension_buffs && mult>0){ d.ascension_buffs[stat]=mult; this.save(d); } return d.ascension_buffs; }
+  static getBuffs(){ return {hp:1,str:1,agi:1,spd:1}; }
   static getSpeed(){ return this.load().settings.speed; }
   static setSpeed(s){ const d=this.load(); d.settings.speed=[1,2,4].includes(s)?s:1; this.save(d); }
   static save(d){ this.mem=JSON.parse(JSON.stringify(d)); try{ localStorage.setItem(this.KEY, JSON.stringify(d)); return true; }catch(e){ return false; } }
@@ -458,7 +451,6 @@ class ForgeSystem {
 
 /* ================= GachaShop ================= */
 class GachaShop {
-  static PRICE = 100;
   static rollRarity(){
     const t=DataEngine.RARITIES.reduce((s,r)=>s+r.w,0); let x=Math.random()*t;
     for(const r of DataEngine.RARITIES){ if((x-=r.w)<0) return r.id; }
@@ -483,12 +475,5 @@ class GachaShop {
     const g=this.rollGear();
     brute.gear.push(g.item);
     return Object.assign({type:"gear"},g);
-  }
-  static open(brute){
-    if(brute.gold<this.PRICE) return {ok:false,msg:"Pas assez d’Or."};
-    brute.gold-=this.PRICE;
-    const result=this.roll(brute);
-    if(result.type==="dup") brute.gold+=25;
-    return Object.assign({ok:true},result);
   }
 }

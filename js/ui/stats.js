@@ -46,6 +46,8 @@ const StatsUI = {
     if (!depenserRessource("or", cout)) { toast("Or insuffisant (" + cout + " requis)."); return; }
     const k = DataEngine.pick(ouvertes), nom = { hp: "Vie", str: "Force", agi: "Agilité", spd: "Rapidité" }[k];
     b.stats[k]++; GameState.achatsStats++;
+    GameState.syncCanister();
+    GameState.canister.caserneActs = (GameState.canister.caserneActs || 0) + 1;
     this.lancerAnimTrain(k);
     persist(); toast("Entraînement : +1 " + nom + " !");
   },
@@ -172,6 +174,11 @@ const StatsUI = {
     }
     const statsGold = this.Q("#cs-stats-gold");
     if (statsGold) statsGold.textContent = "🪙 " + R.or.toLocaleString("fr-FR") + " Or";
+
+    const lvt = this.Q("#cs-stats-crt .fx-lvt");
+    if (lvt && b.level >= GameState.NIVEAU_MAX && (b.paragon || 0) > 0) {
+      lvt.textContent = `NIV. ${b.level} · P.${b.paragon}`;
+    }
 
     const pw = this.Q("#cs-power");
     if (pw) {

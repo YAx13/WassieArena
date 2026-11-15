@@ -12,13 +12,12 @@ const GameState = {
   NIVEAU_MAX: 50,
   PALIERS: 20,                       // paliers par Boss (source unique, lue par Raids)
   MAITRISE_MAX: 10,
-  get PRIX_CAISSE(){ return GachaShop.PRICE; },
   vip: false,
   get illimite(){ return this.vip || !!document.getElementById("devbox"); },   // x4 + Skip illimités : Pass VIP ou mode développeur (#devbox)
 
   /* Clés persistées (hors brute) : snapshot() les lit telles quelles */
   SAVED: ["ressources", "energieTs", "achatsStats", "tentativesParchemins", "reputation", "saisonDebut", "monde", "vip",
-          "ticketsPvp", "skipsGratuits", "jourReset", "maitriseArmes", "competencesEquipees", "presets", "boss", "queteCompagnon"],
+          "ticketsPvp", "skipsGratuits", "jourReset", "maitriseArmes", "competencesEquipees", "presets", "boss", "queteCompagnon", "canister"],
 
   _vierge(){
     return {
@@ -30,7 +29,8 @@ const GameState = {
       reputation: 1000,
       maitriseArmes: {},
       ticketsPvp: 5, skipsGratuits: 3,
-      queteCompagnon: false
+      queteCompagnon: false,
+      canister: { cycle: "", pvpWins: 0, wbKeys: 0, expeClears: 0, caserneActs: 0 }
     };
   },
   _reset(){
@@ -43,27 +43,45 @@ const GameState = {
   get competencesDebloquees(){ return this.brute ? this.brute.skills : []; },
 
   slotsPourNiveau(n){ n = +n || 1; return n >= 10 ? 3 : n >= 5 ? 2 : 1; },
-  defaultRessources(){ return { or: 300, caisses: 0, energie: this.ENERGIE_MAX, parchemins: 0, nourriture: 0, pierres: 0 }; },
+  defaultRessources(){ return { or: 300, caisses: 0, energie: this.ENERGIE_MAX, parchemins: 0, nourriture: 0, pierres: 0, capsules: 0 }; },
   _n(v, def = 0){ v = Math.floor(+v); return Number.isFinite(v) && v >= 0 ? v : def; },
   xpMaxPour(niveau){ return Math.floor(100 * Math.pow(1.11, (+niveau || 1) - 1)); },
   _lire(k){ try { return localStorage.getItem(k); } catch (e) { return null; } },   // localStorage peut être bloqué (iframe sandbox)
 
-  /* ---- Quotidien : minuit, heure locale (tickets, skips, clés du Boss Mondial) ---- */
+  /* ---- Quotidien : minuit local (tickets/clés) + 01:00 UTC (Canister AFK) ---- */
   _jourLocal(){
     const d = new Date(), p = n => String(n).padStart(2, "0");
     return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
   },
+  _cycleCanisterUtc(now = Date.now()){
+    const d = new Date(now - 3600000);
+    return d.getUTCFullYear() + "-" + String(d.getUTCMonth() + 1).padStart(2, "0") + "-" + String(d.getUTCDate()).padStart(2, "0");
+  },
+  syncCanister(){
+    const c = this._cycleCanisterUtc();
+    if (!this.canister || typeof this.canister !== "object") this.canister = this._vierge().canister;
+    if (this.canister.cycle !== c) {
+      this.canister = { cycle: c, pvpWins: 0, wbKeys: 0, expeClears: 0, caserneActs: 0 };
+      return true;
+    }
+    return false;
+  },
   verifierReset(){
-    const j = this._jourLocal(); if (this.jourReset === j) return false;
-    this.jourReset = j; this.ticketsPvp = 5; this.skipsGratuits = 3; this.monde.cles = 2;
-    if (this.brute) this.save();
-    return true;
+    let changed = this.syncCanister();
+    const j = this._jourLocal();
+    if (this.jourReset !== j) {
+      this.jourReset = j; this.ticketsPvp = 5; this.skipsGratuits = 3; this.monde.cles = 2;
+      changed = true;
+    }
+    if (changed && this.brute) this.save();
+    return changed;
   },
 
   /* Alias de types acceptés par donnerRecompense / depenserRessource */
   cle(t){
     const m = { or: "or", gold: "or", caisse: "caisses", caisses: "caisses", energie: "energie", "énergie": "energie", energy: "energie",
-      parchemin: "parchemins", parchemins: "parchemins", nourriture: "nourriture", pierre: "pierres", pierres: "pierres", transmutation: "pierres" };
+      parchemin: "parchemins", parchemins: "parchemins", nourriture: "nourriture", pierre: "pierres", pierres: "pierres", transmutation: "pierres",
+      capsule: "capsules", capsules: "capsules", oeuf: "capsules", adn: "capsules" };
     return m[String(t || "").trim().toLowerCase()] || null;
   },
 
@@ -83,13 +101,21 @@ const GameState = {
   _normBrute(b){
     b.level = Math.min(this.NIVEAU_MAX, Math.max(1, Math.floor(+b.level) || 1));
     if (!Number.isFinite(b.xp)) b.xp = 0;
+    b.paragon = Math.max(0, Math.floor(+b.paragon) || 0);
+    b.paragonXp = Math.max(0, Math.floor(+b.paragonXp) || 0);
     b.hasBeenRenamed = b.hasBeenRenamed === true;
-    b.xpMax = this.xpMaxPour(b.level);
+    b.xpMax = b.level >= this.NIVEAU_MAX ? this.paragonXpPour(b.paragon) : this.xpMaxPour(b.level);
     ["weapons", "gear", "skills"].forEach(k => { if (!Array.isArray(b[k])) b[k] = []; });
     b.weapons = b.weapons.filter(id => Number.isInteger(id) && id >= 0 && id < DataEngine.WEAPONS.length);
     if (!Number.isFinite(b.afkTs) || b.afkTs > Date.now()) b.afkTs = Date.now();
+    b.afkWave = Math.max(1, Math.floor(+b.afkWave) || 1);
+    b.afkWaveMax = Math.max(b.afkWave, Math.floor(+b.afkWaveMax) || 1);
+    b.dnaShards = Math.max(0, Math.floor(+b.dnaShards) || 0);
+    if (!Array.isArray(b.companions)) b.companions = b.companion ? [b.companion] : [];
+    if (b.companion && !b.companions.some(c => c && c.species === b.companion.species)) b.companions.unshift(b.companion);
     return b;
   },
+  paragonXpPour(p){ return Math.floor(15000 * Math.pow(1.08, Math.max(0, +p || 0))); },
 
   /* ---- Sauvegarde / chargement : un seul objet dans localStorage ---- */
   snapshot(){
@@ -119,6 +145,7 @@ const GameState = {
     this.maitriseArmes = {}; Object.keys(d.maitriseArmes || {}).forEach(k => { if (+k >= 0 && +k < DataEngine.WEAPONS.length) this.maitriseArmes[k] = Math.min(this.MAITRISE_MAX, this._n(d.maitriseArmes[k])); });
     this.presets = Object.assign(v.presets, d.presets);
     this.monde = Object.assign(v.monde, d.monde); this.monde.cles = this._n(this.monde.cles, 2); this.monde.record = this._n(this.monde.record);
+    this.canister = Object.assign(v.canister, d.canister);
     this.brute = this.attach(this._normBrute(d.brute));
     this.competencesEquipees = Array.isArray(d.competencesEquipees) ? d.competencesEquipees : this.brute.skills.slice(0, this.brute.slotsCompetences);
     this.verifierReset();
@@ -178,7 +205,8 @@ const GameState = {
   appliquerDecor(){
     const b = this.brute, st = $("#afk-stage"); if (!b || !st) return;
     let key = String(b.sprite || "").toLowerCase();
-    DataEngine.BRAWLERS.forEach(k => { if (key.startsWith(k)) key = k; });   // "samouraiplanche1" → "samourai" (même logique que l'ancienne sécurité)
+    DataEngine.BRAWLERS.forEach(k => { if (key.startsWith(k)) key = k; });
+    if (!key || key === "dummy") key = "general";
     const essayer = (exts) => {
       if (!exts.length) { st.style.removeProperty("--afk-bg-img"); return; }   // image absente : fond uni
       const img = new Image();
@@ -196,28 +224,44 @@ const GameState = {
   headerHTML(){
     const R = this.ressources, f = n => n.toLocaleString("fr-FR");
     return `<div class="chip">⚡ ${R.energie}/${this.ENERGIE_MAX}</div><div class="chip">🪙 ${f(R.or)} Or</div><div class="chip">⚔️ ${f(calculerPuissance())}</div>` +
-      `<div class="chip" title="Caisses Wass-E">📦 ${R.caisses}</div><div class="chip" title="Parchemins de compétence">📜 ${R.parchemins}</div>` +
-      `<div class="chip" title="Nourriture compagnon">🍖 ${R.nourriture}</div><div class="chip" title="Pierres de Transmutation">💎 ${R.pierres}</div>`;
+      `<div class="chip" title="Caisses Wass-E (Drones & Paliers)">📦 ${R.caisses}</div><div class="chip" title="Parchemins de compétence">📜 ${R.parchemins}</div>` +
+      `<div class="chip" title="Nourriture compagnon">🍖 ${R.nourriture}</div><div class="chip" title="Pierres de Transmutation">💎 ${R.pierres}</div>` +
+      `<div class="chip" title="Capsules de Stase (nouveaux compagnons)">🥚 ${R.capsules || 0}</div>`;
   },
   rafraichir(){
     if (S.cur) renderGame();
     AFKMode.hud(); this.majRate(); this.majCargos();
   },
-  /* ---- XP (Brute + compagnon) : donnerRecompense("xp") ---- */
+  /* ---- XP (Brute + Parangon infini après niv. 50) : donnerRecompense("xp") ---- */
   gagnerXp(q){
-    const b = this.brute, st = [], recompenses = []; let niveaux = 0;
-    if (b.level < this.NIVEAU_MAX) b.xp += q;
-    while (b.level < this.NIVEAU_MAX && b.xp >= this.xpMaxPour(b.level)) {
-      b.xp -= this.xpMaxPour(b.level); b.level++; niveaux++;
-      for (let i = 0; i < 2; i++) { const k = DataEngine.pick(["hp", "str", "agi", "spd"]); b.stats[k]++; st.push(k); }   // +2 points, sans plafond
-      if (b.level % 5 === 0) { this.ressources.caisses++; this.ressources.parchemins++; recompenses.push(b.level); }       // paliers 5, 10… : +1 caisse, +1 parchemin
+    const b = this.brute, st = [], recompenses = []; let niveaux = 0, paragonUps = 0;
+    if (b.level < this.NIVEAU_MAX) {
+      b.xp += q;
+      while (b.level < this.NIVEAU_MAX && b.xp >= this.xpMaxPour(b.level)) {
+        b.xp -= this.xpMaxPour(b.level); b.level++; niveaux++;
+        for (let i = 0; i < 2; i++) { const k = DataEngine.pick(["hp", "str", "agi", "spd"]); b.stats[k]++; st.push(k); }
+        if (b.level % 5 === 0) { this.ressources.caisses++; this.ressources.parchemins++; recompenses.push(b.level); }
+      }
     }
-    if (b.level >= this.NIVEAU_MAX) b.xp = 0;
-    b.xpMax = this.xpMaxPour(b.level);
+    if (b.level >= this.NIVEAU_MAX) {
+      const overflow = niveaux > 0 ? b.xp : q;
+      b.xp = 0;
+      b.paragon = Math.max(0, Math.floor(+b.paragon) || 0);
+      b.paragonXp = (Math.max(0, Math.floor(+b.paragonXp) || 0)) + overflow;
+      while (b.paragonXp >= this.paragonXpPour(b.paragon)) {
+        b.paragonXp -= this.paragonXpPour(b.paragon);
+        b.paragon++;
+        paragonUps++;
+      }
+      b.xp = b.paragonXp;
+      b.xpMax = this.paragonXpPour(b.paragon);
+    } else {
+      b.xpMax = this.xpMaxPour(b.level);
+    }
     const evolution = false;
     this.save(); this.rafraichir();
     this.verifierQueteCompagnon();
-    return { xp: q, niveaux, stats: st, recompenses, evolution };
+    return { xp: q, niveaux, paragonUps, stats: st, recompenses, evolution };
   },
   /* ---- Équipement : donnerRecompense("equipement", n, { rarite, part }) ---- */
   donnerEquipement(n, o = {}){
@@ -277,22 +321,17 @@ const GameState = {
     return true;
   },
 
-  /* ---- Cargos Wass-E : acheter (GachaShop.PRICE Or → +1 caisse) puis ouvrir ---- */
+  /* ---- Cargos Wass-E : obtenus gratuitement via Drones AFK et paliers de niveau ---- */
   brancherCargos(){
-    const btn = $("#btn-chest"); if (!btn) return;
-    btn.textContent = "📦 Acheter une Caisse Wass-E : " + GachaShop.PRICE + " Or";
-    btn.onclick = () => this.acheterCaisse();
+    const btn = $("#btn-chest"); if (btn) btn.style.display = "none";
     let ob = $("#btn-chest-open");
-    if (!ob) { ob = document.createElement("button"); ob.id = "btn-chest-open"; ob.className = btn.className.replace("gold", "").trim(); btn.after(ob); }
-    ob.onclick = () => this.ouvrirCaisse();
+    if (!ob && btn) { ob = document.createElement("button"); ob.id = "btn-chest-open"; ob.className = btn.className.replace("gold", "").trim(); btn.after(ob); }
+    if (ob) ob.onclick = () => this.ouvrirCaisse();
     this.majCargos();
-  },  majCargos(){
+  },
+  majCargos(){
     const ob = $("#btn-chest-open"); if (!ob || !this.ressources) return;
     ob.textContent = "🔓 Ouvrir une Caisse (" + this.ressources.caisses + ")"; ob.disabled = this.ressources.caisses < 1;
-  },
-  acheterCaisse(){
-    if (!depenserRessource("or", GachaShop.PRICE)) { toast("Pas assez d’Or."); return; }
-    donnerRecompense("caisses", 1); toast("Caisse Wass-E volée !");
   },
   ouvrirCaisse(){
     if (this.ressources.caisses < 1) { toast("Aucune caisse à ouvrir."); return; }
@@ -363,14 +402,53 @@ function depenserRessource(type, quantite){
   return ok;
 }
 
-/* Score de Puissance (joueur par défaut, ou ennemi : b.skills, pas de maîtrise d'armes). Les stats incluent le bonus d'équipement. */
+/* Score de Puissance (6 chiffres en ~1 sem., 7 chiffres en ~1,5 mois via couches multiplicatives méta) */
 function calculerPuissance(b = GameState.brute){
   if (!b) return 0;
   const GS = GameState, joueur = b === GS.brute, st = b.stats || {}, armes = b.weapons || [];
+  const skills = joueur ? GS.competencesEquipees : (b.skills || []);
   const v = k => (+st[k] || 0) + DataEngine.gearBonus(b, k);
-  let p = v("hp") * 2 + v("str") * 15 + v("agi") * 12 + v("spd") * 12;
-  p += 150 * (joueur ? GS.competencesEquipees : (b.skills || [])).length + 100 * armes.length;
-  if (joueur) armes.forEach(id => p += 50 * (GS.maitriseArmes[id] || 0));
-  if (b.companion) p += (+b.companion.level || 0) * 40 + (b.companion.form || 1) * 250;
-  return Math.round(p);
+
+  // 1. Puissance de base (Stats + Compétences + Arsenal + Maîtrise)
+  let base = v("hp") * 8 + v("str") * 45 + v("agi") * 38 + v("spd") * 38;
+  base += 650 * skills.length + 450 * armes.length;
+  let masteryMult = 1;
+  if (joueur) {
+    let totalM = 0;
+    armes.forEach(id => { totalM += (GS.maitriseArmes[id] || 0); });
+    masteryMult += totalM * 0.015; // jusqu'à +210% avec 14 armes à +10
+  }
+
+  // 2. Multiplicateur de Rareté d'Équipement & Sets (2/4 et 4/4)
+  let gearMult = 1;
+  (b.gear || []).forEach(g => {
+    if (!g) return;
+    const r = Math.max(0, +g.rarity || 0);
+    gearMult += [0.03, 0.07, 0.14, 0.25, 0.42, 0.68][Math.min(5, r)];
+  });
+  let setMult = 1;
+  DataEngine.getActiveSetBonuses(b).forEach(sb => {
+    setMult *= sb.tier === 4 ? 1.45 : 1.18;
+  });
+
+  // 3. Multiplicateur de Synergies Élémentaires
+  let synMult = 1;
+  DataEngine.getAllSynergies(b, skills).forEach(syn => {
+    synMult *= 1 + 0.14 * (syn.idx + 1);
+  });
+
+  // 4. Bonus de Collection & Évolution des Compagnons (tactique RPS + progression globale)
+  let compMult = 1;
+  if (b.companion) {
+    compMult += (+b.companion.level || 1) * 0.015 + ((b.companion.form || 1) - 1) * 0.15;
+  }
+  if (joueur && Array.isArray(b.companions) && b.companions.length > 1) {
+    compMult += (b.companions.length - 1) * 0.08; // +8% par compagnon supplémentaire dans le labo
+  }
+
+  // 5. Niveau Brute & Parangon infini (+2% par niveau Parangon après niv. 50)
+  const levelMult = 1 + Math.max(0, (+b.level || 1) - 1) * 0.035;
+  const paragonMult = 1 + (Math.max(0, +b.paragon || 0)) * 0.02;
+
+  return Math.round(base * masteryMult * gearMult * setMult * synMult * compMult * levelMult * paragonMult);
 }

@@ -49,15 +49,15 @@ const Raids = {
     return { ptsBase, sbires: .55 * ptsBase, boss: 1.15 * ptsBase * (this.mur(p) ? 1.35 : 1) };
   },
   bossPalier(mode, p){
-    const s = this.statsPalier(p), rar = Math.min(4, Math.floor((p - 1) / 4));
-    const equipement = DataEngine.PARTS.map(pt => ({ part: pt.id, rarity: rar, rarite: rar }));
+    const s = this.statsPalier(p), rar = Math.min(5, Math.floor((p - 1) / 3.5));
+    const equipement = DataEngine.PARTS.map(pt => ({ part: pt.id, rarity: rar, rarite: rar, set: ["carnage", "cyber", "mutant"][p % 3] }));
     return Object.assign({}, this.EXPE[mode].boss, { pvMult: this.mur(p) ? 2.0 : 1.6, palier: p, niveau: this.niveauReco(p),
       points: s.boss, stats: s.boss, equipement, equipment: equipement });
   },
-  /* Puissance recommandée : les points du boss sont répartis sur 4 stats (supprimer le /4 si le combat les applique par stat) */
+  /* Puissance recommandée : alignée sur la courbe 6-7 chiffres de calculerPuissance() */
   puissanceReco(mode, p){
     const b = this.bossPalier(mode, p), q = b.points / 4;
-    return calculerPuissance({ stats: { hp: q, str: q, agi: q, spd: q }, gear: b.equipement, weapons: [], skills: [] });
+    return calculerPuissance({ level: b.niveau, stats: { hp: q, str: q, agi: q, spd: q }, gear: b.equipement, weapons: [0, 1].slice(0, Math.min(2, Math.floor(p / 6))), skills: [0, 1, 2].slice(0, Math.min(3, 1 + Math.floor(p / 6))) });
   },
   lancerExpe(mode){
     const c = this.EXPE[mode], p = this.sel[mode]; if (!S.cur || Combat.act) return;
@@ -75,6 +75,8 @@ const Raids = {
   finExpe(mode, p, r){
     const D = DataEngine, GS = GameState; let txt, premiereVictoire = false;
     if (r.victoire) {
+      GS.syncCanister();
+      GS.canister.expeClears = (GS.canister.expeClears || 0) + 1;
       premiereVictoire = (GS.boss[mode] || 0) < p;
       GS.validerPalier(mode, p);
       const xp = 80 * p, lv = donnerRecompense("xp", xp).niveaux; let drop;
@@ -185,6 +187,8 @@ const Raids = {
     }
     const keysBeforeFight = current.cles;
     current.cles--;
+    GameState.syncCanister();
+    GameState.canister.wbKeys = (GameState.canister.wbKeys || 0) + 1;
     Combat.cfg.allowSkip = keysBeforeFight === 1;
     GameState.save();
     this.updateWorldBossEndActions();

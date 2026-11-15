@@ -2,12 +2,6 @@
 /* simulateur.js : mode Entraînement (Simulateur) avec sélecteur de décors fonctionnel */
 const TRAIN={
   NAMES:{dummy:"Dummy (Greybox)",general:"Général",empereur:"Empereur",inversebrah:"Inversebrah",hazmat:"Hazmat",momie:"Momie",samourai:"Samourai",zeus:"Zeus",frankenstein:"Frankenstein",human:"Humain"},
-  GROUPS:[
-    ["Base (planche 1)",[["idle","🧍","Repos"],["dash","🏃","Dash"],["dodge","💨","Esquive"],["hit","💥","Touché"],["death","💀","Mort"]]],
-    ["Attaques (planche 2)",[["punch","👊","Poing"],["thrust","🗡️","Estoc"],["overhead","🪓","Frappe haute"],["throw","🎯","Lancer"]]],
-    ["Critiques (planche 3)",[["uppercut","⬆️","Uppercut"],["pierce","🔱","Perforation"],["meteor","☄️","Météore"],["salto","🤸","Salto"]]],
-    ["Dresseur (planche 4)",[["whistle","📣","Sifflet"],["surprise","❗","Surprise"],["taunt","😏","Provocation"],["victory","🏆","Victoire"]]]
-  ],
   built:false, keys:[], idx:0, cur:"idle", mult:1, paused:false, clock:0, last:0, A:null, F:null, D:null,
   
   // LOGIQUE INTERNE POUR LA NAVIGATION DES DÉCORS
@@ -15,7 +9,6 @@ const TRAIN={
   decorIdx: 0,
 
   keyName(k){ return this.NAMES[k]||(k[0].toUpperCase()+k.slice(1)); },
-  hasSheet(k,sh){ const wid=this.F?.wpn?this.F.wpn.id:null; if(wid!==null&&wid>=0&&wid<=13) return !!renderer.loadImg(DataEngine.spriteBase(k,wid)); if(sh==="base") return true; return !!DataEngine.spriteSheet(k,sh); },
   mk(key,x,flip){ return {b:{sprite:key,hue:200,name:this.keyName(key),weapons:[]},name:this.keyName(key),x,bx:x,y:188,flip0:flip,flip,anim:"idle",t0:0,flash0:-1e6,hp:100,dh:100,lastHp:100,hit0:-1e6,max:100,win:false,air:0,wpn:null}; },
   
  editTarget: "hero",

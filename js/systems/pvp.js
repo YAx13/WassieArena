@@ -98,6 +98,10 @@ const PvP = {
     const eloAdv = c ? c.elo : eloAvant;
     const delta = this.deltaElo(r.victoire, eloAvant, eloAdv);
     GS.reputation = Math.max(0, eloAvant + delta);
+    if (r.victoire) {
+      GS.syncCanister();
+      GS.canister.pvpWins = (GS.canister.pvpWins || 0) + 1;
+    }
     const or = (r.victoire ? this.OR_VICTOIRE : this.OR_DEFAITE) * this.niveau();
     donnerRecompense("or", or);
     GS.save();

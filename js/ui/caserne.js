@@ -68,13 +68,12 @@ const CaserneUI = {
 /* ---------- 2b. CAISSES EN 1 CLIC & MULTI-TIRAGE, ÉQUIPEMENT PVP & FORGE ---------- */
   actionCaisse(count = 1){
     const GS = GameState, b = S.cur; if (!b) return;
-    const target = Math.max(1, Math.min(50, count | 0));
+    const stock = GS.ressources.caisses || 0;
+    if (stock <= 0) { toast("Aucune Caisse en stock. Interceptez des Drones AFK !"); return; }
+    const target = Math.max(1, Math.min(50, Math.min(stock, count | 0)));
     let opened = 0, gearCnt = 0, weapCnt = 0, dupCnt = 0, bestRar = -1;
-        for (let i = 0; i < target; i++) {
-      if ((GS.ressources.caisses || 0) <= 0) {
-        if (!depenserRessource("or", GS.PRIX_CAISSE)) break;
-        donnerRecompense("caisses", 1);
-      }
+    for (let i = 0; i < target; i++) {
+      if ((GS.ressources.caisses || 0) <= 0) break;
       if (target === 1) {
         GS.ouvrirCaisse();
         const resEl = this.Q("#chest-result");
@@ -83,8 +82,7 @@ const CaserneUI = {
         break;
       }
       GS.ressources.caisses--;
-      const r = GachaShop.open(b);
-      if (!r || !r.ok) { GS.ressources.caisses++; break; }
+      const r = GachaShop.roll(b);
       opened++;
       if (r.type === "gear") { gearCnt++; bestRar = Math.max(bestRar, r.rarity); }
       else if (r.type === "weapon") { weapCnt++; }
@@ -95,7 +93,7 @@ const CaserneUI = {
         else GS.ressources.parchemins++;
       }
     }
-    if (!opened) { toast("Or insuffisant (" + GS.PRIX_CAISSE + " Or requis)."); return; }
+    if (!opened) return;
     if (opened > 1) {
       const rarTag = bestRar >= 0 ? ` · Max <b style="color:${DataEngine.RARITIES[bestRar].color}">${DataEngine.RARITIES[bestRar].name}</b>` : "";
       this._lastChestHTML = `📦 <b>×${opened}</b> : ${gearCnt} pièce(s)${weapCnt ? `, ${weapCnt} arme(s)` : ""}${dupCnt ? `, ${dupCnt} doublon(s) → maîtrise` : ""}${rarTag}`;      toast(`Ouverture ×${opened} terminée !`);
@@ -237,9 +235,9 @@ const CaserneUI = {
     if (cnt) cnt.textContent = (b.gear ? b.gear.length : 0) + " pièce(s)";
 
     const hasStock = (R.caisses || 0) > 0;
-    const lcdText = hasStock ? `STOCK ×${R.caisses}` : `${GameState.PRIX_CAISSE} OR`;
-    const btnDis = !hasStock && R.or < GameState.PRIX_CAISSE ? "disabled" : "";
-    const maxOpen = Math.min(50, (R.caisses || 0) + Math.floor((R.or || 0) / GameState.PRIX_CAISSE));
+    const lcdText = hasStock ? `STOCK ×${R.caisses}` : "VIDE (DRONES)";
+    const btnDis = !hasStock ? "disabled" : "";
+    const maxOpen = Math.min(50, R.caisses || 0);
     const n10 = Math.min(10, maxOpen);
 
     const slotsDef = [
@@ -331,10 +329,72 @@ const CaserneUI = {
       btn.onclick = e => { e.stopPropagation(); this.transmuterGroupe(btn.dataset.tr); };
     });
   },
-/* ---------- 4. COMPAGNON : Nourriture + évolution Forme 3 (pop-up Évolutions) ---------- */
+/* ---------- 4. COMPAGNONS : Incubation (🥚), Équipement RPS, Nourriture & Forme 3 ---------- */
+  getOwnedComp(key){
+    const b = S.cur; if (!b) return null;
+    const f = CompanionData.FAMILIES.find(x => x.key === key); if (!f) return null;
+    const list = Array.isArray(b.companions) ? b.companions : (b.companion ? [b.companion] : []);
+    return list.find(x => x && CompanionData.family(x) === f) || null;
+  },
+  equiperCompagnon(key){
+    const b = S.cur, target = this.getOwnedComp(key);
+    if (!b || !target) return;
+    b.companion = target;
+    persist();
+    toast(`🐾 ${target.name} est maintenant votre compagnon actif !`);
+  },
+  async incuberCapsule(){
+    const b = S.cur; if (!b) return;
+    if (!Array.isArray(b.companions)) b.companions = b.companion ? [b.companion] : [];
+    const locked = CompanionData.FAMILIES.filter(f => !b.companions.some(x => x && CompanionData.family(x) === f));
+    if (!locked.length) {
+      if (!depenserRessource("capsules", 1)) { toast("Aucune Capsule de Stase (🥚)."); return; }
+      donnerRecompense("nourriture", 20);
+      toast("Tous les compagnons sont déjà débloqués → +20 🍖 Nourriture !");
+      return;
+    }
+    if (!depenserRessource("capsules", 1)) { toast("Aucune Capsule de Stase (🥚)."); return; }
+
+    // Pitié anti-malchance : 3 éclats d'ADN garantissent une famille manquante
+    if ((b.dnaShards || 0) >= 3) {
+      b.dnaShards = 0;
+      const pick = DataEngine.pick(locked);
+      const created = CompanionData.create(pick.species || pick.key);
+      b.companions.push(created);
+      if (!b.companion) b.companion = created;
+      persist();
+      await uiDialog("🧬 SYNTHÈSE GARANTIE !", `${pick.icon} ${created.name} rejoint votre laboratoire !\nSpécialité : ${pick.spec}`, [["Super !", true]], true);
+      return;
+    }
+
+    // Tirage pondéré par rareté de famille (Commun 65% / Rare 28% / Mythique 7%)
+    const tiers = {
+      common: ["chien", "loup", "ours", "serpent", "oiseau", "felin"],
+      rare:   ["taureau", "arthropode", "aquatique", "lezard", "chimere"],
+      mythic: ["spectre", "tempete"]
+    };
+    const roll = Math.random();
+    const poolKeys = roll < 0.07 ? tiers.mythic : roll < 0.35 ? tiers.rare : tiers.common;
+    const chosenKey = DataEngine.pick(poolKeys);
+    const fam = CompanionData.FAMILIES.find(f => f.key === chosenKey) || DataEngine.pick(CompanionData.FAMILIES);
+    const already = b.companions.some(x => x && CompanionData.family(x) === fam);
+
+    if (already) {
+      b.dnaShards = (b.dnaShards || 0) + 1;
+      donnerRecompense("nourriture", 15);
+      persist();
+      toast(`Doublon (${fam.icon} ${fam.name}) → +15 🍖 Nourriture & +1 🧬 Éclat (${b.dnaShards}/3) !`);
+    } else {
+      const created = CompanionData.create(fam.species || fam.key);
+      b.companions.push(created);
+      if (!b.companion) b.companion = created;
+      persist();
+      await uiDialog("🥚 NOUVEAU COMPAGNON !", `${fam.icon} ${created.name} a été incubé !\nSpécialité : ${fam.spec}`, [["Génial !", true]], true);
+    }
+  },
   nourrir(key){
-    const c = S.cur && S.cur.companion;
-    if (!c) { toast("Aucun compagnon actif."); return; }
+    const c = this.getOwnedComp(key) || (S.cur && S.cur.companion);
+    if (!c) { toast("Compagnon non débloqué."); return; }
     if (c.level >= CompanionData.LEVEL_CAP) { toast(c.name + " est déjà au niveau maximum (" + CompanionData.LEVEL_CAP + ") !"); return; }
     if (!depenserRessource("nourriture", 1)) { toast("Pas de Nourriture."); return; }
     const res = CompanionData.gainXp(c, 50);
@@ -342,29 +402,47 @@ const CaserneUI = {
     toast(res.evolved ? `✨ ${c.name} évolue en Forme ${res.form} !` : res.levels > 0 ? `🐾 ${c.name} passe niveau ${c.level} !` : `🍖 +50 XP (${c.xp}/${c.xpMax})`);
     renderGame();
   },
-  peutForme3(c){ return c && c.form === 2 && c.level >= CompanionData.LEVEL_CAP && GameState.ressources.pierres >= 1; },  evoluerForme3(key){
-    const c = S.cur && S.cur.companion;
-    if (!c) { toast("Aucun compagnon actif."); return; }
+  peutForme3(c){ return c && c.form === 2 && c.level >= CompanionData.LEVEL_CAP && GameState.ressources.pierres >= 1; },
+  evoluerForme3(key){
+    const c = this.getOwnedComp(key) || (S.cur && S.cur.companion);
+    if (!c) { toast("Compagnon non débloqué."); return; }
     if (c.level < CompanionData.LEVEL_CAP) { toast("Niveau " + CompanionData.LEVEL_CAP + " requis pour la Transmutation."); return; }
     if (c.form === 3) { toast(c.name + " a déjà atteint sa forme Légendaire !"); return; }
     if (!depenserRessource("pierres", 1)) { toast("Pierre de Transmutation requise (💎)."); return; }
     CompanionData.transmute(c);
     persist();
-    toast(`💎 Transmutation réussie : ${c.name} (Forme Légendaire) !`);  },
-  attacherEvo(key){                                                           // ajoute le panneau sous la frise existante
-    const f = CompanionData.FAMILIES.find(x => x.key === key), c = S.cur && S.cur.companion, body = this.Q("#evo-body");
-    if (!f || !c || CompanionData.family(c) !== f || !body) return;
-    const R = GameState.ressources, max = CompanionData.LEVEL_CAP, nivReq = max, form = c.form || 1;    const box = document.createElement("div"); box.className = "cs-evo";
+    toast(`💎 Transmutation réussie : ${c.name} (Forme Légendaire) !`);
+  },
+  attacherEvo(key){
+    const f = CompanionData.FAMILIES.find(x => x.key === key), body = this.Q("#evo-body");
+    if (!f || !body) return;
+    const c = this.getOwnedComp(key);
+    const box = document.createElement("div"); box.className = "cs-evo";
+    if (!c) {
+      box.innerHTML = `<div class="cs-evo-h"><b>${this.esc(f.name)}</b> · 🔒 Non débloqué</div><p class="cs-note">Rôle : ${this.esc(f.spec)}<br>Incubez des Capsules de Stase (🥚) trouvées en AFK pour le débloquer.</p>`;
+      body.appendChild(box);
+      return;
+    }
+    const R = GameState.ressources, max = CompanionData.LEVEL_CAP, form = c.form || 1;
+    const isEquipped = S.cur && S.cur.companion === c;
     let h = `<div class="cs-evo-h"><b>${this.esc(c.name)}</b> · Forme ${form} · niv. ${c.level}/${max}${c.level < max ? " · XP " + c.xp + "/" + c.xpMax : ""}</div>`;
+    h += `<div style="font-size:11px;opacity:.85;margin-bottom:4px">Rôle RPS : ${this.esc(f.spec)}</div>`;
+    if (!isEquipped) {
+      h += `<button class="btn gold" id="cs-equip-pet" style="margin-bottom:4px">⚔️ Équiper comme compagnon actif</button>`;
+    } else {
+      h += `<div style="font-size:11px;color:#4ade80;margin-bottom:4px">✔ Compagnon actuellement équipé</div>`;
+    }
     h += `<button class="btn" id="cs-feed" ${c.level >= max || R.nourriture < 1 ? "disabled" : ""}>🍖 Nourrir : +50 XP (1 Nourriture · vous : ${R.nourriture})</button>`;
     if (form === 3) {
       h += `<p class="cs-note">✨ Forme Légendaire atteinte !</p>`;
     } else {
       const ok = this.peutForme3(c);
       h += `<button class="btn gold" id="cs-f3" ${ok ? "" : "disabled"}>💎 Évolution finale (Forme 3)</button>`;
-      if (!ok) h += `<p class="cs-note">Conditions : niveau ${nivReq} (actuel ${c.level}) et 1 Pierre de Transmutation (vous : ${R.pierres}).</p>`;
+      if (!ok) h += `<p class="cs-note">Conditions : niveau ${max} (actuel ${c.level}) et 1 Pierre de Transmutation (vous : ${R.pierres}).</p>`;
     }
     box.innerHTML = h; body.appendChild(box);
+    const eqBtn = box.querySelector("#cs-equip-pet");
+    if (eqBtn) eqBtn.onclick = e => { e.stopPropagation(); this.equiperCompagnon(key); };
     const fd = box.querySelector("#cs-feed"), f3 = box.querySelector("#cs-f3");
     if (fd) fd.onclick = e => { e.stopPropagation(); this.nourrir(key); };
     if (f3) f3.onclick = e => { e.stopPropagation(); this.evoluerForme3(key); };
@@ -405,12 +483,8 @@ const CaserneUI = {
     const sg = this.Q("#fx-sgrid"), pn = document.createElement("div");
     pn.id = "cs-skills";
     const bgUrl = typeof assetPath !== "undefined" && assetPath.competenceBg ? assetPath.competenceBg() : "assets/backgrounds/competence/background.jpeg";
-    const fgUrl = typeof assetPath !== "undefined" && assetPath.competenceFg ? assetPath.competenceFg() : "assets/backgrounds/competence/foreground.png";
     pn.style.backgroundImage = `url("${encodeURI(bgUrl)}")`;
-    pn.innerHTML = '<div id="cs-synergies" class="cs-syn-screen"></div><div id="cs-slots" class="cs-slots"></div><div class="cs-ctrl-right"><div id="cs-presets" class="cs-pres"></div><button id="cs-unlock" class="fx-btn cs-btn"></button></div><img id="cs-skills-fg" alt="" aria-hidden="true">';
-    const fgImg = pn.querySelector("#cs-skills-fg");
-    fgImg.onerror = () => { fgImg.style.display = "none"; };
-    fgImg.src = encodeURI(fgUrl);
+    pn.innerHTML = '<div id="cs-synergies" class="cs-syn-screen"></div><div id="cs-slots" class="cs-slots"></div><div class="cs-ctrl-right"><div id="cs-presets" class="cs-pres"></div><button id="cs-unlock" class="fx-btn cs-btn"></button></div>';
     sg.before(pn);
     pn.appendChild(sg);
     this.Q("#cs-unlock").onclick = e => { e.stopPropagation(); this.debloquerCompetence(); };

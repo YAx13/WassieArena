@@ -116,11 +116,6 @@ function tipHTML(code){
       <div class="fxl">Base : ${b.stats[id]}${bn?` · Équipement : +${bn}`:""}${m!==1?` · Ascension : ×${FX.fmt(m)}`:""}</div>
       <div class="fxl k">Valeur effective : ${eff}${id==="hp"?" → "+BattleEngine.maxHp(b,bf)+" PV":""}</div>`;
   }
-  if(k==="g"){
-    const p=D.PARTS.find(x=>x.id===id), best=b.gear.filter(g=>g.part===id).reduce((m,g)=>Math.max(m,g.rarity),-1), st=FX.STATS.find(s=>s[0]===D.PART_STAT[id]);
-    return best<0?`<h4>${p.icon} ${p.name}</h4><p>Aucune pièce équipée.</p><div class="fxl k">Bonus : ${st[1]}</div><div class="fxl lock">Volez des caisses pour en trouver.</div>`
-      :`<h4 style="color:${D.RARITIES[best].color}">${p.icon} ${p.name}</h4><p>${D.RARITIES[best].name}</p><div class="fxl k">+${D.GEAR_BONUS[best]} ${st[1]}</div>`;
-  }
   return "";
 }
 function hideTip(){ $("#wtip").classList.add("hidden"); }
@@ -415,7 +410,8 @@ function renderFiche(b){
 
   if(armoryShowcase.bruteId!==b.id){
     armoryShowcase.bruteId=b.id;
-    armoryShowcase.wid=b.weapons.length?b.weapons[0]:null;    armoryShowcase.anim="idle";
+    armoryShowcase.wid=b.weapons.length?b.weapons[0]:null;
+    armoryShowcase.anim="idle";
     armoryShowcase.animStart=0;
   }
 
@@ -513,8 +509,6 @@ function renderFiche(b){
   $("#fx-pv").innerHTML=`<b>${BattleEngine.maxHp(b,bf)}</b> points de vie`;
   $("#fx-stats").innerHTML=FX.STATS.map(([k,l,ic])=>{ const bn=D.gearBonus(b,k);
     return `<button class="fx-stat" data-tip="st:${k}"><span class="fx-sl"><span>${ic} ${l}</span><span class="fx-sv">${b.stats[k]}${bn?`<i>+${bn}</i>`:""}</span></span>${seg(b.stats[k],28,k)}</button>`; }).join("");
-  if($("#fx-gear")) $("#fx-gear").innerHTML=D.PARTS.map(p=>{ const best=b.gear.filter(g=>g.part===p.id).reduce((m,g)=>Math.max(m,g.rarity),-1);
-    return `<button class="fx-gslot ${best<0?"":"on"}" ${best<0?"":`style="--c:${D.RARITIES[best].color}"`} data-tip="g:${p.id}" aria-label="${p.name}">${p.icon}</button>`; }).join("");
   // Colonne 3 : 32 compétences
   const ns=D.SKILLS.filter(s=>b.skills.includes(s.id)).length;
   $("#fx-scount").textContent=ns+"/"+D.SKILLS.length;
