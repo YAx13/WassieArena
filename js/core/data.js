@@ -27,17 +27,17 @@ const assetPath = {
 
 /* ================= DataEngine ================= */
 class DataEngine {
-  static BRAWLERS = ["general", "empereur", "frankenstein", "hazmat", "human", "inversebrah", "momie", "samourai", "zeus"];
+  static BRAWLERS = ["dummy", "general", "empereur", "frankenstein", "hazmat", "human", "inversebrah", "momie", "samourai", "zeus"];
 
   // Rempli juste après la classe (boucle sur BRAWLERS)
   static SPRITES = {};
 
   static spriteBase(k,wid=null){
-    if(Number.isInteger(wid)&&wid>=0&&wid<10&&wid!==8) return assetPath.weaponSheet(k,wid);
+    if(Number.isInteger(wid)&&wid>=0&&wid<=13) return assetPath.weaponSheet(k,wid);
     const s=this.SPRITES[k]; return s ? ((Array.isArray(s.planches)?s.planches[0]:s.planches)||s.sprite||"") : "";
   }
   static spriteSheet(k,sh,wid=null){
-    if(Number.isInteger(wid)&&wid>=0&&wid<10&&wid!==8&&(sh==="atk"||sh==="crit")) return assetPath.weaponSheet(k,wid);
+    if(Number.isInteger(wid)&&wid>=0&&wid<=13&&(sh==="atk"||sh==="crit")) return assetPath.weaponSheet(k,wid);
     const s=this.SPRITES[k]; return s ? (s.planches[{atk:1,crit:2,trn:3}[sh]]||"") : "";
   }
   static portrait(k){ const s=this.SPRITES[k]; return s ? (s.portrait||"") : ""; }
@@ -170,7 +170,7 @@ class DataEngine {
   static PET_SHEETS = { "chien_friche:1":"", "chien_friche:2":"", "chien_friche:3":"", "ours_decharge:1":"", "ours_decharge:2":"", "ours_decharge:3":"", "aigle_veille:1":"", "aigle_veille:2":"", "aigle_veille:3":"" };
   static WEAPON_IMGS = {};   // id d'arme -> image 32x32 optionnelle
   // Nombre de skins d'arme présents dans assets/characters/<id>/weapons/
-  static WEAPON_COUNT = { empereur: 1, frankenstein: 1, general: 1, hazmat: 1, human: 0, inversebrah: 0, momie: 1, samourai: 1, zeus: 1 };
+  static WEAPON_COUNT = { dummy: 0, empereur: 1, frankenstein: 1, general: 1, hazmat: 1, human: 0, inversebrah: 0, momie: 1, samourai: 1, zeus: 1 };
   static WEAPON_FILE_NAMES = ["epee", "dague", "couteau", "scie", "hache", "marteau", "pioche", "os", "boomerang", "trident", "pilier", "shuriken", "grenade", "molotov"];
   static WEAPON_SKINS = Object.fromEntries(Object.entries(this.WEAPON_COUNT).map(([k, n]) =>
     [k, Array.from({ length: n }, (_, i) => assetPath.weapon(k, i + 1))]));

@@ -3,7 +3,6 @@ Le numéro de série du volume est 8455-7515
 C:.
 |   .gitattributes
 |   cut_weapons.py
-|   index.hmtl.txt
 |   index.html
 |   Structure-update.cmd
 |   
@@ -221,6 +220,24 @@ C:.
 |   |   |   heavy.txt
 |   |   |   light.txt
 |   |   |   
+|   |   +---dummy
+|   |   |   |   sprite.png
+|   |   |   |   
+|   |   |   \---sheets
+|   |   |           sheet-1.png
+|   |   |           sheet-2.png
+|   |   |           sheet-3.png
+|   |   |           sheet-4.png
+|   |   |           wpn-0.png
+|   |   |           wpn-1.png
+|   |   |           wpn-10.png
+|   |   |           wpn-2.png
+|   |   |           wpn-3.png
+|   |   |           wpn-4.png
+|   |   |           wpn-5.png
+|   |   |           wpn-6.png
+|   |   |           wpn-7.png
+|   |   |           
 |   |   +---empereur
 |   |   |   |   portrait.png
 |   |   |   |   sprite.png
@@ -799,94 +816,112 @@ C:.
 |           stats.js
 |           ui-core.js
 |           
-\---raw
-    |   A UTILISER.jpeg
-    |   background.jpeg
-    |   background.jpg
-    |   ezfzf.jpg
-    |   image_3488da6e.jpeg
-    |   image_6d6b5f1a.jpeg
-    |   mockup-simulator.jpg
-    |   starter.jpeg
++---raw
+|   |   A UTILISER.jpeg
+|   |   background.jpeg
+|   |   background.jpg
+|   |   ezfzf.jpg
+|   |   image_3488da6e.jpeg
+|   |   image_6d6b5f1a.jpeg
+|   |   mockup-simulator.jpg
+|   |   starter.jpeg
+|   |   
+|   +---avif
+|   |       frankenstein.avif
+|   |       hazmat.avif
+|   |       inversebrah.avif
+|   |       momie.avif
+|   |       samourai.avif
+|   |       zeus.avif
+|   |       
+|   +---boss
+|   |   |   image_207d3a66.jpeg
+|   |   |   
+|   |   +---pet
+|   |   |       image_65816223-transparent.png
+|   |   |       image_65816223.jpeg
+|   |   |       image_667026fd.jpeg
+|   |   |       
+|   |   \---weapon
+|   |           image_19cef7c8-transparent.png
+|   |           image_19cef7c8.jpeg
+|   |           image_ddd92bc8.jpeg
+|   |           image_f6ccc56b-transparent.png
+|   |           image_f6ccc56b.jpeg
+|   |           
+|   +---form-1raw
+|   |       aqua.jpeg
+|   |       beetle.jpeg
+|   |       bird.jpeg
+|   |       bull.jpeg
+|   |       cat.jpeg
+|   |       dog.jpeg
+|   |       eagle.jpeg
+|   |       lizard.jpeg
+|   |       ours.jpeg
+|   |       racoon.jpeg
+|   |       snake.jpeg
+|   |       spectre.jpeg
+|   |       wolf.jpeg
+|   |       
+|   +---form-2raw
+|   |       aqua.jpeg
+|   |       beetle.jpeg
+|   |       bird.jpeg
+|   |       bull.jpeg
+|   |       cat.jpeg
+|   |       dog.jpeg
+|   |       eagle.jpeg
+|   |       lizard.jpeg
+|   |       ours.jpeg
+|   |       racoon.jpeg
+|   |       snake.jpeg
+|   |       spectre.jpeg
+|   |       wolf.jpeg
+|   |       
+|   +---form-3raw
+|   |       aqua.jpeg
+|   |       beetle.jpeg
+|   |       bird.jpeg
+|   |       bull.jpeg
+|   |       cat.jpeg
+|   |       dog.jpeg
+|   |       eagle.jpeg
+|   |       lizard.jpeg
+|   |       ours-3.jpeg
+|   |       ours.jpeg
+|   |       racoon.jpeg
+|   |       snake.jpeg
+|   |       spectre.jpeg
+|   |       wolf.jpeg
+|   |       
+|   +---screenshots
+|   |       human-style-description.png
+|   |       
+|   \---weapon
+|           image_166d7294.jpg
+|           image_92b85493.jpg
+|           image_9abc1211.jpg
+|           image_a2a6b3f9.jpg
+|           image_d12e1bcc.jpg
+|           image_d6b42463.jpg
+|           image_ec18278.jpg
+|           
+\---sheety
+    |   battleaxe.jpg
+    |   bone.jpg
+    |   dagger.jpg
+    |   dummy.jpg
+    |   hammrt.jpg
+    |   hand-saw.jpg
+    |   hunter-knife.jpg
+    |   pickaxe.jpg
+    |   pillar1.jpg
+    |   pillar2.jpg
+    |   pillar3.jpg
+    |   pillar4.jpg
+    |   sword.jpg
     |   
-    +---avif
-    |       frankenstein.avif
-    |       hazmat.avif
-    |       inversebrah.avif
-    |       momie.avif
-    |       samourai.avif
-    |       zeus.avif
-    |       
-    +---boss
-    |   |   image_207d3a66.jpeg
-    |   |   
-    |   +---pet
-    |   |       image_65816223-transparent.png
-    |   |       image_65816223.jpeg
-    |   |       image_667026fd.jpeg
-    |   |       
-    |   \---weapon
-    |           image_19cef7c8-transparent.png
-    |           image_19cef7c8.jpeg
-    |           image_ddd92bc8.jpeg
-    |           image_f6ccc56b-transparent.png
-    |           image_f6ccc56b.jpeg
-    |           
-    +---form-1raw
-    |       aqua.jpeg
-    |       beetle.jpeg
-    |       bird.jpeg
-    |       bull.jpeg
-    |       cat.jpeg
-    |       dog.jpeg
-    |       eagle.jpeg
-    |       lizard.jpeg
-    |       ours.jpeg
-    |       racoon.jpeg
-    |       snake.jpeg
-    |       spectre.jpeg
-    |       wolf.jpeg
-    |       
-    +---form-2raw
-    |       aqua.jpeg
-    |       beetle.jpeg
-    |       bird.jpeg
-    |       bull.jpeg
-    |       cat.jpeg
-    |       dog.jpeg
-    |       eagle.jpeg
-    |       lizard.jpeg
-    |       ours.jpeg
-    |       racoon.jpeg
-    |       snake.jpeg
-    |       spectre.jpeg
-    |       wolf.jpeg
-    |       
-    +---form-3raw
-    |       aqua.jpeg
-    |       beetle.jpeg
-    |       bird.jpeg
-    |       bull.jpeg
-    |       cat.jpeg
-    |       dog.jpeg
-    |       eagle.jpeg
-    |       lizard.jpeg
-    |       ours-3.jpeg
-    |       ours.jpeg
-    |       racoon.jpeg
-    |       snake.jpeg
-    |       spectre.jpeg
-    |       wolf.jpeg
-    |       
-    +---screenshots
-    |       human-style-description.png
-    |       
-    \---weapon
-            image_166d7294.jpg
-            image_92b85493.jpg
-            image_9abc1211.jpg
-            image_a2a6b3f9.jpg
-            image_d12e1bcc.jpg
-            image_d6b42463.jpg
-            image_ec18278.jpg
+    \---momie
+            image_5c90b94e.jpg
             

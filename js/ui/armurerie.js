@@ -351,7 +351,8 @@ function attachArmoryHeroEditor(stage,rack){
 const armoryShowcase={bruteId:null,wid:null,anim:"idle",animStart:0,duration:900,loopRunning:false,lastToggle:false};
 
 function getArmoryWeaponAnim(w){
-  const kind=DataEngine.WEAPON_STYLE[w.id]||w.type||"light";
+  if(!w){ armoryShowcase.lastToggle=!armoryShowcase.lastToggle; return armoryShowcase.lastToggle?"punch":"uppercut"; }
+  const kind=w.id===10?"heavy":(DataEngine.WEAPON_STYLE?.[w.id]||w.type||"light");
   const pair={
     light:["thrust","pierce"],
     heavy:["overhead","meteor"],
@@ -362,16 +363,17 @@ function getArmoryWeaponAnim(w){
 }
 
 function triggerArmoryWeaponPreview(b,wid){
-  const w=DataEngine.WEAPONS[wid]; if(!w) return;
+  const w=(wid!==null&&wid!==undefined)?DataEngine.WEAPONS[wid]:null;
   const nextAnim=getArmoryWeaponAnim(w);
   if(armoryShowcase.wid===wid&&armoryShowcase.anim!=="idle"&&performance.now()-armoryShowcase.animStart<260) return;
   armoryShowcase.bruteId=b.id;
-  armoryShowcase.wid=wid;
+  armoryShowcase.wid=w?w.id:null;
   armoryShowcase.anim=nextAnim;
   armoryShowcase.animStart=performance.now();
-  const A=(CanvasRenderer.WPN_ANIMS&&CanvasRenderer.WPN_ANIMS[nextAnim])||CanvasRenderer.ANIMS[nextAnim]||CanvasRenderer.ANIMS.idle;
+  const hasSheet=w&&Number.isInteger(w.id)&&w.id>=0&&w.id<=13&&renderer.loadImg(DataEngine.spriteBase(b.sprite,w.id));
+  const A=(hasSheet&&CanvasRenderer.WPN_ANIMS?.[nextAnim])||CanvasRenderer.ANIMS[nextAnim]||CanvasRenderer.ANIMS.idle;
   const frames=(A.f?A.f.length:4);
-  armoryShowcase.duration=Math.max(520,(frames/(A.fps||10))*1000+140);
+  armoryShowcase.duration=Math.max(540,(frames/(A.fps||10))*1000+160);
 }
 
 function startArmoryHeroLoop(){
@@ -389,8 +391,9 @@ function startArmoryHeroLoop(){
       ctx.clearRect(0,0,96,96);
       ctx.imageSmoothingEnabled=false;
       ctx.save();
-      ctx.translate(0,32);
       const wid=armoryShowcase.wid;
+      if(wid===10){ ctx.translate(10,36); ctx.scale(0.82,0.82); }
+      else { ctx.translate(16,28); }
       renderer.drawBrute(ctx,b,animT,armoryShowcase.anim,null,wid);
       ctx.restore();
     }
@@ -429,6 +432,13 @@ function renderFiche(b){
   const armoryStage=rack.querySelector("#fx-armory-stage");
   applyArmoryHeroStage(armoryStage);
   attachArmoryHeroEditor(armoryStage,rack);
+  if(armoryStage){
+    armoryStage.onclick=ev=>{
+      if(weaponRackEditing) return;
+      ev.stopPropagation();
+      triggerArmoryWeaponPreview(b,armoryShowcase.wid);
+    };
+  }
 
   const weaponGrid=rack.querySelector(".fx-rack-grid");
   rack.style.position="relative";

@@ -92,7 +92,7 @@ class CanvasRenderer {
   skip(){ if(this.arena) this.arena.skip(); }
   sprite(key,allowEnemy=false,wid=null){
     if(!DataEngine.SPRITES[key]||(!allowEnemy&&!DataEngine.BRAWLERS.includes(key))){const ks=DataEngine.readyKeys();key=ks[[...String(key)].reduce((a,c)=>a+c.charCodeAt(0),0)%ks.length]}
-    if(Number.isInteger(wid)&&wid>=0&&wid<10&&wid!==8){
+    if(Number.isInteger(wid)&&wid>=0&&wid<=13){
       const wImg=this.loadImg(DataEngine.spriteBase(key,wid));
       if(wImg) return wImg;
     }
@@ -105,9 +105,11 @@ class CanvasRenderer {
     punch:{f:[4,5,5,6,7],fps:11},
     thrust:{f:[4,5,5,6,7],fps:13},
     overhead:{f:[4,5,5,6,7],fps:9},
+    throw:{f:[4,5,5,6,7],fps:9},
     uppercut:{f:[8,9,9,10,11],fps:10},
     pierce:{f:[8,9,9,10,11],fps:14},
     meteor:{f:[8,9,9,10,11],fps:8},
+    salto:{f:[8,9,9,10,11],fps:8},
     throw_wpn:{f:[12,13],fps:9},
     dash:{f:[14,15],fps:10,loop:1}
   };
@@ -146,7 +148,7 @@ class CanvasRenderer {
   }
   drawBrute(ctx,b,t,anim="idle",fi=null,wid=null){
     const cols=[0,1,2,3], set=b&&CanvasRenderer.ANIM_SETS[b.animationSet];
-    const wId=Number.isInteger(wid)&&wid>=0&&wid<10&&wid!==8?wid:null;
+    const wId=Number.isInteger(wid)&&wid>=0&&wid<=13?wid:null;
     const wSrc=wId!==null?DataEngine.spriteBase(b.sprite,wId):null;
     const wImg=wSrc?this.keyedSheet(wSrc):null;
     const WA=wImg?CanvasRenderer.WPN_ANIMS[anim]:null;
@@ -254,7 +256,7 @@ class CanvasRenderer {
   freeze(ms){ this.frozen=performance.now()+ms; }   // freeze frame : l'horloge de jeu s'arrête
   animFrame(f,c){
     const T=f.pet?CanvasRenderer.PET:CanvasRenderer.ANIMS, set=!f.pet&&f.b&&CanvasRenderer.ANIM_SETS[f.b.animationSet];
-    const wid=!f.pet&&f.wpn&&Number.isInteger(f.wpn.id)&&f.wpn.id>=0&&f.wpn.id<10&&f.wpn.id!==8?f.wpn.id:null;
+    const wid=!f.pet&&f.wpn&&Number.isInteger(f.wpn.id)&&f.wpn.id>=0&&f.wpn.id<=13?f.wpn.id:null;
     const hasWpnSheet=wid!==null&&!!this.loadImg(DataEngine.spriteBase(f.b.sprite,wid));
     const WA=hasWpnSheet?CanvasRenderer.WPN_ANIMS[f.anim]:null;
     const A=WA||(set&&set[f.anim])||T[f.anim]||T.idle, n=Math.floor((c-f.t0)*A.fps/1000), L=A.f?A.f.length:4;
@@ -268,7 +270,8 @@ class CanvasRenderer {
     if(fl>0){ o.globalCompositeOperation="source-atop"; o.fillStyle=`rgba(255,255,255,${fl})`; o.fillRect(0,0,64,64); o.globalCompositeOperation="source-over"; }
     const hop=(f.win?Math.abs(Math.sin(c/180))*8:0)+(f.air||0);
     ctx.save(); ctx.translate(Math.round(f.x),Math.round(f.y-hop)); const fp=f.flip&&!f.win; if(fp) ctx.scale(-1,1);
-    const R=CanvasRenderer, OY=-(R.SPR-R.PAD); ctx.drawImage(this.off,-R.SPR/2,OY,R.SPR,R.SPR);
+    const R=CanvasRenderer, sc=(wid===10&&f.wpn)?1.65:1, sw=R.SPR*sc, OY=-(sw-R.PAD*sc);
+    ctx.drawImage(this.off,-sw/2,OY,sw,sw);
     ctx.restore();
   }
   drawArena(ctx,A,c){

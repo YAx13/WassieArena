@@ -109,7 +109,7 @@ class BattleEngine {
         if(wp.fx&&wp.fx.crit) wfx.crit=(wp.crit-5)*.012+m*.01+wp.fx.crit;
         sk={name:wl,weapon:wp,t:"A",pw:(.8+wp.dmg*.08)*(1+m*.10),fx:wfx,desc:""};
         A.next-=(100/A.spd)*(wp.spd-5)*.03;
-        if(wp.type==="throw") A.held=null;
+        if(wp.type==="throw" && wp.id!==10) A.held=null;
       }
     }
     let dot=0; S.dot.forEach(d=>{dot+=d.dmg; d.n--}); S.dot=S.dot.filter(d=>d.n>0);
@@ -331,21 +331,37 @@ const Combat={
      throw:{a:"throw",T:[0,720,980],h:520,rel:220,ranged:1},uppercut:{a:"uppercut",T:[420,920,1250],h:560,amp:9},pierce:{a:"pierce",T:[260,700,1050],h:200,through:1,amp:9},
      meteor:{a:"meteor",T:[520,1100,1450],h:620,jump:40,amp:13},salto:{a:"salto",T:[0,950,1200],h:650,rel:500,ranged:1,amp:9},
      self:{a:"taunt",T:[0,700,700],h:200},idle:{a:"idle",T:[0,500,500],h:100}},
+  WPN_FX:{
+    "-1":{ atk:{dashT:180,air:0, dur:400,hits:1,shake:5, freeze:0,  dist:44}, crit:{dashT:230,air:34,dur:560,hits:1,shake:10,freeze:85, dist:44} }, // Mains nues
+    0:   { atk:{dashT:160,air:0, dur:420,hits:1,shake:5, freeze:0,  dist:48}, crit:{dashT:130,air:18,dur:580,hits:1,shake:11,freeze:95, dist:48} }, // Épée
+    1:   { atk:{dashT:90, air:0, dur:340,hits:1,shake:4, freeze:0,  dist:42}, crit:{dashT:75, air:0, dur:500,hits:2,shake:9, freeze:80, dist:40} }, // Dague (Blink)
+    2:   { atk:{dashT:150,air:0, dur:400,hits:1,shake:5, freeze:0,  dist:42}, crit:{dashT:230,air:38,dur:560,hits:1,shake:11,freeze:90, dist:42} }, // Couteau
+    3:   { atk:{dashT:170,air:0, dur:560,hits:3,shake:4, freeze:0,  dist:44}, crit:{dashT:150,air:0, dur:740,hits:4,shake:7, freeze:70, dist:44} }, // Scie (Multi-hit)
+    4:   { atk:{dashT:220,air:12,dur:480,hits:1,shake:7, freeze:0,  dist:52}, crit:{dashT:250,air:32,dur:640,hits:1,shake:13,freeze:110,dist:52} }, // Hache
+    5:   { atk:{dashT:240,air:24,dur:500,hits:1,shake:8, freeze:0,  dist:50}, crit:{dashT:300,air:58,dur:680,hits:1,shake:15,freeze:140,dist:50} }, // Marteau (Meteor)
+    6:   { atk:{dashT:220,air:16,dur:470,hits:1,shake:7, freeze:0,  dist:50}, crit:{dashT:260,air:28,dur:620,hits:1,shake:12,freeze:110,dist:50} }, // Pioche
+    7:   { atk:{dashT:200,air:16,dur:460,hits:1,shake:7, freeze:0,  dist:50}, crit:{dashT:260,air:48,dur:640,hits:1,shake:14,freeze:120,dist:50} }, // Os / Massue
+    9:   { atk:{dashT:180,air:0, dur:460,hits:1,shake:6, freeze:0,  dist:64}, crit:{dashT:160,air:12,dur:640,hits:3,shake:12,freeze:100,dist:64} }, // Trident (Lourde)
+    10:  { atk:{dashT:340,air:10,dur:580,hits:1,shake:10,freeze:40, dist:62}, crit:{dashT:360,air:52,dur:780,hits:1,shake:18,freeze:180,dist:62} }  // Pilier Colossal
+  },
   next(c){
     this.q=[]; this.stepEng(); this.proj=null;
     const at=this.q[0], ev=this.q.slice(1), ht=ev.find(e=>e.type==="on_hit"), crit=!!(ht&&ht.crit), A=this.V[at.i], bx=this.V[at.j].bx, dir=at.i?-1:1;
     let kind;
     if(at.pet) kind="pet"; else if(at.self) kind=at.skill?"self":"idle";
-    else if(at.weapon){ const wt=(DataEngine.WEAPONS[at.weapon.id]&&DataEngine.WEAPONS[at.weapon.id].type)||"light"; kind=crit?{light:"pierce",heavy:"meteor",throw:"salto"}[wt]:{light:"estoc",heavy:"overhead",throw:"throw"}[wt]; }
+    else if(at.weapon){ const wt=at.weapon.id===10?"heavy":((DataEngine.WEAPONS[at.weapon.id]&&DataEngine.WEAPONS[at.weapon.id].type)||"light"); kind=crit?{light:"pierce",heavy:"meteor",throw:"salto"}[wt]:{light:"estoc",heavy:"overhead",throw:"throw"}[wt]; }
     else kind=crit?"uppercut":"punch";
-    const K=this.K[kind]||this.K.idle;
+    const baseK=this.K[kind]||this.K.idle;
+    const widKey=at.weapon?at.weapon.id:-1, fxSet=this.WPN_FX[widKey]||this.WPN_FX["-1"], fx=crit?fxSet.crit:fxSet.atk;
+    const K=!baseK.ranged&&kind!=="pet"&&!at.self?Object.assign({},baseK,{T:[fx.dashT,fx.dashT+fx.dur,fx.dashT+fx.dur+200],h:fx.dashT+Math.round(fx.dur*0.45),jump:fx.air,amp:fx.shake,hits:fx.hits,freeze:fx.freeze}):baseK;
+    const dist=fx.dist||46;
     const heldId=this.eng.f[at.i].held;
-    const hasDrawAnim=!!(at.drewWpn&&at.weapon&&Number.isInteger(at.weapon.id)&&at.weapon.id>=0&&at.weapon.id<10&&at.weapon.id!==8&&renderer.loadImg(DataEngine.spriteBase(A.b.sprite,at.weapon.id)));
+    const hasDrawAnim=!!(at.drewWpn&&at.weapon&&Number.isInteger(at.weapon.id)&&at.weapon.id>=0&&at.weapon.id<=13&&renderer.loadImg(DataEngine.spriteBase(A.b.sprite,at.weapon.id)));
     const drawDelay=hasDrawAnim?240:0;
     const dropInfo=at.droppedWpn||null;
-    const hasDropSheet=!!(dropInfo&&dropInfo.id>=0&&dropInfo.id<10&&dropInfo.id!==8&&renderer.loadImg(DataEngine.spriteBase(A.b.sprite,dropInfo.id)));
-    this.ph={k:"act",kind,K,t0:c,drawDelay,dropInfo,hasDropSheet,i:at.i,j:at.j,ev,hit:0,wicon:at.weapon&&at.weapon.icon,wid:at.weapon&&at.weapon.id,
-      tx:K.ranged||at.self||kind==="pet"?(kind==="pet"?bx+(at.i?42:-42):A.bx):K.through?bx-dir*60:bx+(at.i?46:-46)};
+    const hasDropSheet=!!(dropInfo&&dropInfo.id>=0&&dropInfo.id<=13&&renderer.loadImg(DataEngine.spriteBase(A.b.sprite,dropInfo.id)));
+    this.ph={k:"act",kind,K,t0:c,drawDelay,dropInfo,hasDropSheet,i:at.i,j:at.j,ev,hit:0,hitStep:0,wicon:at.weapon&&at.weapon.icon,wid:at.weapon&&at.weapon.id,
+      tx:K.ranged||at.self||kind==="pet"?(kind==="pet"?bx+(at.i?42:-42):A.bx):K.through?bx-dir*60:bx+(at.i?dist:-dist)};
     this.amp=K.amp||5;
     if(dropInfo&&!at.drewWpn) A.wpn={ic:dropInfo.icon,id:dropInfo.id};
     else if(at.weapon&&!at.pet) A.wpn={ic:at.weapon.icon,id:at.weapon.id};
@@ -395,8 +411,14 @@ const Combat={
       this.setA(a,"draw_wpn",p.t0+(p.dropInfo?120:0));
       return;
     }
-    const e=rawE-p.drawDelay, K=p.K, T=K.T;
-    if(!p.hit&&e>=K.h){ p.hit=1; this.impact(p,c); }
+    const e=rawE-p.drawDelay, K=p.K, T=K.T, hits=K.hits||1;
+    if(hits>1 && e>=T[0] && e<T[1]){
+      const step=Math.floor(((e-T[0])/Math.max(1,T[1]-T[0]))*hits)+1;
+      if(step>(p.hitStep||0) && step<hits && e>=T[0]+(T[1]-T[0])*0.25){
+        p.hitStep=step; d.flash0=c; this.shake0=c; this.setA(d,"hit",c);
+      }
+    }
+    if(!p.hit&&e>=K.h){ p.hit=1; if(K.freeze) renderer.freeze(K.freeze); this.impact(p,c); }
     if(K.rel&&e>=K.rel&&e<K.h){ a.wpn=null; if(!this.proj&&p.wicon) this.proj={ic:p.wicon,id:p.wid,b:a.b,x0:a.bx+(p.i?-28:28),y0:a.y-48,x1:d.bx,y1:d.y-42,t0:p.t0+p.drawDelay+K.rel,t1:p.t0+p.drawDelay+K.h}; }
     if(e<T[0]){ const k=e/T[0]; a.x=a.bx+(p.tx-a.bx)*k; a.air=K.jump?Math.sin(Math.PI*k)*K.jump:0; a.flip=a.flip0; this.setA(a,"dash",p.t0+p.drawDelay); }
     else if(e<T[1]){ a.x=p.tx; a.air=0; a.flip=a.flip0; this.setA(a,K.a,p.t0+p.drawDelay+T[0]); }

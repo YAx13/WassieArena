@@ -1,7 +1,7 @@
 "use strict";
 /* simulateur.js : mode Entraînement (Simulateur) avec sélecteur de décors fonctionnel */
 const TRAIN={
-  NAMES:{general:"Général",empereur:"Empereur",inversebrah:"Inversebrah",hazmat:"Hazmat",momie:"Momie",samourai:"Samourai",zeus:"Zeus",frankenstein:"Frankenstein",human:"Humain"},
+  NAMES:{dummy:"Dummy (Greybox)",general:"Général",empereur:"Empereur",inversebrah:"Inversebrah",hazmat:"Hazmat",momie:"Momie",samourai:"Samourai",zeus:"Zeus",frankenstein:"Frankenstein",human:"Humain"},
   GROUPS:[
     ["Base (planche 1)",[["idle","🧍","Repos"],["dash","🏃","Dash"],["dodge","💨","Esquive"],["hit","💥","Touché"],["death","💀","Mort"]]],
     ["Attaques (planche 2)",[["punch","👊","Poing"],["thrust","🗡️","Estoc"],["overhead","🪓","Frappe haute"],["throw","🎯","Lancer"]]],
@@ -15,7 +15,7 @@ const TRAIN={
   decorIdx: 0,
 
   keyName(k){ return this.NAMES[k]||(k[0].toUpperCase()+k.slice(1)); },
-  hasSheet(k,sh){ const wid=this.F?.wpn?this.F.wpn.id:null; if(wid!==null&&wid>=0&&wid<8) return !!renderer.loadImg(DataEngine.spriteBase(k,wid)); if(sh==="base") return true; return !!DataEngine.spriteSheet(k,sh); },
+  hasSheet(k,sh){ const wid=this.F?.wpn?this.F.wpn.id:null; if(wid!==null&&wid>=0&&wid<=13) return !!renderer.loadImg(DataEngine.spriteBase(k,wid)); if(sh==="base") return true; return !!DataEngine.spriteSheet(k,sh); },
   mk(key,x,flip){ return {b:{sprite:key,hue:200,name:this.keyName(key),weapons:[]},name:this.keyName(key),x,bx:x,y:188,flip0:flip,flip,anim:"idle",t0:0,flash0:-1e6,hp:100,dh:100,lastHp:100,hit0:-1e6,max:100,win:false,air:0,wpn:null}; },
   
  editTarget: "hero",
@@ -116,6 +116,7 @@ const TRAIN={
   },
   getWpnAnims(){
     const i=+$("#tr-wpn").value;
+    if(i===10) return {atk:"overhead",crit:"meteor"};
     const wType=i>=0?(DataEngine.WEAPONS[i]?.type||"light"):"punch";
     return {light:{atk:"thrust",crit:"pierce"},heavy:{atk:"overhead",crit:"meteor"},throw:{atk:"throw",crit:"salto"}}[wType]||{atk:"punch",crit:"uppercut"};
   },
@@ -159,37 +160,67 @@ const TRAIN={
     };
     chargerImage(item.value);
   },
+  WPN_FX:{
+    "-1":{ atk:{dashT:160,air:0,dur:380,hits:1,shake:4,freeze:0,dist:44},  crit:{dashT:210,air:34,dur:540,hits:1,shake:10,freeze:85,dist:44} }, // Mains nues
+    0:   { atk:{dashT:150,air:0,dur:400,hits:1,shake:5,freeze:0,dist:48},  crit:{dashT:110,air:18,dur:560,hits:1,shake:11,freeze:95,dist:48} }, // Épée
+    1:   { atk:{dashT:80, air:0,dur:320,hits:1,shake:4,freeze:0,dist:42},  crit:{dashT:65, air:0, dur:480,hits:2,shake:9, freeze:80,dist:40} }, // Dague (Blink)
+    2:   { atk:{dashT:140,air:0,dur:380,hits:1,shake:5,freeze:0,dist:42},  crit:{dashT:220,air:38,dur:540,hits:1,shake:11,freeze:90,dist:42} }, // Couteau
+    3:   { atk:{dashT:160,air:0,dur:540,hits:3,shake:4,freeze:0,dist:44},  crit:{dashT:140,air:0, dur:720,hits:4,shake:7, freeze:70,dist:44} }, // Scie (Multi-hit)
+    4:   { atk:{dashT:200,air:12,dur:460,hits:1,shake:7,freeze:0,dist:52}, crit:{dashT:230,air:32,dur:620,hits:1,shake:13,freeze:110,dist:52}}, // Hache
+    5:   { atk:{dashT:220,air:24,dur:480,hits:1,shake:8,freeze:0,dist:50}, crit:{dashT:280,air:58,dur:660,hits:1,shake:15,freeze:140,dist:50}}, // Marteau (Meteor)
+    6:   { atk:{dashT:200,air:16,dur:450,hits:1,shake:7,freeze:0,dist:50}, crit:{dashT:240,air:28,dur:600,hits:1,shake:12,freeze:110,dist:50}}, // Pioche
+    7:   { atk:{dashT:190,air:16,dur:440,hits:1,shake:7,freeze:0,dist:50}, crit:{dashT:250,air:48,dur:620,hits:1,shake:14,freeze:120,dist:50}}, // Os / Massue
+    9:   { atk:{dashT:170,air:0, dur:440,hits:1,shake:6,freeze:0,dist:64}, crit:{dashT:150,air:12,dur:620,hits:3,shake:12,freeze:100,dist:64}}, // Trident (Lourde)
+    10:  { atk:{dashT:320,air:10,dur:560,hits:1,shake:10,freeze:40,dist:62},crit:{dashT:340,air:52,dur:760,hits:1,shake:18,freeze:180,dist:62}}  // Pilier Colossal
+  },
   tick(t){
-    const dt=Math.min(50,t-(this.last||t)); this.last=t;
+    const dt=this.last?Math.min(34,t-this.last):16; this.last=t;
     const cv=this.cv;
     if(cv&&cv.offsetParent){
       if(!this.paused) this.clock+=dt*this.mult;
-      const F=this.F, D=this.D, el=this.clock-F.t0, isMelee=["punch","thrust","overhead","uppercut","pierce","meteor"].includes(this.cur), isThrow=["throw","salto"].includes(this.cur);
+      const F=this.F, D=this.D, el=this.clock-F.t0, loopOn=$("#tr-auto").checked, isCrit=["uppercut","pierce","meteor","salto"].includes(this.cur), isMelee=["punch","thrust","overhead","uppercut","pierce","meteor"].includes(this.cur), isThrow=["throw","salto"].includes(this.cur);
+      const wid=F.wpn?F.wpn.id:-1, fxSet=this.WPN_FX[wid]||this.WPN_FX["-1"], fx=isCrit?fxSet.crit:fxSet.atk;
+      const A=CanvasRenderer.ANIMS[this.cur]||CanvasRenderer.ANIMS.idle, L=A.f?A.f.length:4, animDur=fx.dur||Math.max(400,Math.round(L/A.fps*1000));
       if(isMelee && $("#tr-dummy").checked){
-        const tx=F.flip0?D.bx+46:D.bx-46;
-        if(el<260){ const k=el/260; F.x=F.bx+(tx-F.bx)*k; F.air=["overhead","meteor"].includes(this.cur)?Math.sin(Math.PI*k)*24:0; F.anim="dash"; F.flip=F.flip0; }
-        else if(el<780){ F.x=tx; F.air=0; F.flip=F.flip0; if(F.anim!==this.cur){ F.anim=this.cur; F.t0=this.clock; } }
-        else if(el<1040){ const k=(el-780)/260; F.x=tx+(F.bx-tx)*k; F.anim="dash"; F.flip=!F.flip0; }
+        const tx=F.flip0?D.bx+fx.dist:D.bx-fx.dist, dashT=fx.dashT, hitEnd=dashT+animDur, backEnd=hitEnd+180;
+        if(el<dashT){ const k=el/dashT; F.x=F.bx+(tx-F.bx)*k; F.air=fx.air?Math.sin(Math.PI*k)*fx.air:0; F.anim="dash"; F.flip=F.flip0; if(isCrit&&el<40) F.flash0=this.clock; }
+        else if(el<hitEnd){
+          F.x=tx; F.air=0; F.flip=F.flip0;
+          if(F.anim!==this.cur){ F.anim=this.cur; this._hitStep=0; }
+          const step=Math.floor(((el-dashT)/animDur)*fx.hits)+1;
+          if(step>this._hitStep && el>=dashT+animDur*0.35){
+            this._hitStep=step; D.anim="hit"; D.t0=this.clock; D.flash0=this.clock; this.A.amp=fx.shake; this.A.shake0=this.clock;
+            if(step===fx.hits && fx.freeze) renderer.freeze(fx.freeze);
+          }
+        }
+        else if(el<backEnd){ const k=(el-hitEnd)/180; F.x=tx+(F.bx-tx)*k; F.anim="dash"; F.flip=!F.flip0; }
         else {
-          F.x=F.bx; F.air=0; F.flip=F.flip0; F.anim="idle";
-          if($("#tr-auto").checked){ if(el>1450) this.play(this.cur); }
+          F.x=F.bx; F.air=0; F.flip=F.flip0; F.anim="idle"; D.anim="idle";
+          if(loopOn){ if(el>backEnd+350) this.play(this.cur); }
           else { this.cur="idle"; F.t0=this.clock; }
         }
       } else if(isThrow && $("#tr-dummy").checked){
         F.x=F.bx; F.flip=F.flip0;
-        if(el<550){ if(F.anim!==this.cur){ F.anim=this.cur; F.t0=this.clock; } if(el>=220&&F.wpn){ this.A.proj={ic:F.wpn.ic,id:F.wpn.id,b:F.b,x0:F.bx+(F.flip0?-28:28),y0:F.y-48,x1:D.bx,y1:D.y-42,t0:this.clock,t1:this.clock+300}; F.wpn=null; } }
+        if(el<animDur){
+          if(F.anim!==this.cur){ F.anim=this.cur; this._hitStep=0; }
+          if(el>=animDur*0.35&&F.wpn){ this.A.proj={ic:F.wpn.ic,id:F.wpn.id,b:F.b,x0:F.bx+(F.flip0?-28:28),y0:F.y-48,x1:D.bx,y1:D.y-42,t0:this.clock,t1:this.clock+260}; F.wpn=null; }
+          if(!this._hitStep && el>=animDur*0.35+220){ this._hitStep=1; D.anim="hit"; D.t0=this.clock; D.flash0=this.clock; this.A.amp=isCrit?12:5; this.A.shake0=this.clock; if(isCrit) renderer.freeze(90); }
+        }
         else {
           F.anim="idle";
-          if(el>950){
+          if(el>animDur+300){
+            D.anim="idle";
             const wi=+$("#tr-wpn").value; if(wi>=0) F.wpn={id:wi,ic:DataEngine.WEAPONS[wi].icon}; this.A.proj=null;
-            if($("#tr-auto").checked) this.play(this.cur);
+            if(loopOn) this.play(this.cur);
             else { this.cur="idle"; F.t0=this.clock; }
           }
         }
       } else {
         F.x=F.bx; F.air=0; F.flip=F.flip0;
-        const A=CanvasRenderer.ANIMS[F.anim]||CanvasRenderer.ANIMS.idle, L=A.f?A.f.length:4, dur=L/A.fps*1000;
-        if($("#tr-auto").checked && !A.loop && F.anim!=="idle" && el>dur+500) this.play(this.cur);
+        if(F.anim!=="idle" && el>animDur+200){
+          if(loopOn) this.play(this.cur);
+          else { this.cur="idle"; F.anim="idle"; F.hp=F.max; F.t0=this.clock; }
+        }
       }
       $$("#tr-anims .tr-pose").forEach(b=>b.classList.toggle("on",b.dataset.a===this.cur));
       renderer.drawArena(cv.getContext("2d"),this.A,this.clock);
