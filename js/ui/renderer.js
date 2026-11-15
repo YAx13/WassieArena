@@ -82,7 +82,6 @@ class CanvasRenderer {
     }
   };
   static PET={ idle:{r:0,fps:6,loop:1}, run:{r:1,fps:14,loop:1}, bite:{r:2,fps:12}, hit:{f:[12],fps:8}, fall:{f:[13],fps:8}, death:{f:[13,14,15],fps:6} };
-  static SKY=[[10,22,18],[40,14,30],[70,30,12],[120,16,24],[160,26,16],[250,20,28],[290,34,14],[350,30,22]];
   constructor(){
     this.targets=[]; this.imgs={}; this.weaponSheets={}; this.weaponBounds={}; this.speed=1; this.clock=0; this.last=0; this.arena=null; this.tick=null;
     this.off=document.createElement("canvas"); this.off.width=this.off.height=64; this.octx=this.off.getContext("2d");
@@ -93,25 +92,72 @@ class CanvasRenderer {
   skip(){ if(this.arena) this.arena.skip(); }
   sprite(key,allowEnemy=false,wid=null){
     if(!DataEngine.SPRITES[key]||(!allowEnemy&&!DataEngine.BRAWLERS.includes(key))){const ks=DataEngine.readyKeys();key=ks[[...String(key)].reduce((a,c)=>a+c.charCodeAt(0),0)%ks.length]}
-    if(Number.isInteger(wid)&&wid>=0&&wid<8){
+    if(Number.isInteger(wid)&&wid>=0&&wid<10&&wid!==8){
       const wImg=this.loadImg(DataEngine.spriteBase(key,wid));
       if(wImg) return wImg;
     }
     const src=DataEngine.spriteBase(key); if(!src) return null;
     return this.loadImg(src);
   }
+  static WPN_ANIMS={
+    idle:{f:[0,1],fps:4,loop:1},
+    draw_wpn:{f:[2,3],fps:8},
+    punch:{f:[4,5,5,6,7],fps:11},
+    thrust:{f:[4,5,5,6,7],fps:13},
+    overhead:{f:[4,5,5,6,7],fps:9},
+    uppercut:{f:[8,9,9,10,11],fps:10},
+    pierce:{f:[8,9,9,10,11],fps:14},
+    meteor:{f:[8,9,9,10,11],fps:8},
+    throw_wpn:{f:[12,13],fps:9},
+    dash:{f:[14,15],fps:10,loop:1}
+  };
+  keyedSheet(src){
+    if(!src) return null;
+    const cacheKey="wpnKey|"+src;
+    if(this.weaponSheets[cacheKey]) return this.weaponSheets[cacheKey];
+    const source=this.loadImg(src);
+    if(!source) return null;
+    const cv=document.createElement("canvas"); cv.width=source.naturalWidth; cv.height=source.naturalHeight;
+    const ctx=cv.getContext("2d",{willReadFrequently:true}); ctx.drawImage(source,0,0);
+    try{
+      const image=ctx.getImageData(0,0,cv.width,cv.height), px=image.data;
+      const isMagenta=px[0]>200&&px[1]<60&&px[2]>200;
+      for(let i=0;i<px.length;i+=4){
+        const r=px[i], g=px[i+1], b=px[i+2];
+        if(isMagenta){
+          const dom=Math.min(r,b)-g;
+          if(r>140&&b>140&&dom>35){
+            const keep=Math.max(0,Math.min(1,(110-dom)/75));
+            px[i+3]=Math.round(px[i+3]*keep);
+          }
+        } else {
+          const dom=g-Math.max(r,b);
+          if(g>90&&dom>28){
+            const keep=Math.max(0,Math.min(1,(100-dom)/72));
+            px[i+3]=Math.round(px[i+3]*keep);
+            if(keep<1) px[i+1]=Math.min(g,Math.round(Math.max(r,b)+dom*keep));
+          }
+        }
+      }
+      ctx.putImageData(image,0,0);
+    }catch(e){}
+    this.weaponSheets[cacheKey]=cv;
+    return cv;
+  }
   drawBrute(ctx,b,t,anim="idle",fi=null,wid=null){
-    const cols=[0,1,2,3], set=b&&CanvasRenderer.ANIM_SETS[b.animationSet], A=(set&&set[anim])||CanvasRenderer.ANIMS[anim]||CanvasRenderer.ANIMS.idle, row=cols.map(i=>A.r*4+i);
-    const wId=Number.isInteger(wid)&&wid>=0&&wid<8?wid:null;
-    const wImg=wId!==null?this.loadImg(DataEngine.spriteBase(b.sprite,wId)):null;
-    const wRow={idle:0,dash:1,punch:2,thrust:2,overhead:2,uppercut:3,pierce:3,meteor:3}[anim];
+    const cols=[0,1,2,3], set=b&&CanvasRenderer.ANIM_SETS[b.animationSet];
+    const wId=Number.isInteger(wid)&&wid>=0&&wid<10&&wid!==8?wid:null;
+    const wSrc=wId!==null?DataEngine.spriteBase(b.sprite,wId):null;
+    const wImg=wSrc?this.keyedSheet(wSrc):null;
+    const WA=wImg?CanvasRenderer.WPN_ANIMS[anim]:null;
+    const A=WA||(set&&set[anim])||CanvasRenderer.ANIMS[anim]||CanvasRenderer.ANIMS.idle, row=cols.map(i=>A.r*4+i);
     let img, F;
-    if(wImg&&wRow!==undefined){ img=wImg; F=cols.map(i=>wRow*4+i); }
+    if(wImg&&WA){ img=wImg; F=WA.f; }
     else if(A.s==="base"){ img=this.sprite(b.sprite,!!(b&&b.animationSet)); F=A.f||row; }
     else{ img=this.sheet(b.sprite,A.s); if(img) F=row; else { img=this.sprite(b.sprite); F=A.fb; } }
     const n=fi!==null?fi:Math.floor(t*A.fps/1000), k=A.loop?n%F.length:Math.min(n,F.length-1), fr=F[k];
     ctx.clearRect(0,0,64,64); ctx.imageSmoothingEnabled=false;
-    if(img){ const fw=img.naturalWidth/4, fh=img.naturalHeight/4; ctx.drawImage(img,(fr%4)*fw,((fr/4)|0)*fh,fw,fh,0,0,64,64); return; }
+    if(img){ const fw=(img.naturalWidth||img.width)/4, fh=(img.naturalHeight||img.height)/4; ctx.drawImage(img,(fr%4)*fw,((fr/4)|0)*fh,fw,fh,0,0,64,64); return; }
     // Placeholder 2.5D : cube de couleur, pose selon l'animation
     const bob=anim==="idle"?Math.round(Math.sin(t/280)*1.5):0, h=b.hue, c=`hsl(${h},55%,48%)`, cl=`hsl(${h},55%,64%)`, cd=`hsl(${h},55%,30%)`;
     ctx.fillStyle="rgba(0,0,0,.45)"; ctx.beginPath(); ctx.ellipse(32,56,17,6,0,0,7); ctx.fill();
@@ -150,16 +196,19 @@ class CanvasRenderer {
       }
       const canvas=document.createElement("canvas"); canvas.width=source.naturalWidth; canvas.height=source.naturalHeight;
       const ctx=canvas.getContext("2d",{willReadFrequently:true}); ctx.drawImage(source,0,0);
-      try{ const image=ctx.getImageData(0,0,canvas.width,canvas.height), pixels=image.data;
-      for(let i=0;i<pixels.length;i+=4){
-        const r=pixels[i], g=pixels[i+1], blue=pixels[i+2], dominance=g-Math.max(r,blue);
-        if(g>80&&dominance>18){
-          const keep=Math.max(0,Math.min(1,(90-dominance)/72));
-          pixels[i+3]=Math.round(pixels[i+3]*keep);
-          if(keep<1) pixels[i+1]=Math.min(g,Math.round(Math.max(r,blue)+dominance*keep));
+      if(!src.endsWith("-transparent.png")){
+        try{ const image=ctx.getImageData(0,0,canvas.width,canvas.height), pixels=image.data;
+        for(let i=0;i<pixels.length;i+=4){
+          const r=pixels[i], g=pixels[i+1], blue=pixels[i+2], dominance=g-Math.max(r,blue);
+          if(g>80&&dominance>18){
+            const keep=Math.max(0,Math.min(1,(90-dominance)/72));
+            pixels[i+3]=Math.round(pixels[i+3]*keep);
+            if(keep<1) pixels[i+1]=Math.min(g,Math.round(Math.max(r,blue)+dominance*keep));
+          }
         }
+        ctx.putImageData(image,0,0); }catch(e){}
       }
-      ctx.putImageData(image,0,0); }catch(e){} this.weaponSheets[cacheKey]=canvas;
+      this.weaponSheets[cacheKey]=canvas;
     }
     const sheet=this.weaponSheets[cacheKey], tile=sheet.width/4, cell=DataEngine.WEAPON_CELLS[id];
     if(sheet.width!==sheet.height||!Number.isInteger(tile)||!Number.isInteger(cell)) return null;
@@ -167,8 +216,8 @@ class CanvasRenderer {
     if(hit){ if(!this._wReady) this._wReady=new Set(); this._wReady.add(cacheKey); onload(); }
     const boundsKey=cacheKey+"|"+id;
     if(!this.weaponBounds[boundsKey]){
-      const x=id===11?3*tile:(cell%4)*tile, y=id===11?2*tile:Math.floor(cell/4)*tile;
-      const cw=tile, ch=id===11?tile*2:tile;
+      const x=(cell%4)*tile, y=Math.floor(cell/4)*tile;
+      const cw=tile, ch=id===10?tile*2:tile;
       let pixels=null; try{ pixels=sheet.getContext("2d").getImageData(x,y,cw,ch).data; }catch(e){}
       if(!pixels){ this.weaponBounds[boundsKey]={x,y,width:cw,height:ch}; return {sheet,...this.weaponBounds[boundsKey]}; }
       let left=cw,top=ch,right=-1,bottom=-1;
@@ -205,7 +254,10 @@ class CanvasRenderer {
   freeze(ms){ this.frozen=performance.now()+ms; }   // freeze frame : l'horloge de jeu s'arrête
   animFrame(f,c){
     const T=f.pet?CanvasRenderer.PET:CanvasRenderer.ANIMS, set=!f.pet&&f.b&&CanvasRenderer.ANIM_SETS[f.b.animationSet];
-    const A=(set&&set[f.anim])||T[f.anim]||T.idle, n=Math.floor((c-f.t0)*A.fps/1000), L=A.f?A.f.length:4;
+    const wid=!f.pet&&f.wpn&&Number.isInteger(f.wpn.id)&&f.wpn.id>=0&&f.wpn.id<10&&f.wpn.id!==8?f.wpn.id:null;
+    const hasWpnSheet=wid!==null&&!!this.loadImg(DataEngine.spriteBase(f.b.sprite,wid));
+    const WA=hasWpnSheet?CanvasRenderer.WPN_ANIMS[f.anim]:null;
+    const A=WA||(set&&set[f.anim])||T[f.anim]||T.idle, n=Math.floor((c-f.t0)*A.fps/1000), L=A.f?A.f.length:4;
     if(!A.loop && f.anim!=="death" && n>=L) return ["idle",Math.floor(c*6/1000)];
     return [f.anim,n];
   }
@@ -293,7 +345,7 @@ class CanvasRenderer {
         }
       }
     });
-    const pj=A.proj; if(pj&&c>=pj.t0&&c<=pj.t1){ const k=(c-pj.t0)/(pj.t1-pj.t0), sz=pj.id===11?36:26; ctx.save(); ctx.translate(pj.x0+(pj.x1-pj.x0)*k,pj.y0+(pj.y1-pj.y0)*k-Math.sin(Math.PI*k)*(pj.id===11?24:18)); ctx.rotate(c/(pj.id===11?90:45)); const skin=pj.b&&Number.isInteger(pj.id)?this.weaponSprite(pj.b,pj.id):null; if(skin){ ctx.drawImage(skin.sheet,skin.x,skin.y,skin.width,skin.height,-sz/2,-sz/2,sz,sz); } else { ctx.font=(pj.id===11?"28px":"19px")+" serif"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText(pj.ic,0,0); } ctx.restore(); }
+    const pj=A.proj; if(pj&&c>=pj.t0&&c<=pj.t1){ const k=(c-pj.t0)/(pj.t1-pj.t0), sz=pj.id===10?36:26; ctx.save(); ctx.translate(pj.x0+(pj.x1-pj.x0)*k,pj.y0+(pj.y1-pj.y0)*k-Math.sin(Math.PI*k)*(pj.id===10?24:18)); ctx.rotate(c/(pj.id===10?90:45)); const skin=pj.b&&Number.isInteger(pj.id)?this.weaponSprite(pj.b,pj.id):null; if(skin){ ctx.drawImage(skin.sheet,skin.x,skin.y,skin.width,skin.height,-sz/2,-sz/2,sz,sz); } else { ctx.font=(pj.id===10?"28px":"19px")+" serif"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText(pj.ic,0,0); } ctx.restore(); }
     ctx.textAlign="center";
     A.fl.forEach(t=>{                                   // nombres flottants
       const age=c-t.c0; if(age<0||age>1000) return;

@@ -192,7 +192,7 @@ const StatsUI = {
       segBox.innerHTML = Array.from({ length: 10 }, (_, idx) => {
         const col = idx < rem ? topCol : baseCol;
         return col
-          ? `<i class="on" style="background:${col};border-color:${col};box-shadow:0 0 6px ${col}"></i>`
+          ? `<i class="on" style="background:${col} !important;border-color:${col} !important;box-shadow:0 0 6px ${col}"></i>`
           : `<i></i>`;
       }).join("");
     });

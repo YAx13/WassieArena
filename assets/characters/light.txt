@@ -1,0 +1,21 @@
+Create a 4x4 pixel-art sprite sheet (16 frames total, 4 columns by 4 rows) of the exact character from Image 1 wielding the exact light melee weapon from Image 2 in his right hand, in 3/4 side view, 2.5D beat-'em-up perspective, facing right.
+
+STRICT 16-FRAME GRID & HIT-FRAME TIMING (MATCHING IMAGE 1'S EXACT CELL SPACING):
+- Row 1 (Frames 1-4): Frames 1-2 = idle battle stance holding the weapon ready; Frames 3-4 = drawing/equipping the weapon into a ready guard stance.
+- Row 2 (Frames 5-8 — Standard Thrust/Slash Attack):
+  * Frame 5: anticipation wind-up pulling the weapon back.
+  * Frame 6 (HIT FRAME): maximum forward lunge and slash extension with a crisp bright white/energy slash smear at the point of impact.
+  * Frame 7: follow-through recoil.
+  * Frame 8: recovery back to guard stance.
+- Row 3 (Frames 9-12 — Critical Piercing Dash Attack):
+  * Frame 9: crouching energy charge wind-up.
+  * Frame 10 (CRITICAL HIT FRAME): lightning-fast forward piercing thrust at full extension with a bright high-speed motion smear and impact flash.
+  * Frame 11: high-speed pass-through follow-through.
+  * Frame 12: recovery back to guard stance.
+- Row 4 (Frames 13-16): Frames 13-14 = throwing/tossing the weapon forward (Frame 13 = wind-up, Frame 14 = release follow-through with empty hand); Frames 15-16 = fast forward dash / dodge holding the weapon.
+
+CONSISTENCY & PIXEL ART RULES:
+- Keep the exact character proportions, face, outfit, colors, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 1.
+- Keep the exact weapon design, colors, and proportional size from Image 2 firmly gripped in the right hand (except on Frame 14 where it is just released).
+- Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) — or pure magenta (#FF00FF) for Hazmat/Frankenstein — with zero anti-aliasing, zero blur, and zero drop shadows.

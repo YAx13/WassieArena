@@ -1,0 +1,11 @@
+Recolor and reskin the entire 4x4 grid of greybox weapons in Image 1 into a [BRAWLER THEME] themed weapon set, matching the exact pixel-art style, 1-pixel black outline, dithering, and color palette of the character in Image 2, and the rendering quality and shading density of the finished weapons in Image 3.
+
+STRICT LAYOUT & GEOMETRY RULES:
+- Preserve the exact 4x4 grid layout, positions, sizes, 45-degree angles, and silhouettes of all 15 weapons from Image 1 (Row 1: sword, dagger, knife, handsaw; Row 2: battleaxe, hammer, pickaxe, bone; Row 3: boomerang, bow, trident, pillar; Row 4: shuriken, grenade, molotov bottle).
+- Do not move, resize, crop, or merge any weapon.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) with no grid lines, gradients, shadows, or green color spill onto the 1px black outlines.
+- Style: crisp 16-bit retro pixel art, hard pixel edges, 1px black outer outlines, zero anti-aliasing or blur.
+
+THEME & MATERIAL DIRECTION:
+- Color Palette (sampled strictly from Image 2): [PRIMARY COLOR, SECONDARY COLOR, ACCENT COLOR].
+- Material & Motif Reskin: [2-3 SPECIFIC MOTIFS FOR THIS BRAWLER].

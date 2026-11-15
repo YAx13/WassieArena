@@ -8,8 +8,6 @@ C:.
 |   Structure-update.cmd
 |   
 +---assets
-|   |   greybox-weapons.png
-|   |   
 |   +---backgrounds
 |   |   +---afk
 |   |   |   +---empereur
@@ -58,6 +56,9 @@ C:.
 |   |   |           afk-2.jpeg
 |   |   |           afk-3.jpeg
 |   |   |           
+|   |   +---arsenal
+|   |   |       background-greybox.jpg
+|   |   |       
 |   |   +---boss
 |   |   |   +---paper
 |   |   |   |       bossroom-1.jpg
@@ -235,7 +236,6 @@ C:.
 |   |   |   |       
 |   |   |   \---weapons
 |   |   |           weapon-1-transparent.png
-|   |   |           weapon-1.jpeg
 |   |   |           
 |   |   +---frankenstein
 |   |   |   |   starter.jpeg
@@ -256,7 +256,6 @@ C:.
 |   |   |   |       
 |   |   |   \---weapons
 |   |   |           weapon-1-transparent.png
-|   |   |           weapon-1.jpeg
 |   |   |           
 |   |   +---general
 |   |   |   |   portrait.png
@@ -279,13 +278,6 @@ C:.
 |   |   |   |       
 |   |   |   \---weapons
 |   |   |           weapon-1-transparent.png
-|   |   |           weapon-1.jpeg
-|   |   |           weapon-2-transparent.png
-|   |   |           weapon-2.jpeg
-|   |   |           weapon-3-transparent.png
-|   |   |           weapon-3.jpeg
-|   |   |           weapon-4-transparent.png
-|   |   |           weapon-4.jpeg
 |   |   |           
 |   |   +---hazmat
 |   |   |   |   sprite.png
@@ -307,11 +299,6 @@ C:.
 |   |   |   |       
 |   |   |   \---weapons
 |   |   |           weapon-1-transparent.png
-|   |   |           weapon-1.jpeg
-|   |   |           weapon-2-transparent.png
-|   |   |           weapon-2.jpeg
-|   |   |           weapon-3-transparent.png
-|   |   |           weapon-3.jpeg
 |   |   |           
 |   |   +---human
 |   |   |   |   starter.jpeg
@@ -386,11 +373,6 @@ C:.
 |   |   |   |       
 |   |   |   \---weapons
 |   |   |           weapon-1-transparent.png
-|   |   |           weapon-1.jpeg
-|   |   |           weapon-2-transparent.png
-|   |   |           weapon-2.jpeg
-|   |   |           weapon-3-transparent.png
-|   |   |           weapon-3.jpeg
 |   |   |           
 |   |   +---samourai
 |   |   |   |   sprite.png
@@ -412,13 +394,9 @@ C:.
 |   |   |   |       
 |   |   |   \---weapons
 |   |   |           weapon-1-transparent.png
-|   |   |           weapon-1.jpeg
-|   |   |           weapon-2-transparent.png
-|   |   |           weapon-2.jpeg
-|   |   |           weapon-3-transparent.png
-|   |   |           weapon-3.jpeg
 |   |   |           
 |   |   \---zeus
+|   |       |   image_c4798b7.jpg
 |   |       |   sprite.png
 |   |       |   starter.jpeg
 |   |       |   
@@ -438,94 +416,299 @@ C:.
 |   |       |       
 |   |       \---weapons
 |   |               weapon-1-transparent.png
-|   |               weapon-1.jpeg
-|   |               weapon-2-transparent.png
-|   |               weapon-2.jpeg
-|   |               weapon-3-transparent.png
-|   |               weapon-3.jpeg
 |   |               
-|   \---companion
+|   +---companion
+|   |   +---empereur
+|   |   |       background.jpeg
+|   |   |       foreground.png
+|   |   |       
+|   |   +---form-1
+|   |   |       aqua.png
+|   |   |       beetle.png
+|   |   |       bird.png
+|   |   |       bull.png
+|   |   |       cat.png
+|   |   |       dog.png
+|   |   |       eagle.png
+|   |   |       lizard.png
+|   |   |       ours.png
+|   |   |       racoon.png
+|   |   |       snake.png
+|   |   |       spectre.png
+|   |   |       wolf.png
+|   |   |       
+|   |   +---form-2
+|   |   |       aqua.png
+|   |   |       beetle.png
+|   |   |       bird.png
+|   |   |       bull.png
+|   |   |       cat.png
+|   |   |       dog.png
+|   |   |       eagle.png
+|   |   |       lizard.png
+|   |   |       ours.png
+|   |   |       racoon.png
+|   |   |       snake.png
+|   |   |       spectre.png
+|   |   |       wolf.png
+|   |   |       
+|   |   +---form-3
+|   |   |       aqua.png
+|   |   |       beetle.png
+|   |   |       bird.png
+|   |   |       bull.png
+|   |   |       cat.png
+|   |   |       dog.png
+|   |   |       eagle.png
+|   |   |       lizard.png
+|   |   |       ours.png
+|   |   |       racoon.png
+|   |   |       snake.png
+|   |   |       spectre.png
+|   |   |       wolf.png
+|   |   |       
+|   |   +---frankenstein
+|   |   |       background.jpeg
+|   |   |       foreground.png
+|   |   |       
+|   |   +---general
+|   |   |       background.jpeg
+|   |   |       foreground.png
+|   |   |       
+|   |   +---hazmat
+|   |   |       background.jpeg
+|   |   |       foreground.png
+|   |   |       
+|   |   +---human
+|   |   |       background.jpeg
+|   |   |       foreground.png
+|   |   |       
+|   |   +---inversebrah
+|   |   |       background.jpeg
+|   |   |       foreground.png
+|   |   |       
+|   |   +---momie
+|   |   |       background.jpeg
+|   |   |       foreground.png
+|   |   |       
+|   |   +---samourai
+|   |   |       background.jpeg
+|   |   |       foreground.png
+|   |   |       
+|   |   \---zeus
+|   |           background.jpeg
+|   |           foreground.png
+|   |           
+|   \---weapons_cut
+|       |   greybox-weapons.png
+|       |   prompt-heavy.txt
+|       |   prompt-light.txt
+|       |   prompt-weapon.txt
+|       |   
 |       +---empereur
-|       |       background.jpeg
-|       |       foreground.png
-|       |       
-|       +---form-1
-|       |       aqua.png
-|       |       beetle.png
-|       |       bird.png
-|       |       bull.png
-|       |       cat.png
-|       |       dog.png
-|       |       eagle.png
-|       |       lizard.png
-|       |       ours.png
-|       |       racoon.png
-|       |       snake.png
-|       |       spectre.png
-|       |       wolf.png
-|       |       
-|       +---form-2
-|       |       aqua.png
-|       |       beetle.png
-|       |       bird.png
-|       |       bull.png
-|       |       cat.png
-|       |       dog.png
-|       |       eagle.png
-|       |       lizard.png
-|       |       ours.png
-|       |       racoon.png
-|       |       snake.png
-|       |       spectre.png
-|       |       wolf.png
-|       |       
-|       +---form-3
-|       |       aqua.png
-|       |       beetle.png
-|       |       bird.png
-|       |       bull.png
-|       |       cat.png
-|       |       dog.png
-|       |       eagle.png
-|       |       lizard.png
-|       |       ours.png
-|       |       racoon.png
-|       |       snake.png
-|       |       spectre.png
-|       |       wolf.png
-|       |       
+|       |   \---skin-1
+|       |           wpn-0-epee.png
+|       |           wpn-1-dague.png
+|       |           wpn-10-trident.png
+|       |           wpn-11-pilier.png
+|       |           wpn-12-shuriken.png
+|       |           wpn-13-grenade.png
+|       |           wpn-14-molotov.png
+|       |           wpn-2-couteau.png
+|       |           wpn-3-scie.png
+|       |           wpn-4-hache.png
+|       |           wpn-5-marteau.png
+|       |           wpn-6-pioche.png
+|       |           wpn-7-os.png
+|       |           wpn-8-boomerang.png
+|       |           wpn-9-arc.png
+|       |           
 |       +---frankenstein
-|       |       background.jpeg
-|       |       foreground.png
-|       |       
+|       |   \---skin-1
+|       |           wpn-0-epee.png
+|       |           wpn-1-dague.png
+|       |           wpn-10-trident.png
+|       |           wpn-11-pilier.png
+|       |           wpn-12-shuriken.png
+|       |           wpn-13-grenade.png
+|       |           wpn-14-molotov.png
+|       |           wpn-2-couteau.png
+|       |           wpn-3-scie.png
+|       |           wpn-4-hache.png
+|       |           wpn-5-marteau.png
+|       |           wpn-6-pioche.png
+|       |           wpn-7-os.png
+|       |           wpn-8-boomerang.png
+|       |           wpn-9-arc.png
+|       |           
 |       +---general
-|       |       background.jpeg
-|       |       foreground.png
-|       |       
+|       |   \---skin-1
+|       |           wpn-0-epee.png
+|       |           wpn-1-dague.png
+|       |           wpn-10-trident.png
+|       |           wpn-11-pilier.png
+|       |           wpn-12-shuriken.png
+|       |           wpn-13-grenade.png
+|       |           wpn-14-molotov.png
+|       |           wpn-2-couteau.png
+|       |           wpn-3-scie.png
+|       |           wpn-4-hache.png
+|       |           wpn-5-marteau.png
+|       |           wpn-6-pioche.png
+|       |           wpn-7-os.png
+|       |           wpn-8-boomerang.png
+|       |           wpn-9-arc.png
+|       |           
 |       +---hazmat
-|       |       background.jpeg
-|       |       foreground.png
-|       |       
+|       |   \---skin-1
+|       |           wpn-0-epee.png
+|       |           wpn-1-dague.png
+|       |           wpn-10-trident.png
+|       |           wpn-11-pilier.png
+|       |           wpn-12-shuriken.png
+|       |           wpn-13-grenade.png
+|       |           wpn-14-molotov.png
+|       |           wpn-2-couteau.png
+|       |           wpn-3-scie.png
+|       |           wpn-4-hache.png
+|       |           wpn-5-marteau.png
+|       |           wpn-6-pioche.png
+|       |           wpn-7-os.png
+|       |           wpn-8-boomerang.png
+|       |           wpn-9-arc.png
+|       |           
 |       +---human
-|       |       background.jpeg
-|       |       foreground.png
-|       |       
+|       |   \---skin-1
+|       |           wpn-0-epee.png
+|       |           wpn-1-dague.png
+|       |           wpn-10-trident.png
+|       |           wpn-11-pilier.png
+|       |           wpn-12-shuriken.png
+|       |           wpn-13-grenade.png
+|       |           wpn-14-molotov.png
+|       |           wpn-2-couteau.png
+|       |           wpn-3-scie.png
+|       |           wpn-4-hache.png
+|       |           wpn-5-marteau.png
+|       |           wpn-6-pioche.png
+|       |           wpn-7-os.png
+|       |           wpn-8-boomerang.png
+|       |           wpn-9-arc.png
+|       |           
 |       +---inversebrah
-|       |       background.jpeg
-|       |       foreground.png
-|       |       
+|       |   +---skin-1
+|       |   |       wpn-0-epee.png
+|       |   |       wpn-1-dague.png
+|       |   |       wpn-10-trident.png
+|       |   |       wpn-11-pilier.png
+|       |   |       wpn-12-shuriken.png
+|       |   |       wpn-13-grenade.png
+|       |   |       wpn-14-molotov.png
+|       |   |       wpn-2-couteau.png
+|       |   |       wpn-3-scie.png
+|       |   |       wpn-4-hache.png
+|       |   |       wpn-5-marteau.png
+|       |   |       wpn-6-pioche.png
+|       |   |       wpn-7-os.png
+|       |   |       wpn-8-boomerang.png
+|       |   |       wpn-9-arc.png
+|       |   |       
+|       |   +---skin-2
+|       |   |       wpn-0-epee.png
+|       |   |       wpn-1-dague.png
+|       |   |       wpn-10-trident.png
+|       |   |       wpn-11-pilier.png
+|       |   |       wpn-2-couteau.png
+|       |   |       wpn-3-scie.png
+|       |   |       wpn-4-hache.png
+|       |   |       wpn-5-marteau.png
+|       |   |       wpn-6-pioche.png
+|       |   |       wpn-7-os.png
+|       |   |       wpn-8-boomerang.png
+|       |   |       wpn-9-arc.png
+|       |   |       
+|       |   +---skin-3
+|       |   |       wpn-0-epee.png
+|       |   |       wpn-1-dague.png
+|       |   |       wpn-10-trident.png
+|       |   |       wpn-11-pilier.png
+|       |   |       wpn-2-couteau.png
+|       |   |       wpn-3-scie.png
+|       |   |       wpn-4-hache.png
+|       |   |       wpn-5-marteau.png
+|       |   |       wpn-6-pioche.png
+|       |   |       wpn-7-os.png
+|       |   |       wpn-8-boomerang.png
+|       |   |       wpn-9-arc.png
+|       |   |       
+|       |   \---skin-4
+|       |           wpn-0-epee.png
+|       |           wpn-1-dague.png
+|       |           wpn-10-trident.png
+|       |           wpn-11-pilier.png
+|       |           wpn-2-couteau.png
+|       |           wpn-3-scie.png
+|       |           wpn-4-hache.png
+|       |           wpn-5-marteau.png
+|       |           wpn-6-pioche.png
+|       |           wpn-7-os.png
+|       |           wpn-8-boomerang.png
+|       |           wpn-9-arc.png
+|       |           
 |       +---momie
-|       |       background.jpeg
-|       |       foreground.png
-|       |       
+|       |   \---skin-1
+|       |           wpn-0-epee.png
+|       |           wpn-1-dague.png
+|       |           wpn-10-trident.png
+|       |           wpn-11-pilier.png
+|       |           wpn-12-shuriken.png
+|       |           wpn-13-grenade.png
+|       |           wpn-14-molotov.png
+|       |           wpn-2-couteau.png
+|       |           wpn-3-scie.png
+|       |           wpn-4-hache.png
+|       |           wpn-5-marteau.png
+|       |           wpn-6-pioche.png
+|       |           wpn-7-os.png
+|       |           wpn-8-boomerang.png
+|       |           wpn-9-arc.png
+|       |           
 |       +---samourai
-|       |       background.jpeg
-|       |       foreground.png
-|       |       
+|       |   \---skin-1
+|       |           wpn-0-epee.png
+|       |           wpn-1-dague.png
+|       |           wpn-10-trident.png
+|       |           wpn-11-pilier.png
+|       |           wpn-12-shuriken.png
+|       |           wpn-13-grenade.png
+|       |           wpn-14-molotov.png
+|       |           wpn-2-couteau.png
+|       |           wpn-3-scie.png
+|       |           wpn-4-hache.png
+|       |           wpn-5-marteau.png
+|       |           wpn-6-pioche.png
+|       |           wpn-7-os.png
+|       |           wpn-8-boomerang.png
+|       |           wpn-9-arc.png
+|       |           
 |       \---zeus
-|               background.jpeg
-|               foreground.png
-|               
+|           \---skin-1
+|                   wpn-0-epee.png
+|                   wpn-1-dague.png
+|                   wpn-10-trident.png
+|                   wpn-11-pilier.png
+|                   wpn-12-shuriken.png
+|                   wpn-13-grenade.png
+|                   wpn-14-molotov.png
+|                   wpn-2-couteau.png
+|                   wpn-3-scie.png
+|                   wpn-4-hache.png
+|                   wpn-5-marteau.png
+|                   wpn-6-pioche.png
+|                   wpn-7-os.png
+|                   wpn-8-boomerang.png
+|                   wpn-9-arc.png
+|                   
 +---css
 |       character-select.css
 |       game-frame.css
@@ -597,447 +780,94 @@ C:.
 |           stats.js
 |           ui-core.js
 |           
-+---raw
-|   |   A UTILISER.jpeg
-|   |   background.jpeg
-|   |   background.jpg
-|   |   ezfzf.jpg
-|   |   image_3488da6e.jpeg
-|   |   image_6d6b5f1a.jpeg
-|   |   starter.jpeg
-|   |   
-|   +---avif
-|   |       frankenstein.avif
-|   |       hazmat.avif
-|   |       inversebrah.avif
-|   |       momie.avif
-|   |       samourai.avif
-|   |       zeus.avif
-|   |       
-|   +---boss
-|   |   |   image_207d3a66.jpeg
-|   |   |   
-|   |   +---pet
-|   |   |       image_65816223-transparent.png
-|   |   |       image_65816223.jpeg
-|   |   |       image_667026fd.jpeg
-|   |   |       
-|   |   \---weapon
-|   |           image_19cef7c8-transparent.png
-|   |           image_19cef7c8.jpeg
-|   |           image_ddd92bc8.jpeg
-|   |           image_f6ccc56b-transparent.png
-|   |           image_f6ccc56b.jpeg
-|   |           
-|   +---form-1raw
-|   |       aqua.jpeg
-|   |       beetle.jpeg
-|   |       bird.jpeg
-|   |       bull.jpeg
-|   |       cat.jpeg
-|   |       dog.jpeg
-|   |       eagle.jpeg
-|   |       lizard.jpeg
-|   |       ours.jpeg
-|   |       racoon.jpeg
-|   |       snake.jpeg
-|   |       spectre.jpeg
-|   |       wolf.jpeg
-|   |       
-|   +---form-2raw
-|   |       aqua.jpeg
-|   |       beetle.jpeg
-|   |       bird.jpeg
-|   |       bull.jpeg
-|   |       cat.jpeg
-|   |       dog.jpeg
-|   |       eagle.jpeg
-|   |       lizard.jpeg
-|   |       ours.jpeg
-|   |       racoon.jpeg
-|   |       snake.jpeg
-|   |       spectre.jpeg
-|   |       wolf.jpeg
-|   |       
-|   +---form-3raw
-|   |       aqua.jpeg
-|   |       beetle.jpeg
-|   |       bird.jpeg
-|   |       bull.jpeg
-|   |       cat.jpeg
-|   |       dog.jpeg
-|   |       eagle.jpeg
-|   |       lizard.jpeg
-|   |       ours-3.jpeg
-|   |       ours.jpeg
-|   |       racoon.jpeg
-|   |       snake.jpeg
-|   |       spectre.jpeg
-|   |       wolf.jpeg
-|   |       
-|   \---screenshots
-|           human-style-description.png
-|           
-\---weapons_cut
-    |   prompt-heavy.txt
-    |   prompt-light.txt
+\---raw
+    |   A UTILISER.jpeg
+    |   background.jpeg
+    |   background.jpg
+    |   ezfzf.jpg
+    |   image_3488da6e.jpeg
+    |   image_6d6b5f1a.jpeg
+    |   mockup-simulator.jpg
+    |   starter.jpeg
     |   
-    +---empereur
-    |   \---skin-1
-    |           wpn-0-epee.png
-    |           wpn-1-dague.png
-    |           wpn-10-trident.png
-    |           wpn-11-pilier.png
-    |           wpn-2-couteau.png
-    |           wpn-3-scie.png
-    |           wpn-4-hache.png
-    |           wpn-5-marteau.png
-    |           wpn-6-pioche.png
-    |           wpn-7-os.png
-    |           wpn-8-boomerang.png
-    |           wpn-9-arc.png
+    +---avif
+    |       frankenstein.avif
+    |       hazmat.avif
+    |       inversebrah.avif
+    |       momie.avif
+    |       samourai.avif
+    |       zeus.avif
+    |       
+    +---boss
+    |   |   image_207d3a66.jpeg
+    |   |   
+    |   +---pet
+    |   |       image_65816223-transparent.png
+    |   |       image_65816223.jpeg
+    |   |       image_667026fd.jpeg
+    |   |       
+    |   \---weapon
+    |           image_19cef7c8-transparent.png
+    |           image_19cef7c8.jpeg
+    |           image_ddd92bc8.jpeg
+    |           image_f6ccc56b-transparent.png
+    |           image_f6ccc56b.jpeg
     |           
-    +---frankenstein
-    |   \---skin-1
-    |           wpn-0-epee.png
-    |           wpn-1-dague.png
-    |           wpn-10-trident.png
-    |           wpn-11-pilier.png
-    |           wpn-2-couteau.png
-    |           wpn-3-scie.png
-    |           wpn-4-hache.png
-    |           wpn-5-marteau.png
-    |           wpn-6-pioche.png
-    |           wpn-7-os.png
-    |           wpn-8-boomerang.png
-    |           wpn-9-arc.png
-    |           
-    +---general
-    |   +---skin-1
-    |   |       wpn-0-epee.png
-    |   |       wpn-1-dague.png
-    |   |       wpn-10-trident.png
-    |   |       wpn-11-pilier.png
-    |   |       wpn-2-couteau.png
-    |   |       wpn-3-scie.png
-    |   |       wpn-4-hache.png
-    |   |       wpn-5-marteau.png
-    |   |       wpn-6-pioche.png
-    |   |       wpn-7-os.png
-    |   |       wpn-8-boomerang.png
-    |   |       wpn-9-arc.png
-    |   |       
-    |   +---skin-2
-    |   |       wpn-0-epee.png
-    |   |       wpn-1-dague.png
-    |   |       wpn-10-trident.png
-    |   |       wpn-11-pilier.png
-    |   |       wpn-2-couteau.png
-    |   |       wpn-3-scie.png
-    |   |       wpn-4-hache.png
-    |   |       wpn-5-marteau.png
-    |   |       wpn-6-pioche.png
-    |   |       wpn-7-os.png
-    |   |       wpn-8-boomerang.png
-    |   |       wpn-9-arc.png
-    |   |       
-    |   +---skin-3
-    |   |       wpn-0-epee.png
-    |   |       wpn-1-dague.png
-    |   |       wpn-10-trident.png
-    |   |       wpn-11-pilier.png
-    |   |       wpn-2-couteau.png
-    |   |       wpn-3-scie.png
-    |   |       wpn-4-hache.png
-    |   |       wpn-5-marteau.png
-    |   |       wpn-6-pioche.png
-    |   |       wpn-7-os.png
-    |   |       wpn-8-boomerang.png
-    |   |       wpn-9-arc.png
-    |   |       
-    |   \---skin-4
-    |           wpn-0-epee.png
-    |           wpn-1-dague.png
-    |           wpn-10-trident.png
-    |           wpn-11-pilier.png
-    |           wpn-2-couteau.png
-    |           wpn-3-scie.png
-    |           wpn-4-hache.png
-    |           wpn-5-marteau.png
-    |           wpn-6-pioche.png
-    |           wpn-7-os.png
-    |           wpn-8-boomerang.png
-    |           wpn-9-arc.png
-    |           
-    +---hazmat
-    |   +---skin-1
-    |   |       wpn-0-epee.png
-    |   |       wpn-1-dague.png
-    |   |       wpn-10-trident.png
-    |   |       wpn-11-pilier.png
-    |   |       wpn-2-couteau.png
-    |   |       wpn-3-scie.png
-    |   |       wpn-4-hache.png
-    |   |       wpn-5-marteau.png
-    |   |       wpn-6-pioche.png
-    |   |       wpn-7-os.png
-    |   |       wpn-8-boomerang.png
-    |   |       wpn-9-arc.png
-    |   |       
-    |   +---skin-2
-    |   |       wpn-0-epee.png
-    |   |       wpn-1-dague.png
-    |   |       wpn-10-trident.png
-    |   |       wpn-11-pilier.png
-    |   |       wpn-2-couteau.png
-    |   |       wpn-3-scie.png
-    |   |       wpn-4-hache.png
-    |   |       wpn-5-marteau.png
-    |   |       wpn-6-pioche.png
-    |   |       wpn-7-os.png
-    |   |       wpn-8-boomerang.png
-    |   |       wpn-9-arc.png
-    |   |       
-    |   \---skin-3
-    |           wpn-0-epee.png
-    |           wpn-1-dague.png
-    |           wpn-10-trident.png
-    |           wpn-11-pilier.png
-    |           wpn-2-couteau.png
-    |           wpn-3-scie.png
-    |           wpn-4-hache.png
-    |           wpn-5-marteau.png
-    |           wpn-6-pioche.png
-    |           wpn-7-os.png
-    |           wpn-8-boomerang.png
-    |           wpn-9-arc.png
-    |           
-    +---human
-    |   +---skin-1
-    |   |       wpn-0-epee.png
-    |   |       wpn-1-dague.png
-    |   |       wpn-10-trident.png
-    |   |       wpn-11-pilier.png
-    |   |       wpn-2-couteau.png
-    |   |       wpn-3-scie.png
-    |   |       wpn-4-hache.png
-    |   |       wpn-5-marteau.png
-    |   |       wpn-6-pioche.png
-    |   |       wpn-7-os.png
-    |   |       wpn-8-boomerang.png
-    |   |       wpn-9-arc.png
-    |   |       
-    |   +---skin-2
-    |   |       wpn-0-epee.png
-    |   |       wpn-1-dague.png
-    |   |       wpn-10-trident.png
-    |   |       wpn-11-pilier.png
-    |   |       wpn-2-couteau.png
-    |   |       wpn-3-scie.png
-    |   |       wpn-4-hache.png
-    |   |       wpn-5-marteau.png
-    |   |       wpn-6-pioche.png
-    |   |       wpn-7-os.png
-    |   |       wpn-8-boomerang.png
-    |   |       wpn-9-arc.png
-    |   |       
-    |   \---skin-3
-    |           wpn-0-epee.png
-    |           wpn-1-dague.png
-    |           wpn-10-trident.png
-    |           wpn-11-pilier.png
-    |           wpn-2-couteau.png
-    |           wpn-3-scie.png
-    |           wpn-4-hache.png
-    |           wpn-5-marteau.png
-    |           wpn-6-pioche.png
-    |           wpn-7-os.png
-    |           wpn-8-boomerang.png
-    |           wpn-9-arc.png
-    |           
-    +---inversebrah
-    |   +---skin-1
-    |   |       wpn-0-epee.png
-    |   |       wpn-1-dague.png
-    |   |       wpn-10-trident.png
-    |   |       wpn-11-pilier.png
-    |   |       wpn-2-couteau.png
-    |   |       wpn-3-scie.png
-    |   |       wpn-4-hache.png
-    |   |       wpn-5-marteau.png
-    |   |       wpn-6-pioche.png
-    |   |       wpn-7-os.png
-    |   |       wpn-8-boomerang.png
-    |   |       wpn-9-arc.png
-    |   |       
-    |   +---skin-2
-    |   |       wpn-0-epee.png
-    |   |       wpn-1-dague.png
-    |   |       wpn-10-trident.png
-    |   |       wpn-11-pilier.png
-    |   |       wpn-2-couteau.png
-    |   |       wpn-3-scie.png
-    |   |       wpn-4-hache.png
-    |   |       wpn-5-marteau.png
-    |   |       wpn-6-pioche.png
-    |   |       wpn-7-os.png
-    |   |       wpn-8-boomerang.png
-    |   |       wpn-9-arc.png
-    |   |       
-    |   +---skin-3
-    |   |       wpn-0-epee.png
-    |   |       wpn-1-dague.png
-    |   |       wpn-10-trident.png
-    |   |       wpn-11-pilier.png
-    |   |       wpn-2-couteau.png
-    |   |       wpn-3-scie.png
-    |   |       wpn-4-hache.png
-    |   |       wpn-5-marteau.png
-    |   |       wpn-6-pioche.png
-    |   |       wpn-7-os.png
-    |   |       wpn-8-boomerang.png
-    |   |       wpn-9-arc.png
-    |   |       
-    |   \---skin-4
-    |           wpn-0-epee.png
-    |           wpn-1-dague.png
-    |           wpn-10-trident.png
-    |           wpn-11-pilier.png
-    |           wpn-2-couteau.png
-    |           wpn-3-scie.png
-    |           wpn-4-hache.png
-    |           wpn-5-marteau.png
-    |           wpn-6-pioche.png
-    |           wpn-7-os.png
-    |           wpn-8-boomerang.png
-    |           wpn-9-arc.png
-    |           
-    +---momie
-    |   +---skin-1
-    |   |       wpn-0-epee.png
-    |   |       wpn-1-dague.png
-    |   |       wpn-10-trident.png
-    |   |       wpn-11-pilier.png
-    |   |       wpn-2-couteau.png
-    |   |       wpn-3-scie.png
-    |   |       wpn-4-hache.png
-    |   |       wpn-5-marteau.png
-    |   |       wpn-6-pioche.png
-    |   |       wpn-7-os.png
-    |   |       wpn-8-boomerang.png
-    |   |       wpn-9-arc.png
-    |   |       
-    |   +---skin-2
-    |   |       wpn-0-epee.png
-    |   |       wpn-1-dague.png
-    |   |       wpn-10-trident.png
-    |   |       wpn-11-pilier.png
-    |   |       wpn-2-couteau.png
-    |   |       wpn-3-scie.png
-    |   |       wpn-4-hache.png
-    |   |       wpn-5-marteau.png
-    |   |       wpn-6-pioche.png
-    |   |       wpn-7-os.png
-    |   |       wpn-8-boomerang.png
-    |   |       wpn-9-arc.png
-    |   |       
-    |   \---skin-3
-    |           wpn-0-epee.png
-    |           wpn-1-dague.png
-    |           wpn-10-trident.png
-    |           wpn-11-pilier.png
-    |           wpn-2-couteau.png
-    |           wpn-3-scie.png
-    |           wpn-4-hache.png
-    |           wpn-5-marteau.png
-    |           wpn-6-pioche.png
-    |           wpn-7-os.png
-    |           wpn-8-boomerang.png
-    |           wpn-9-arc.png
-    |           
-    +---samourai
-    |   +---skin-1
-    |   |       wpn-0-epee.png
-    |   |       wpn-1-dague.png
-    |   |       wpn-10-trident.png
-    |   |       wpn-11-pilier.png
-    |   |       wpn-2-couteau.png
-    |   |       wpn-3-scie.png
-    |   |       wpn-4-hache.png
-    |   |       wpn-5-marteau.png
-    |   |       wpn-6-pioche.png
-    |   |       wpn-7-os.png
-    |   |       wpn-8-boomerang.png
-    |   |       wpn-9-arc.png
-    |   |       
-    |   +---skin-2
-    |   |       wpn-0-epee.png
-    |   |       wpn-1-dague.png
-    |   |       wpn-10-trident.png
-    |   |       wpn-11-pilier.png
-    |   |       wpn-2-couteau.png
-    |   |       wpn-3-scie.png
-    |   |       wpn-4-hache.png
-    |   |       wpn-5-marteau.png
-    |   |       wpn-6-pioche.png
-    |   |       wpn-7-os.png
-    |   |       wpn-8-boomerang.png
-    |   |       wpn-9-arc.png
-    |   |       
-    |   \---skin-3
-    |           wpn-0-epee.png
-    |           wpn-1-dague.png
-    |           wpn-10-trident.png
-    |           wpn-11-pilier.png
-    |           wpn-2-couteau.png
-    |           wpn-3-scie.png
-    |           wpn-4-hache.png
-    |           wpn-5-marteau.png
-    |           wpn-6-pioche.png
-    |           wpn-7-os.png
-    |           wpn-8-boomerang.png
-    |           wpn-9-arc.png
-    |           
-    \---zeus
-        +---skin-1
-        |       wpn-0-epee.png
-        |       wpn-1-dague.png
-        |       wpn-10-trident.png
-        |       wpn-11-pilier.png
-        |       wpn-2-couteau.png
-        |       wpn-3-scie.png
-        |       wpn-4-hache.png
-        |       wpn-5-marteau.png
-        |       wpn-6-pioche.png
-        |       wpn-7-os.png
-        |       wpn-8-boomerang.png
-        |       wpn-9-arc.png
-        |       
-        +---skin-2
-        |       wpn-0-epee.png
-        |       wpn-1-dague.png
-        |       wpn-10-trident.png
-        |       wpn-11-pilier.png
-        |       wpn-2-couteau.png
-        |       wpn-3-scie.png
-        |       wpn-4-hache.png
-        |       wpn-5-marteau.png
-        |       wpn-6-pioche.png
-        |       wpn-7-os.png
-        |       wpn-8-boomerang.png
-        |       wpn-9-arc.png
-        |       
-        \---skin-3
-                wpn-0-epee.png
-                wpn-1-dague.png
-                wpn-10-trident.png
-                wpn-11-pilier.png
-                wpn-2-couteau.png
-                wpn-3-scie.png
-                wpn-4-hache.png
-                wpn-5-marteau.png
-                wpn-6-pioche.png
-                wpn-7-os.png
-                wpn-8-boomerang.png
-                wpn-9-arc.png
-                
+    +---form-1raw
+    |       aqua.jpeg
+    |       beetle.jpeg
+    |       bird.jpeg
+    |       bull.jpeg
+    |       cat.jpeg
+    |       dog.jpeg
+    |       eagle.jpeg
+    |       lizard.jpeg
+    |       ours.jpeg
+    |       racoon.jpeg
+    |       snake.jpeg
+    |       spectre.jpeg
+    |       wolf.jpeg
+    |       
+    +---form-2raw
+    |       aqua.jpeg
+    |       beetle.jpeg
+    |       bird.jpeg
+    |       bull.jpeg
+    |       cat.jpeg
+    |       dog.jpeg
+    |       eagle.jpeg
+    |       lizard.jpeg
+    |       ours.jpeg
+    |       racoon.jpeg
+    |       snake.jpeg
+    |       spectre.jpeg
+    |       wolf.jpeg
+    |       
+    +---form-3raw
+    |       aqua.jpeg
+    |       beetle.jpeg
+    |       bird.jpeg
+    |       bull.jpeg
+    |       cat.jpeg
+    |       dog.jpeg
+    |       eagle.jpeg
+    |       lizard.jpeg
+    |       ours-3.jpeg
+    |       ours.jpeg
+    |       racoon.jpeg
+    |       snake.jpeg
+    |       spectre.jpeg
+    |       wolf.jpeg
+    |       
+    +---screenshots
+    |       human-style-description.png
+    |       
+    \---weapon
+            image_166d7294.jpg
+            image_92b85493.jpg
+            image_9abc1211.jpg
+            image_a2a6b3f9.jpg
+            image_d12e1bcc.jpg
+            image_d6b42463.jpg
+            image_ec18278.jpg
+            

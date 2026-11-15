@@ -89,9 +89,13 @@ class BattleEngine {
       sk = { name: c.name, pet: c, el, t: "A", pw, fx, desc: "" };
     }
     // Recours à l'arme : dégainage persistant (light / heavy) et lancer à distance (throw)
-    let drewWpn=false;
+    let drewWpn=false, droppedWpn=null;
     if(!sk){
-      if(A.held!==null && A.bag.length>0 && Math.random()<0.12) A.held=null;
+      if(A.held!==null && A.bag.length>0 && Math.random()<0.12){
+        const oldW=DataEngine.WEAPONS[A.held];
+        if(oldW) droppedWpn={id:oldW.id,icon:oldW.icon};
+        A.held=null;
+      }
       if(A.held===null && A.bag.length>0 && Math.random()<0.38){
         const pid=DataEngine.pick(A.bag);
         A.bag=A.bag.filter(id=>id!==pid);
@@ -114,7 +118,7 @@ class BattleEngine {
     if(stunned) S.stun--;
     const wpnVerb={light:"frappe vivement avec",heavy:"abat lourdement",throw:"lance"}[wp?wp.type||"light":"light"];
     const wpnMsg=wp?(drewWpn?A.name+" dégaine "+wp.icon+" "+wl+" et "+wpnVerb+" son arme !":A.name+" "+wpnVerb+" "+wp.icon+" "+wl+" !"):"";
-    this.emit("on_attack",{i,j,round:this.round,self:!!(stunned||dead||(sk&&sk.pw===0)),skill:sk&&!wp?sk.name:null,weapon:wp?{name:wl,icon:wp.icon,id:wp.id}:null,pet:sk&&sk.pet?{name:sk.pet.name,species:sk.pet.species,form:sk.pet.form||1}:null,msg:dead?A.name+" vacille…":stunned?A.name+" est étourdi et perd son tour.":sk&&sk.pet?A.name+" siffle : "+sk.pet.name+" passe à l’attaque !":wp?wpnMsg:sk?A.name+" utilise "+sk.name+" !":A.name+" fonce en avant !"});
+    this.emit("on_attack",{i,j,round:this.round,self:!!(stunned||dead||(sk&&sk.pw===0)),drewWpn,droppedWpn,skill:sk&&!wp?sk.name:null,weapon:wp?{name:wl,icon:wp.icon,id:wp.id}:null,pet:sk&&sk.pet?{name:sk.pet.name,species:sk.pet.species,form:sk.pet.form||1}:null,msg:dead?A.name+" vacille…":stunned?A.name+" est étourdi et perd son tour.":sk&&sk.pet?A.name+" siffle : "+sk.pet.name+" passe à l’attaque !":wp?wpnMsg:sk?A.name+" utilise "+sk.name+" !":A.name+" fonce en avant !"});
     out.forEach(e=>this.emit(e.type,e));
     if(dead){ this.over=true; this.winner=j; this.emit("on_death",{i,j,dead:i,msg:A.name+" succombe à ses blessures."}); }
     else if(!stunned){
@@ -336,10 +340,15 @@ const Combat={
     else kind=crit?"uppercut":"punch";
     const K=this.K[kind]||this.K.idle;
     const heldId=this.eng.f[at.i].held;
-    this.ph={k:"act",kind,K,t0:c,i:at.i,j:at.j,ev,hit:0,wicon:at.weapon&&at.weapon.icon,wid:at.weapon&&at.weapon.id,
+    const hasDrawAnim=!!(at.drewWpn&&at.weapon&&Number.isInteger(at.weapon.id)&&at.weapon.id>=0&&at.weapon.id<10&&at.weapon.id!==8&&renderer.loadImg(DataEngine.spriteBase(A.b.sprite,at.weapon.id)));
+    const drawDelay=hasDrawAnim?240:0;
+    const dropInfo=at.droppedWpn||null;
+    const hasDropSheet=!!(dropInfo&&dropInfo.id>=0&&dropInfo.id<10&&dropInfo.id!==8&&renderer.loadImg(DataEngine.spriteBase(A.b.sprite,dropInfo.id)));
+    this.ph={k:"act",kind,K,t0:c,drawDelay,dropInfo,hasDropSheet,i:at.i,j:at.j,ev,hit:0,wicon:at.weapon&&at.weapon.icon,wid:at.weapon&&at.weapon.id,
       tx:K.ranged||at.self||kind==="pet"?(kind==="pet"?bx+(at.i?42:-42):A.bx):K.through?bx-dir*60:bx+(at.i?46:-46)};
     this.amp=K.amp||5;
-    if(at.weapon&&!at.pet) A.wpn={ic:at.weapon.icon,id:at.weapon.id};
+    if(dropInfo&&!at.drewWpn) A.wpn={ic:dropInfo.icon,id:dropInfo.id};
+    else if(at.weapon&&!at.pet) A.wpn={ic:at.weapon.icon,id:at.weapon.id};
     else A.wpn=heldId!==null?{ic:DataEngine.WEAPONS[heldId].icon,id:heldId}:null;
     if(kind==="pet"){ this.ph.pt=this.P.find(p=>p.i===at.i); }
     this.lg(at.msg);
@@ -372,14 +381,26 @@ const Combat={
     if(p.k==="end"){ if(c>=p.t){ this.ph=null; this.finish(); } return; }
     if(p.k==="prop"){ this.prop(p,c); return; }
     if(p.k==="swap"){ if(c>=p.t){ this.idx++; this.fl=[]; this.spawn(c,false); this.annonce(false); this.ph={k:"intro",t:c+500}; } return; }   // ennemi suivant
-    const e=c-p.t0, a=this.V[p.i];
-    if(p.kind==="pet"){ this.tickPet(p,c,e,a); return; }
-    const K=p.K, T=K.T, d=this.V[p.j];
+    const rawE=c-p.t0, a=this.V[p.i];
+    if(p.kind==="pet"){ this.tickPet(p,c,rawE,a); return; }
+    const d=this.V[p.j];
+    // Phase optionnelle : lâcher l'arme précédente (throw_wpn) ou dégainer la nouvelle (draw_wpn)
+    if(p.drawDelay>0 && rawE<p.drawDelay){
+      a.x=a.bx; a.air=0; a.flip=a.flip0;
+      if(p.dropInfo && rawE<120){
+        if(!this.proj) this.proj={ic:p.dropInfo.icon,id:p.dropInfo.id,b:a.b,x0:a.bx+(p.i?-18:18),y0:a.y-42,x1:a.bx+(p.i?34:-34),y1:a.y-6,t0:p.t0+40,t1:p.t0+260};
+        if(p.hasDropSheet){ a.wpn={ic:p.dropInfo.icon,id:p.dropInfo.id}; this.setA(a,"throw_wpn",p.t0); return; }
+      }
+      a.wpn=p.wicon?{ic:p.wicon,id:p.wid}:null;
+      this.setA(a,"draw_wpn",p.t0+(p.dropInfo?120:0));
+      return;
+    }
+    const e=rawE-p.drawDelay, K=p.K, T=K.T;
     if(!p.hit&&e>=K.h){ p.hit=1; this.impact(p,c); }
-    if(K.rel&&e>=K.rel&&e<K.h){ a.wpn=null; if(!this.proj&&p.wicon) this.proj={ic:p.wicon,id:p.wid,b:a.b,x0:a.bx+(p.i?-28:28),y0:a.y-48,x1:d.bx,y1:d.y-42,t0:p.t0+K.rel,t1:p.t0+K.h}; }
-    if(e<T[0]){ const k=e/T[0]; a.x=a.bx+(p.tx-a.bx)*k; a.air=K.jump?Math.sin(Math.PI*k)*K.jump:0; a.flip=a.flip0; this.setA(a,"dash",p.t0); }
-    else if(e<T[1]){ a.x=p.tx; a.air=0; a.flip=a.flip0; this.setA(a,K.a,p.t0+T[0]); }
-    else if(e<T[2]){ a.x=p.tx+(a.bx-p.tx)*(e-T[1])/(T[2]-T[1]); a.flip=!a.flip0; this.setA(a,"dash",p.t0+T[1]); }
+    if(K.rel&&e>=K.rel&&e<K.h){ a.wpn=null; if(!this.proj&&p.wicon) this.proj={ic:p.wicon,id:p.wid,b:a.b,x0:a.bx+(p.i?-28:28),y0:a.y-48,x1:d.bx,y1:d.y-42,t0:p.t0+p.drawDelay+K.rel,t1:p.t0+p.drawDelay+K.h}; }
+    if(e<T[0]){ const k=e/T[0]; a.x=a.bx+(p.tx-a.bx)*k; a.air=K.jump?Math.sin(Math.PI*k)*K.jump:0; a.flip=a.flip0; this.setA(a,"dash",p.t0+p.drawDelay); }
+    else if(e<T[1]){ a.x=p.tx; a.air=0; a.flip=a.flip0; this.setA(a,K.a,p.t0+p.drawDelay+T[0]); }
+    else if(e<T[2]){ a.x=p.tx+(a.bx-p.tx)*(e-T[1])/(T[2]-T[1]); a.flip=!a.flip0; this.setA(a,"dash",p.t0+p.drawDelay+T[1]); }
     else { const heldId=this.eng.f[p.i].held; a.wpn=heldId!==null?{ic:DataEngine.WEAPONS[heldId].icon,id:heldId}:null; a.air=0; a.x=a.bx; a.flip=a.flip0; this.setA(a,"idle",c);
       if(p.prop!=null){ this.ph={k:"prop",t0:c,j:p.prop,sw:0}; return; }
       this.after(c); }

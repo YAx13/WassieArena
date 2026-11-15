@@ -144,38 +144,25 @@ document.addEventListener("click",hideTip); addEventListener("scroll",hideTip,tr
 })();
 
 /* --- Rendu de la fiche --- */
-const WEAPON_RACK_LAYOUT_PREFIX="arene_weapon_rack_dev_layout_v1_";
-let weaponRackEditing=false, weaponRackPositions=null, weaponRackDrag=null, weaponRackBrute="general";
-const WEAPON_RACK_FROZEN={};
+const WEAPON_RACK_LAYOUT_KEY="arene_armory_layout_global_v2";
+let weaponRackEditing=false, weaponRackPositions=null, weaponRackDrag=null;
 function validRackPositions(p){
   return Array.isArray(p)&&p.length===DataEngine.WEAPONS.length&&p.every((q,i)=>q&&q.id===i&&[q.x,q.y,q.size,q.angle].every(Number.isFinite));
 }
-function readWeaponRackPositions(brute=weaponRackBrute){
+function readWeaponRackPositions(){
   try{
-    const saved=localStorage.getItem(WEAPON_RACK_LAYOUT_PREFIX+brute);
+    const saved=localStorage.getItem(WEAPON_RACK_LAYOUT_KEY);
     if(saved){
       const positions=JSON.parse(saved);
       if(validRackPositions(positions)) return positions;
-      console.error("La configuration DEV du râtelier est invalide.");
     }
-  }catch(error){
-    console.error("Impossible de charger la configuration DEV du râtelier.",error);
-  }
-  const frozen=WEAPON_RACK_FROZEN[brute];
-  return validRackPositions(frozen)?frozen.map(p=>({...p})):null;
+  }catch(error){}
+  return null;
 }
 function saveWeaponRackPositions(){
   if(!weaponRackPositions) return;
-  try{ localStorage.setItem(WEAPON_RACK_LAYOUT_PREFIX+weaponRackBrute,JSON.stringify(weaponRackPositions)); }
-  catch(error){ console.error("Impossible de sauvegarder la configuration DEV du râtelier.",error); }
-  console.log(`WEAPON_RACK_LAYOUT["${weaponRackBrute}"] =`,JSON.stringify(weaponRackPositions.map(({id,x,y,size,angle,flip})=>({id,x:+x.toFixed(2),y:+y.toFixed(2),size:+size.toFixed(2),angle:+angle.toFixed(1),flip:!!flip}))));
-}
-function rackPositionText(){
-  return JSON.stringify(weaponRackPositions.map(({id,x,y,size,angle,flip})=>({id,x:+x.toFixed(2),y:+y.toFixed(2),size:+size.toFixed(2),angle:+angle.toFixed(1),flip:!!flip})),null,2);
-}
-function updateRackPositionExport(){
-  const output=$("#dev-rack-positions");
-  if(output&&weaponRackPositions) output.value=rackPositionText();
+  try{ localStorage.setItem(WEAPON_RACK_LAYOUT_KEY,JSON.stringify(weaponRackPositions)); }catch(error){}
+  console.log("ARMORY_DEFAULT_LAYOUT =",JSON.stringify(weaponRackPositions.map(({id,x,y,size,angle,flip})=>({id,x:+x.toFixed(2),y:+y.toFixed(2),size:+size.toFixed(2),angle:+angle.toFixed(1),flip:!!flip}))));
 }
 function rackPositionBounds(position,grid){
   const angle=position.angle*Math.PI/180, size=position.size/100;
@@ -197,43 +184,19 @@ function applyRackPosition(button,position,grid){
   button.style.top=position.y+"%";
   button.style.width=size+"px";
   button.style.height=size+"px";
-  button.style.setProperty("--rack-angle",position.angle+"deg");
   button.style.position="absolute";
   button.style.margin="0";
-  button.style.gridColumn=button.style.gridRow="auto";
   button.style.transform=`translate(-50%,-50%) rotate(${position.angle}deg) scaleX(${position.flip?-1:1})`;
-}
-function rackPositionOverlaps(position,grid,id){
-  const bounds=rackPositionBounds(position,grid);
-  return weaponRackPositions.some(other=>{
-    if(other.id===id) return false;
-    const box=rackPositionBounds(other,grid);
-    return bounds.left<box.right&&bounds.right>box.left&&bounds.top<box.bottom&&bounds.bottom>box.top;
-  });
 }
 function beginWeaponRackEditing(grid){
   const buttons=[...grid.querySelectorAll(".fx-rack-weapon")];
-  if(!grid.clientWidth||!grid.clientHeight){ console.error("Râtelier : grille de taille 0",grid.clientWidth,grid.clientHeight); return; }
+  if(!grid.clientWidth||!grid.clientHeight) return;
   if(!weaponRackPositions){
-    weaponRackPositions=readWeaponRackPositions();
-    if(!weaponRackPositions){
-      const gr=grid.getBoundingClientRect(), ox=gr.left+grid.clientLeft, oy=gr.top+grid.clientTop;
-      weaponRackPositions=Array.from({length:DataEngine.WEAPONS.length},(_,id)=>{
-        const button=buttons.find(item=>+item.dataset.rackWeapon===id), rect=button.getBoundingClientRect();
-        return {
-          id,
-          x:(rect.left+rect.width/2-ox)/grid.clientWidth*100,
-          y:(rect.top+rect.height/2-oy)/grid.clientHeight*100,
-          size:button.offsetWidth/grid.clientHeight*100,
-          angle:parseFloat(button.style.getPropertyValue("--rack-angle"))||0
-        };
-      });
-    }
+    weaponRackPositions=readWeaponRackPositions()||ARMORY_DEFAULT_LAYOUT.map(p=>({...p}));
   }
   weaponRackEditing=true;
   grid.classList.add("is-editing");
   buttons.forEach(button=>applyRackPosition(button,weaponRackPositions[+button.dataset.rackWeapon],grid));
-  updateRackPositionExport();
 }
 function attachWeaponRackEditor(grid){
   grid.addEventListener("pointerdown",event=>{
@@ -242,7 +205,7 @@ function attachWeaponRackEditor(grid){
     if(!button) return;
     event.preventDefault();event.stopPropagation();
     const id=+button.dataset.rackWeapon;
-    weaponRackDrag={id,pointerId:event.pointerId,start:{...weaponRackPositions[id]},grid};
+    weaponRackDrag={id,pointerId:event.pointerId,grid};
     button.setPointerCapture(event.pointerId);
   });
   grid.addEventListener("pointermove",event=>{
@@ -254,193 +217,32 @@ function attachWeaponRackEditor(grid){
   });
   const finish=event=>{
     if(!weaponRackDrag||event.pointerId!==weaponRackDrag.pointerId) return;
-    const {id,grid,start}=weaponRackDrag,button=grid.querySelector(`[data-rack-weapon="${id}"]`);
     weaponRackDrag=null;
-    saveWeaponRackPositions();updateRackPositionExport();
+    saveWeaponRackPositions();
   };
   grid.addEventListener("pointerup",finish);
   grid.addEventListener("pointercancel",finish);
+  grid.addEventListener("contextmenu",event=>{
+    if(!weaponRackEditing) return;
+    const button=event.target.closest(".fx-rack-weapon");
+    if(!button) return;
+    event.preventDefault();
+    const pos=weaponRackPositions[+button.dataset.rackWeapon];
+    if(pos){ pos.flip=!pos.flip; applyRackPosition(button,pos,grid); saveWeaponRackPositions(); }
+  });
   grid.addEventListener("wheel",event=>{
     if(!weaponRackEditing) return;
     const button=event.target.closest(".fx-rack-weapon");
     if(!button) return;
     event.preventDefault();event.stopPropagation();
-    const position=weaponRackPositions[+button.dataset.rackWeapon],start={...position};
+    const position=weaponRackPositions[+button.dataset.rackWeapon];
     if(event.shiftKey) position.angle+=event.deltaY<0?5:-5;
-    else position.size=Math.max(12,Math.min(85,position.size+(event.deltaY<0?3:-3)));
+    else position.size=Math.max(8,Math.min(55,position.size+(event.deltaY<0?2:-2)));
     clampRackPosition(position,grid);
-    applyRackPosition(button,weaponRackPositions[position.id],grid);
-    saveWeaponRackPositions();updateRackPositionExport();
+    applyRackPosition(button,position,grid);
+    saveWeaponRackPositions();
   },{passive:false});
 }
-const weaponPixelMetrics={};
-let weaponBuckleSize=30;
-
-function measureWeaponPixels(b,id){
-  const key=(b.sprite||"general")+":"+id;
-  if(weaponPixelMetrics[key]) return weaponPixelMetrics[key];
-  const skin=renderer.weaponSprite(b,id);
-  if(!skin||!skin.sheet||!skin.sheet.complete||!skin.sheet.naturalWidth) return null;
-  try{
-    const W=skin.width, H=skin.height, cv=document.createElement("canvas");
-    cv.width=W; cv.height=H;
-    const ctx=cv.getContext("2d");
-    ctx.drawImage(skin.sheet,skin.x,skin.y,W,H,0,0,W,H);
-    const data=ctx.getImageData(0,0,W,H).data;
-    const solid=new Uint8Array(W*H), vis=new Uint8Array(W*H);
-    for(let i=0;i<W*H;i++) if(data[i*4+3]>140) solid[i]=1;
-    // Isoler uniquement la composante connexe principale (supprime les pixels isolés)
-    let bestBlob=[];
-    const stack=new Int32Array(W*H);
-    for(let i=0;i<W*H;i++){
-      if(!solid[i]||vis[i]) continue;
-      let sp=0; stack[sp++]=i; vis[i]=1;
-      const blob=[];
-      while(sp>0){
-        const cur=stack[--sp]; blob.push(cur);
-        const cx=cur%W, cy=(cur-cx)/W;
-        for(let dy=-1;dy<=1;dy++) for(let dx=-1;dx<=1;dx++){
-          if(!dx&&!dy) continue;
-          const nx=cx+dx, ny=cy+dy;
-          if(nx>=0&&nx<W&&ny>=0&&ny<H){
-            const ni=ny*W+nx;
-            if(solid[ni]&&!vis[ni]){ vis[ni]=1; stack[sp++]=ni; }
-          }
-        }
-      }
-      if(blob.length>bestBlob.length) bestBlob=blob;
-    }
-    const cleanMask=new Uint8Array(W*H);
-    let minX=W, maxX=0, minY=H, maxY=0;
-    for(const idx of bestBlob){
-      cleanMask[idx]=1;
-      const x=idx%W, y=(idx-x)/W;
-      if(x<minX) minX=x; if(x>maxX) maxX=x;
-      if(y<minY) minY=y; if(y>maxY) maxY=y;
-    }
-    if(!bestBlob.length) return weaponPixelMetrics[key]={W:32,H:32,mask:new Uint8Array(1024).fill(1),wRatio:0.6,hRatio:0.6,area:0.35,tier:"med"};
-    const wRatio=(maxX-minX+1)/W, hRatio=(maxY-minY+1)/H;
-    const area=bestBlob.length/(W*H), maxDim=Math.max(wRatio,hRatio);
-    const tier=maxDim>=0.74||area>=0.22?"big":maxDim<=0.50&&area<=0.13?"small":"med";
-    return weaponPixelMetrics[key]={W,H,mask:cleanMask,wRatio,hRatio,area,tier};
-  }catch(e){
-    return weaponPixelMetrics[key]={W:32,H:32,mask:new Uint8Array(1024).fill(1),wRatio:0.65,hRatio:0.65,area:0.32,tier:"med"};
-  }
-}
-
-function generateWeaponRackChaos(b,grid,buckleSize=weaponBuckleSize){
-  const W=grid.clientWidth||900, H=grid.clientHeight||480;
-  // Grille haute précision (260px de large) pour détecter chaque lame et manche sans trou
-  const GW=260, GH=Math.max(120,Math.round(GW*(H/W)));
-  const occ=new Uint8Array(GW*GH);
-  const L=Math.round(GW*0.075), R=Math.round(GW*0.925), T=Math.round(GH*0.105), B=Math.round(GH*0.895);
-  const WASS_L=Math.round(GW*0.68), WASS_B=Math.round(GH*0.25);
-
-  const buckleW=DataEngine.WEAPONS.find(w=>w.id===11||/pilier|bouclier|shield/i.test(w.name))||DataEngine.WEAPONS[DataEngine.WEAPONS.length-1];
-  const buckleId=buckleW.id;
-  const metrics=DataEngine.WEAPONS.map(w=>{
-    const m=measureWeaponPixels(b,w.id)||{W:32,H:32,mask:new Uint8Array(1024).fill(1),wRatio:0.65,hRatio:0.65,area:0.3,tier:"med"};
-    const baseSize=w.id===11?buckleSize:m.tier==="big"?25.5:m.tier==="small"?18.0:21.5;
-    return {id:w.id,...m,size:baseSize};
-  });
-
-  // Échantillonnage dense (chaque pixel du sprite) pour éviter tout chevauchement de pointes fines
-  const stampPoints=(m,pos)=>{
-    const rad=(pos.angle||0)*Math.PI/180, cos=Math.cos(rad), sin=Math.sin(rad);
-    const scale=(GH*(pos.size/100))/m.H;
-    const cx=(pos.x/100)*GW, cy=(pos.y/100)*GH;
-    const halfW=m.W/2, halfH=m.H/2;
-    const pts=[];
-    const step=m.W>64?2:1;
-    for(let sy=0;sy<m.H;sy+=step){
-      for(let sx=0;sx<m.W;sx+=step){
-        if(!m.mask[sy*m.W+sx]) continue;
-        const lx=(pos.flip?(halfW-sx):(sx-halfW))*scale;
-        const ly=(sy-halfH)*scale;
-        const gx=Math.round(cx+lx*cos-ly*sin);
-        const gy=Math.round(cy+lx*sin+ly*cos);
-        pts.push(gx,gy);
-      }
-    }
-    return pts;
-  };
-
-  const fits=(pts,pad)=>{
-    for(let i=0;i<pts.length;i+=2){
-      const gx=pts[i], gy=pts[i+1];
-      if(gx-pad<L||gx+pad>R||gy-pad<T||gy+pad>B) return false;
-      if(gx+pad>WASS_L&&gy-pad<WASS_B) return false;
-      for(let dy=-pad;dy<=pad;dy++){
-        const row=(gy+dy)*GW;
-        for(let dx=-pad;dx<=pad;dx++){
-          if(occ[row+gx+dx]) return false;
-        }
-      }
-    }
-    return true;
-  };
-
-  // Remplit chaque point + un halo 3x3 pour garantir une silhouette continue sans interstice
-  const commit=(pts)=>{
-    for(let i=0;i<pts.length;i+=2){
-      const gx=pts[i], gy=pts[i+1];
-      for(let dy=-1;dy<=1;dy++){
-        const ny=gy+dy; if(ny<0||ny>=GH) continue;
-        const row=ny*GW;
-        for(let dx=-1;dx<=1;dx++){
-          const nx=gx+dx; if(nx>=0&&nx<GW) occ[row+nx]=1;
-        }
-      }
-    }
-  };
-
-  const placed=[];
-  // 1. Pilier central verrouillé au centre du panneau bleu
-  const buckleM=metrics.find(m=>m.id===buckleId);
-  const bucklePos={id:buckleId,x:50,y:50,size:buckleM?buckleM.size:buckleSize,angle:0,flip:false};
-  commit(stampPoints(buckleM,bucklePos));
-  placed.push(bucklePos);
-
-  // 2. Placement du plus grand au plus petit : réduit progressivement la taille jusqu'à trouver une place 100% libre
-  const others=metrics.filter(m=>m.id!==buckleId).sort((a,c)=>(c.area*c.size)-(a.area*a.size));
-
-  others.forEach(m=>{
-    const pad=m.tier==="big"?3:m.tier==="small"?1:2;
-    let chosen=null;
-    for(const sizeMult of [1.0,0.88,0.76,0.65,0.55]){
-      let bestScore=Infinity;
-      for(let attempt=0;attempt<450;attempt++){
-        const angle=Math.round(Math.random()*360-180);
-        const flip=Math.random()<0.5;
-        const rx=8+Math.random()*84;
-        const ry=11+Math.random()*78;
-        const cand={id:m.id,x:rx,y:ry,size:m.size*sizeMult*(0.95+Math.random()*0.1),angle,flip};
-        const pts=stampPoints(m,cand);
-        if(!pts.length||!fits(pts,pad)) continue;
-        const dx=(rx-50)*0.65, dy=(ry-50);
-        const score=Math.hypot(dx,dy)+Math.random()*12;
-        if(score<bestScore){ bestScore=score; chosen={pos:cand,pts}; }
-      }
-      if(chosen) break;
-    }
-    if(chosen){
-      commit(chosen.pts);
-      placed.push(chosen.pos);
-    }else{
-      const fb={id:m.id,x:14+Math.random()*72,y:16+Math.random()*68,size:m.size*0.48,angle:Math.round(Math.random()*360-180),flip:Math.random()<0.5};
-      commit(stampPoints(m,fb));
-      placed.push(fb);
-    }
-  });
-
-  weaponRackPositions=placed.sort((a,c)=>a.id-c.id);
-  saveWeaponRackPositions();
-  updateRackPositionExport();
-  const buttons=[...grid.querySelectorAll(".fx-rack-weapon")];
-  buttons.forEach(btn=>{ const p=weaponRackPositions[+btn.dataset.rackWeapon]; if(p) applyRackPosition(btn,p,grid); });
-  if(typeof toast==="function") toast("🎲 Chaos pixel-accurate généré !");
-}
-
 function updateWeaponRackDevUI(){
   const edit=$("#fx-rack-edit"),dev=!!$("#devbox"),panel=$(".fx-panel.fx-weapons");
   if(!edit||!panel) return;
@@ -449,19 +251,17 @@ function updateWeaponRackDevUI(){
     bar=document.createElement("div");
     bar.id="fx-rack-devbar";
     bar.style.cssText="position:absolute;right:12px;bottom:12px;z-index:25;display:flex;gap:6px;align-items:center;background:rgba(10,8,6,.88);border:1px solid #c9953a;padding:4px 8px;border-radius:3px;font:11px monospace;color:#ffd77a";
-    bar.innerHTML=`<label style="display:flex;align-items:center;gap:4px">Boucle <input id="fx-buckle-size" type="range" min="16" max="56" step="1" value="${weaponBuckleSize}" style="width:72px"></label>`
-      + `<button type="button" id="fx-rack-chaos" class="fx-btn" style="width:auto!important;height:auto!important;min-height:0!important;padding:4px 8px!important;font-size:11px!important">🎲 Chaos</button>`;
+    bar.innerHTML=`<button type="button" id="fx-rack-reset" class="fx-btn" style="width:auto!important;height:auto!important;min-height:0!important;padding:4px 8px!important;font-size:11px!important">↺ Reset</button>`;
     panel.appendChild(bar);
     bar.appendChild(edit);
     edit.style.cssText="position:static!important;width:auto!important;height:auto!important;min-height:0!important;padding:4px 8px!important;font-size:11px!important";
-    bar.querySelector("#fx-buckle-size").oninput=ev=>{
-      weaponBuckleSize=Number(ev.target.value);
+    bar.querySelector("#fx-rack-reset").onclick=()=>{
+      try{ localStorage.removeItem(WEAPON_RACK_LAYOUT_KEY); localStorage.removeItem(ARMORY_HERO_KEY); }catch(e){}
+      weaponRackPositions=ARMORY_DEFAULT_LAYOUT.map(p=>({...p}));
+      armoryHeroPos={...ARMORY_HERO_DEFAULT};
+      applyArmoryHeroStage($("#fx-armory-stage"));
       const grid=$("#fx-wrack .fx-rack-grid");
-      if(grid&&S.cur) generateWeaponRackChaos(S.cur,grid,weaponBuckleSize);
-    };
-    bar.querySelector("#fx-rack-chaos").onclick=()=>{
-      const grid=$("#fx-wrack .fx-rack-grid");
-      if(grid&&S.cur) generateWeaponRackChaos(S.cur,grid,weaponBuckleSize);
+      if(grid) fitWeaponRack(grid.parentElement);
     };
   }
   bar.style.display=dev?"flex":"none";
@@ -471,393 +271,244 @@ function updateWeaponRackDevUI(){
     const grid=$("#fx-wrack .fx-rack-grid");
     if(!grid) return;
     if(weaponRackEditing){ weaponRackEditing=false;renderFiche(S.cur); }
-    else{ beginWeaponRackEditing(grid);edit.textContent="Terminer"; }
+    else{
+      beginWeaponRackEditing(grid);
+      $("#fx-armory-stage")?.classList.add("is-editing");
+      edit.textContent="Terminer";
+    }
   };
 }
 function fitWeaponRack(rack){
   const grid=rack.querySelector(".fx-rack-grid"), weapons=grid?[...grid.children]:[];
-  const count=weapons.length;
-  if(!grid||!count) return;
-  const width=grid.clientWidth, height=grid.clientHeight;
-  if(!width||!height) return;
-  let columns=1, rows=count, size=0;
-  for(let candidate=1;candidate<=count;candidate++){
-    const candidateRows=Math.ceil(count/candidate), candidateSize=Math.min(width/candidate,height/candidateRows);
-    if(candidateSize>size){ columns=candidate; rows=candidateRows; size=candidateSize; }
-  }
-  grid.style.setProperty("--rack-columns",columns);
-  grid.style.setProperty("--rack-rows",rows);
-  size=Math.floor(size*.94);
-  const saved=weaponRackPositions||(weaponRackPositions=readWeaponRackPositions());
-  if(saved){
-    grid.classList.toggle("is-editing",weaponRackEditing);
-    weapons.forEach(button=>{ const p=saved[+button.dataset.rackWeapon]; if(p) applyRackPosition(button,p,grid); });
-    return;
-  }  let seed=Number(grid.dataset.seed)>>>0;
-  const random=()=>{ seed=(Math.imul(seed,1664525)+1013904223)>>>0; return seed/4294967296; };
-  const slots=Array.from({length:columns*rows},(_,i)=>i);
-  for(let i=slots.length-1;i>0;i--){ const j=Math.floor(random()*(i+1)); [slots[i],slots[j]]=[slots[j],slots[i]]; }
-  weapons.forEach((button,index)=>{
-    const slot=slots[index];
-    button.style.gridColumn=String(slot%columns+1);
-    button.style.gridRow=String(Math.floor(slot/columns)+1);
-    button.style.width=size+"px";
-    button.style.height=size+"px";
-    button.style.setProperty("--rack-angle",Math.round(random()*6-3)+"deg");
-  });
+  if(!grid||!weapons.length||!grid.clientWidth||!grid.clientHeight) return;
+  const saved=weaponRackPositions||(weaponRackPositions=readWeaponRackPositions())||ARMORY_DEFAULT_LAYOUT.map(p=>({...p}));
+  grid.classList.toggle("is-editing",weaponRackEditing);
+  weapons.forEach(button=>{ const p=saved[+button.dataset.rackWeapon]; if(p) applyRackPosition(button,p,grid); });
 }
 const weaponRackObserver=typeof ResizeObserver==="undefined"?null:new ResizeObserver(entries=>entries.forEach(({target})=>fitWeaponRack(target)));
-/* --- Placement libre des compagnons (mode DEV) --- */
-const COMP_LAYOUT_KEY="arene_companion_dev_layout_v1";
-let compEditing=false, compPositions=null, compDrag=null;
-
-const COMP_FROZEN=[
-  { "key": "chien", "x": 16.65, "y": 21.02, "size": 10, "angle": 0, "flip": false },
-  { "key": "loup", "x": 49.81, "y": 39.25, "size": 13.5, "angle": 0, "flip": false },
-  { "key": "ours", "x": 17.67, "y": 41.89, "size": 15, "angle": 0, "flip": false },
-  { "key": "serpent", "x": 39.2, "y": 20.68, "size": 13.5, "angle": 0, "flip": false },
-  { "key": "oiseau", "x": 60.61, "y": 40.19, "size": 12.5, "angle": 0, "flip": false },
-  { "key": "arthropode", "x": 61.69, "y": 19.25, "size": 15, "angle": 0, "flip": false },
-  { "key": "felin", "x": 72.24, "y": 21.02, "size": 11, "angle": 0, "flip": false },
-  { "key": "taureau", "x": 27.96, "y": 20.13, "size": 16, "angle": 0, "flip": false },
-  { "key": "aquatique", "x": 28.4, "y": 39.61, "size": 13.5, "angle": 0, "flip": false },
-  { "key": "chimere", "x": 38.95, "y": 39.99, "size": 11, "angle": 0, "flip": false },
-  { "key": "lezard", "x": 49.68, "y": 21.42, "size": 12.5, "angle": 0, "flip": false },
-  { "key": "spectre", "x": 71.66, "y": 41.01, "size": 13.5, "angle": 0, "flip": false },
-  { "key": "tempete", "x": 83.23, "y": 21.35, "size": 11, "angle": 0, "flip": false }
+const ARMORY_DEFAULT_LAYOUT=[
+  {id:0,  x:91.35, y:49.83, size:18,   angle:75,  flip:false},
+  {id:1,  x:10.12, y:48.85, size:15.5, angle:35,  flip:false},
+  {id:2,  x:17.37, y:38.34, size:15.5, angle:40,  flip:false},
+  {id:3,  x:24.24, y:26.72, size:20.5, angle:-15, flip:false},
+  {id:4,  x:93.64, y:34.3,  size:18.5, angle:75,  flip:true},
+  {id:5,  x:85.3,  y:27.82, size:16.5, angle:-35, flip:false},
+  {id:6,  x:82.89, y:39.92, size:16.5, angle:75,  flip:false},
+  {id:7,  x:14.31, y:28.07, size:18.5, angle:-67, flip:false},
+  {id:8,  x:22.14, y:78.19, size:16,   angle:68,  flip:true},
+  {id:9,  x:81.49, y:71.96, size:21.5, angle:297, flip:true},
+  {id:10, x:74.11, y:22.56, size:29,   angle:-10, flip:false},
+  {id:11, x:17.75, y:94.21, size:10,   angle:10,  flip:false},
+  {id:12, x:23.28, y:94.5,  size:10,   angle:-6,  flip:false},
+  {id:13, x:28.37, y:89.2,  size:12.5, angle:11,  flip:true}
 ];
-function defaultCompPositions(){
-  const cols=7;
-  const base=CompanionData.FAMILIES.map((f,i)=>({
-    key:f.key,
-    x:10+(i%cols)*13.2,
-    y:i<cols?34:74,
-    size:26,
-    angle:0,
-    flip:false
-  }));
-  COMP_FROZEN.forEach(s=>{ const t=base.find(d=>d.key===s.key); if(t) Object.assign(t,s); });
-  return base;
-}
-function readCompPositions(){
-  try{
-    const saved=localStorage.getItem(COMP_LAYOUT_KEY);
-    if(!saved) return null;
-    const arr=JSON.parse(saved);
-    if(!Array.isArray(arr)||arr.length!==CompanionData.FAMILIES.length) return null;
-    return arr;
-  }catch(e){ return null; }
-}
-function saveCompPositions(){
-  if(!compPositions) return;
-  try{ localStorage.setItem(COMP_LAYOUT_KEY,JSON.stringify(compPositions)); }catch(e){}
-  console.log("COMP_LAYOUT =",JSON.stringify(compPositions.map(({key,x,y,size,angle,flip})=>({key,x:+x.toFixed(2),y:+y.toFixed(2),size:+size.toFixed(1),angle:+(angle||0).toFixed(1),flip:!!flip}))));
-}
-/* --- Placement libre des 3 évolutions au sol + 2 flèches (mode DEV) --- */
-const HOLO_LAYOUT_KEY="arene_comp_holo_layout_v1";
-let holoPositions=null, holoDrag=null;
 
-const HOLO_FROZEN=[
-  { "id": "st1", "x": 37.48, "y": 71.69, "size": 9.2, "angle": 0, "flip": false },
-  { "id": "ar1", "x": 43.2, "y": 75, "size": 4.5, "angle": 0, "flip": false },
-  { "id": "st2", "x": 49.74, "y": 71.59, "size": 12, "angle": 0, "flip": false },
-  { "id": "ar2", "x": 56, "y": 73, "size": 4.5, "angle": 0, "flip": false },
-  { "id": "st3", "x": 63.32, "y": 68.47, "size": 14.6, "angle": 0, "flip": false }
-];
-function defaultHoloPositions(){
-  const base=[
-    { id:"st1", x:37.5, y:75, size:14, angle:0, flip:false },
-    { id:"ar1", x:43.2, y:75, size:4.5, angle:0, flip:false },
-    { id:"st2", x:49.5, y:73, size:18, angle:0, flip:false },
-    { id:"ar2", x:56.0, y:73, size:4.5, angle:0, flip:false },
-    { id:"st3", x:63.0, y:70, size:23, angle:0, flip:false }
-  ];
-  HOLO_FROZEN.forEach(s=>{ const t=base.find(d=>d.id===s.id); if(t) Object.assign(t,s); });
-  return base;
-}
-function readHoloPositions(){
-  try{
-    const arr=JSON.parse(localStorage.getItem(HOLO_LAYOUT_KEY)||"null");
-    return Array.isArray(arr)&&arr.length===5?arr:null;
-  }catch(e){ return null; }
-}
-function saveHoloPositions(){
-  if(!holoPositions) return;
-  try{ localStorage.setItem(HOLO_LAYOUT_KEY,JSON.stringify(holoPositions)); }catch(e){}
-  console.log("HOLO_LAYOUT =",JSON.stringify(holoPositions.map(({id,x,y,size,angle,flip})=>({id,x:+x.toFixed(2),y:+y.toFixed(2),size:+size.toFixed(1),angle:+(angle||0).toFixed(1),flip:!!flip}))));
-}
-function applyHoloItemPos(el,pos){
-  el.style.position="absolute";
-  el.style.left=pos.x+"%";
-  el.style.top=pos.y+"%";
-  el.style.transform=`translate(-50%,-50%) rotate(${pos.angle||0}deg)`;
-  const cv=el.querySelector(".comp-cv");
-  if(cv){
-    cv.style.height=(pos.size||16)+"vh";
-    cv.style.width="auto";
-    cv.style.aspectRatio="1 / 1";
-    cv.style.transform=`scaleX(${pos.flip?-1:1})`;
-  } else {
-    el.style.fontSize=Math.max(12,(pos.size||4.5)*3.4)+"px";
-  }
-}
+const ARMORY_HERO_KEY="arene_armory_hero_pos_v2";
+const ARMORY_HERO_DEFAULT={x:51.15,y:37.97,size:20,flip:false};
+let armoryHeroPos=null, armoryHeroDrag=null;
 
-function applyCompPosition(btn,pos,stage){
-  const pct=pos.size||26;
-  btn.style.position="absolute";
-  btn.style.left=pos.x+"%";
-  btn.style.top=pos.y+"%";
-  btn.style.height=pct+"%";
-  btn.style.width="auto";
-  btn.style.aspectRatio="1 / 1";
-  btn.style.margin="0";
-  btn.style.transform=`translate(-50%,-50%) rotate(${pos.angle||0}deg) scaleX(${pos.flip?-1:1})`;
+function readArmoryHeroPos(){
+  try{
+    const raw=JSON.parse(localStorage.getItem(ARMORY_HERO_KEY)||"null");
+    if(raw&&[raw.x,raw.y,raw.size].every(Number.isFinite)) return {...ARMORY_HERO_DEFAULT,...raw};
+  }catch(e){}
+  return {...ARMORY_HERO_DEFAULT};
 }
-function updateCompDevUI(){
-  const compPanel=$(".fx-panel.fx-comp");
-  if(!compPanel) return;
-  let edit=$("#fx-comp-edit");
-  if(!edit){
-    edit=document.createElement("button");
-    edit.id="fx-comp-edit"; edit.type="button"; edit.className="fx-btn";
-    compPanel.appendChild(edit);
-  }
-  const dev=!!$("#devbox");
-  edit.hidden=!dev;
-  edit.textContent=compEditing?"Terminer le placement":"Éditer les compagnons";
-  edit.onclick=()=>{
-    compEditing=!compEditing;
-    renderFiche(S.cur);
-  };
+function saveArmoryHeroPos(){
+  if(!armoryHeroPos) return;
+  try{ localStorage.setItem(ARMORY_HERO_KEY,JSON.stringify(armoryHeroPos)); }catch(e){}
+  console.log("ARMORY_HERO_DEFAULT =",JSON.stringify({x:+armoryHeroPos.x.toFixed(2),y:+armoryHeroPos.y.toFixed(2),size:+armoryHeroPos.size.toFixed(1),flip:!!armoryHeroPos.flip}));
 }
-function attachCompEditor(stage){
-  if(stage.dataset.editorBound) return;
-  stage.dataset.editorBound="1";
+function applyArmoryHeroStage(stage){
+  if(!stage) return;
+  if(!armoryHeroPos) armoryHeroPos=readArmoryHeroPos();
+  stage.style.left=armoryHeroPos.x+"%";
+  stage.style.top=armoryHeroPos.y+"%";
+  stage.style.width=armoryHeroPos.size+"%";
+  stage.style.transform=`translate(-50%,-50%) scaleX(${armoryHeroPos.flip?-1:1})`;
+}
+function attachArmoryHeroEditor(stage,rack){
+  if(!stage||stage.dataset.bound) return;
+  stage.dataset.bound="1";
   stage.addEventListener("pointerdown",ev=>{
-    if(!compEditing) return;
-    const btn=ev.target.closest("[data-fam]");
-    if(!btn) return;
+    if(!weaponRackEditing) return;
     ev.preventDefault(); ev.stopPropagation();
-    const key=btn.dataset.fam, pos=compPositions.find(p=>p.key===key);
-    if(!pos) return;
-    compDrag={key,pos,pointerId:ev.pointerId,stage};
-    btn.setPointerCapture(ev.pointerId);
+    armoryHeroDrag={pointerId:ev.pointerId};
+    stage.setPointerCapture(ev.pointerId);
   });
   stage.addEventListener("pointermove",ev=>{
-    if(!compDrag||ev.pointerId!==compDrag.pointerId) return;
-    const {key,pos,stage}=compDrag, rect=stage.getBoundingClientRect();
-    pos.x=Math.max(2,Math.min(98,(ev.clientX-rect.left)/rect.width*100));
-    pos.y=Math.max(6,Math.min(96,(ev.clientY-rect.top)/rect.height*100));
-    const btn=stage.querySelector(`[data-fam="${key}"]`);
-    if(btn) applyCompPosition(btn,pos,stage);
+    if(!armoryHeroDrag||ev.pointerId!==armoryHeroDrag.pointerId) return;
+    const rect=rack.getBoundingClientRect();
+    armoryHeroPos.x=Math.max(10,Math.min(90,(ev.clientX-rect.left)/rect.width*100));
+    armoryHeroPos.y=Math.max(15,Math.min(90,(ev.clientY-rect.top)/rect.height*100));
+    applyArmoryHeroStage(stage);
   });
   const end=ev=>{
-    if(!compDrag||ev.pointerId!==compDrag.pointerId) return;
-    compDrag=null;
-    saveCompPositions();
+    if(!armoryHeroDrag||ev.pointerId!==armoryHeroDrag.pointerId) return;
+    armoryHeroDrag=null; saveArmoryHeroPos();
   };
   stage.addEventListener("pointerup",end);
   stage.addEventListener("pointercancel",end);
   stage.addEventListener("contextmenu",ev=>{
-    if(!compEditing) return;
-    const btn=ev.target.closest("[data-fam]");
-    if(!btn) return;
-    ev.preventDefault();
-    const pos=compPositions.find(p=>p.key===btn.dataset.fam);
-    if(pos){ pos.flip=!pos.flip; applyCompPosition(btn,pos,stage); saveCompPositions(); }
+    if(!weaponRackEditing) return;
+    ev.preventDefault(); ev.stopPropagation();
+    armoryHeroPos.flip=!armoryHeroPos.flip;
+    applyArmoryHeroStage(stage); saveArmoryHeroPos();
   });
   stage.addEventListener("wheel",ev=>{
-    if(!compEditing) return;
-    const btn=ev.target.closest("[data-fam]");
-    if(!btn) return;
+    if(!weaponRackEditing) return;
     ev.preventDefault(); ev.stopPropagation();
-    const pos=compPositions.find(p=>p.key===btn.dataset.fam);
-    if(!pos) return;
-    if(ev.shiftKey) pos.angle=(pos.angle||0)+(ev.deltaY<0?5:-5);
-    else pos.size=Math.max(10,Math.min(70,(pos.size||26)+(ev.deltaY<0?2.5:-2.5)));
-    applyCompPosition(btn,pos,stage);
-    saveCompPositions();
+    armoryHeroPos.size=Math.max(20,Math.min(85,armoryHeroPos.size+(ev.deltaY<0?2.5:-2.5)));
+    applyArmoryHeroStage(stage); saveArmoryHeroPos();
   },{passive:false});
+}
+
+const armoryShowcase={bruteId:null,wid:null,anim:"idle",animStart:0,duration:900,loopRunning:false,lastToggle:false};
+
+function getArmoryWeaponAnim(w){
+  const kind=DataEngine.WEAPON_STYLE[w.id]||w.type||"light";
+  const pair={
+    light:["thrust","pierce"],
+    heavy:["overhead","meteor"],
+    throw:["throw","salto"]
+  }[kind]||["punch","uppercut"];
+  armoryShowcase.lastToggle=!armoryShowcase.lastToggle;
+  return armoryShowcase.lastToggle?pair[0]:pair[1];
+}
+
+function triggerArmoryWeaponPreview(b,wid){
+  const w=DataEngine.WEAPONS[wid]; if(!w) return;
+  const nextAnim=getArmoryWeaponAnim(w);
+  if(armoryShowcase.wid===wid&&armoryShowcase.anim!=="idle"&&performance.now()-armoryShowcase.animStart<260) return;
+  armoryShowcase.bruteId=b.id;
+  armoryShowcase.wid=wid;
+  armoryShowcase.anim=nextAnim;
+  armoryShowcase.animStart=performance.now();
+  const A=(CanvasRenderer.WPN_ANIMS&&CanvasRenderer.WPN_ANIMS[nextAnim])||CanvasRenderer.ANIMS[nextAnim]||CanvasRenderer.ANIMS.idle;
+  const frames=(A.f?A.f.length:4);
+  armoryShowcase.duration=Math.max(520,(frames/(A.fps||10))*1000+140);
+}
+
+function startArmoryHeroLoop(){
+  if(armoryShowcase.loopRunning) return;
+  armoryShowcase.loopRunning=true;
+  const tick=now=>{
+    const cv=$("#fx-armory-hero");
+    if(cv&&cv.offsetParent&&S.cur){
+      const b=S.cur;
+      if(armoryShowcase.anim!=="idle"&&now-armoryShowcase.animStart>=armoryShowcase.duration){
+        armoryShowcase.anim="idle";
+      }
+      const animT=armoryShowcase.anim==="idle"?now:Math.max(0,now-armoryShowcase.animStart);
+      const ctx=cv.getContext("2d");
+      ctx.clearRect(0,0,96,96);
+      ctx.imageSmoothingEnabled=false;
+      ctx.save();
+      ctx.translate(0,32);
+      const wid=armoryShowcase.wid;
+      renderer.drawBrute(ctx,b,animT,armoryShowcase.anim,null,wid);
+      ctx.restore();
+    }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
 }
 
 function renderFiche(b){
   const D=DataEngine, E=FX.esc, bf=fxBuffs();
-  // Colonne 1 : armes débloquées sur le râtelier
+  // Colonne 1 : armes autour du kiosque central (greybox verrouillée / vrai sprite débloqué)
   const nw=D.WEAPONS.filter(w=>b.weapons.includes(w.id)).length;
   $("#fx-wcount").textContent=nw+"/"+D.WEAPONS.length;
   updateWeaponRackDevUI();
   const rack=$("#fx-wrack"), rackBrute=D.BRAWLERS.includes(b.sprite)?b.sprite:"general";
-  if(weaponRackBrute!==rackBrute){ weaponRackBrute=rackBrute; weaponRackPositions=null; }
-  rack.style.backgroundImage=`url("${assetPath.starter(rackBrute)}"),url("${assetPath.starter("general")}")`;
-  const weapons=$("#devbox")?D.WEAPONS:D.WEAPONS.filter(w=>b.weapons.includes(w.id));
-  rack.innerHTML=`<div class="fx-rack-grid">${weapons.map(w=>
-    `<button class="fx-rack-weapon" data-rack-weapon="${w.id}" data-tip="w:${w.id}" aria-label="${E(w.name)}" title="${E(w.name)}"><canvas width="128" height="128" aria-hidden="true"></canvas></button>`
-  ).join("")}</div>`;
+  rack.style.backgroundImage=`url("assets/backgrounds/arsenal/${rackBrute}/background.jpg"),url("assets/backgrounds/arsenal/background-greybox.jpg")`;
+  rack.style.backgroundSize="cover";
+  rack.style.backgroundPosition="center";
+
+  if(armoryShowcase.bruteId!==b.id){
+    armoryShowcase.bruteId=b.id;
+    armoryShowcase.wid=b.weapons.length?b.weapons[0]:null;
+    armoryShowcase.anim="idle";
+    armoryShowcase.animStart=0;
+  }
+
+  rack.innerHTML=`
+    <div class="fx-armory-stage ${weaponRackEditing?"is-editing":""}" id="fx-armory-stage">
+      <canvas id="fx-armory-hero" width="96" height="96"></canvas>
+    </div>
+    <div class="fx-rack-grid">${D.WEAPONS.map(w=>{
+      const own=b.weapons.includes(w.id), sel=armoryShowcase.wid===w.id;
+      return `<button class="fx-rack-weapon ${own?"owned":"locked"} ${sel?"equipped":""}" data-rack-weapon="${w.id}" data-tip="w:${w.id}" aria-label="${E(w.name)}" title="${E(w.name)}"><canvas width="128" height="128" aria-hidden="true"></canvas></button>`;
+    }).join("")}</div>`;
+
+  const armoryStage=rack.querySelector("#fx-armory-stage");
+  applyArmoryHeroStage(armoryStage);
+  attachArmoryHeroEditor(armoryStage,rack);
+
   const weaponGrid=rack.querySelector(".fx-rack-grid");
   rack.style.position="relative";
   weaponGrid.style.position="absolute";
   weaponGrid.style.inset="0";
   weaponGrid.style.width="100%";
   weaponGrid.style.height="100%";
-  weaponGrid.dataset.seed=String([...String(b.id||b.name||b.sprite)].reduce((n,c)=>(n*31+c.charCodeAt(0))>>>0,7));
+  weaponGrid.style.zIndex="4";
   if(weaponRackEditing&&weaponRackPositions) weaponGrid.classList.add("is-editing");
   fitWeaponRack(rack);
   attachWeaponRackEditor(weaponGrid);
   if(weaponRackObserver) weaponRackObserver.observe(rack);
+
+  // Rendu de chaque arme : greybox si verrouillée, sprite personnalisé si débloquée
+  const greySheet=renderer.loadImg(DataEngine.GREYBOX_WEAPONS);
   rack.querySelectorAll("[data-rack-weapon]").forEach(button=>{
-    const id=+button.dataset.rackWeapon, ctx=button.querySelector("canvas").getContext("2d");
+    const id=+button.dataset.rackWeapon, own=b.weapons.includes(id), ctx=button.querySelector("canvas").getContext("2d");
     ctx.imageSmoothingEnabled=false;
-    const skin=renderer.weaponSprite(b,id,()=>{ if(S.cur&&S.cur.id===b.id) renderFiche(b); });
-    if(skin){
-      const scale=Math.min(128/skin.width,128/skin.height),width=skin.width*scale,height=skin.height*scale;
-      ctx.drawImage(skin.sheet,skin.x,skin.y,skin.width,skin.height,(128-width)/2,(128-height)/2,width,height);
-    }
-    else { ctx.font="76px serif"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText(D.WEAPONS[id].icon,64,68); }
-  });
-  // Colonne 1 : compagnons — placement libre dans le décor avec animation idle
-  const c=b.companion, cf=c?CompanionData.family(c):null;
-  const compPanel=$(".fx-panel.fx-comp"), stage=$("#fx-comp");
-  if(compPanel){
-    compPanel.style.background=`url("${DataEngine.getCompanionBg(b.sprite)}") center/cover no-repeat`;
-    let fg=compPanel.querySelector(".comp-fg-layer");
-    if(!fg){
-      fg=document.createElement("div");
-      fg.className="comp-fg-layer";
-      compPanel.appendChild(fg);
-    }
-    fg.style.backgroundImage=`url("${DataEngine.getCompanionFg(b.sprite)}")`;
-  }
-  $("#fx-ccount").textContent=(cf?1:0)+"/"+CompanionData.FAMILIES.length;
-  updateCompDevUI();
-  if(!compPositions) compPositions=readCompPositions()||defaultCompPositions();
-  stage.classList.toggle("is-editing",compEditing);
-  stage.innerHTML=CompanionData.FAMILIES.map(f=>{
-    const o=f===cf, form=o?(c.form||1):1, art=DataEngine.getCompanionArt(f.key,form);
-    return `<button class="fx-comp-pet ${o?"owned":"locked"}" data-fam="${f.key}" title="${E(f.name)}" aria-label="${o?E(f.name):"Famille inconnue"}"><canvas class="comp-cv" width="64" height="64" data-art="${E(art)}"></canvas></button>`;
-  }).join("");
-  requestAnimationFrame(()=>{
-    stage.querySelectorAll(".fx-comp-pet").forEach(btn=>{
-      const pos=compPositions.find(p=>p.key===btn.dataset.fam);
-      if(pos) applyCompPosition(btn,pos,stage);
-    });
-  });
-  attachCompEditor(stage);
-  // Projecteur holographique d'évolution sur la grille au sol (clic sur une cellule)
-  if(!holoPositions) holoPositions=readHoloPositions()||defaultHoloPositions();
-  let holo=compPanel&&compPanel.querySelector(".comp-holo-stage");
-  const showHolo=key=>{
-    const f=CompanionData.FAMILIES.find(x=>x.key===key); if(!f||!holo) return;
-    const curComp=S.cur&&S.cur.companion;
-    const unlockedForm=(curComp&&CompanionData.family(curComp)===f)?(curComp.form||1):0;
-    holo.dataset.fam=key;
-    holo.innerHTML=[
-      `<div class="holo-step st1 ${unlockedForm>0?"owned":"locked"}" data-holo="st1"><canvas class="comp-cv" width="64" height="64" data-art="${E(DataEngine.getCompanionArt(key,1))}"></canvas><span class="holo-lbl">${E(f.stages[0])}<small>Niv. ${CompanionData.EVO_LEVELS[0]}</small></span></div>`,
-      `<span class="holo-arrow" data-holo="ar1">➜</span>`,
-      `<div class="holo-step st2 ${unlockedForm>1?"owned":"locked"}" data-holo="st2"><canvas class="comp-cv" width="64" height="64" data-art="${E(DataEngine.getCompanionArt(key,2))}"></canvas><span class="holo-lbl">${E(f.stages[1])}<small>Niv. ${CompanionData.EVO_LEVELS[1]}</small></span></div>`,
-      `<span class="holo-arrow" data-holo="ar2">➜</span>`,
-      `<div class="holo-step st3 ${unlockedForm>2?"owned":"locked"}" data-holo="st3"><canvas class="comp-cv" width="64" height="64" data-art="${E(DataEngine.getCompanionArt(key,3))}"></canvas><span class="holo-lbl">${E(f.stages[2])}<small>Niv. ${CompanionData.EVO_LEVELS[2]}</small></span></div>`,
-      `<div id="evo-body" style="position:absolute;left:50%;bottom:10px;transform:translateX(-50%);width:min(360px,92%);z-index:10;pointer-events:auto;background:rgba(10,8,6,.88);border-radius:4px"></div>`
-    ].join("");
-    holo.classList.remove("hidden");
-    holo.querySelectorAll("[data-holo]").forEach(el=>{
-      const pos=holoPositions.find(p=>p.id===el.dataset.holo);
-      if(pos) applyHoloItemPos(el,pos);
-    });
-    if(typeof CaserneUI!=="undefined") CaserneUI.attacherEvo(key);
-  };
-  if(compPanel&&!holo){
-    holo=document.createElement("div");
-    holo.className="comp-holo-stage hidden";
-    compPanel.appendChild(holo);
-    stage.addEventListener("click",ev=>{
-      if(compEditing) return;
-      const btn=ev.target.closest("[data-fam]");
-      if(!btn){ holo.classList.add("hidden"); holo.dataset.fam=""; return; }
-      ev.stopPropagation();
-      const key=btn.dataset.fam;
-      if(holo.dataset.fam===key && !holo.classList.contains("hidden")){
-        holo.classList.add("hidden"); holo.dataset.fam=""; return;
+    ctx.clearRect(0,0,128,128);
+    if(own){
+      const skin=renderer.weaponSprite(b,id,()=>{ if(S.cur&&S.cur.id===b.id) renderFiche(b); });
+      if(skin){
+        const scale=Math.min(128/skin.width,128/skin.height),width=skin.width*scale,height=skin.height*scale;
+        ctx.drawImage(skin.sheet,skin.x,skin.y,skin.width,skin.height,(128-width)/2,(128-height)/2,width,height);
+      } else {
+        ctx.font="76px serif"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText(D.WEAPONS[id].icon,64,68);
       }
-      showHolo(key);
-    });
-    // Contrôles DEV sur les 3 évolutions + 2 flèches au sol
-    holo.addEventListener("pointerdown",ev=>{
-      if(!compEditing) return;
-      const el=ev.target.closest("[data-holo]"); if(!el) return;
-      ev.preventDefault(); ev.stopPropagation();
-      const pos=holoPositions.find(p=>p.id===el.dataset.holo); if(!pos) return;
-      holoDrag={el,pos,pointerId:ev.pointerId};
-      el.setPointerCapture(ev.pointerId);
-    });
-    holo.addEventListener("pointermove",ev=>{
-      if(!holoDrag||ev.pointerId!==holoDrag.pointerId) return;
-      const rect=compPanel.getBoundingClientRect();
-      holoDrag.pos.x=Math.max(4,Math.min(96,(ev.clientX-rect.left)/rect.width*100));
-      holoDrag.pos.y=Math.max(20,Math.min(96,(ev.clientY-rect.top)/rect.height*100));
-      applyHoloItemPos(holoDrag.el,holoDrag.pos);
-    });
-    const endHolo=ev=>{
-      if(!holoDrag||ev.pointerId!==holoDrag.pointerId) return;
-      holoDrag=null; saveHoloPositions();
+    } else if(greySheet&&greySheet.complete&&greySheet.naturalWidth){
+      const cell=DataEngine.WEAPON_CELLS[id]??id;
+      const tw=Math.floor(greySheet.naturalWidth/4), th=Math.floor(greySheet.naturalHeight/4);
+      const sx=(cell%4)*tw, sy=Math.floor(cell/4)*th, sh=id===10?th*2:th;
+      const scale=Math.min(128/tw,128/sh), width=tw*scale, height=sh*scale;
+      ctx.save();
+      ctx.filter="brightness(0.45) contrast(1.15)";
+      ctx.globalAlpha=0.78;
+      ctx.drawImage(greySheet,sx,sy,tw,sh,(128-width)/2,(128-height)/2,width,height);
+      ctx.restore();
+    } else {
+      ctx.save();
+      ctx.globalAlpha=0.32;
+      ctx.filter="grayscale(1) brightness(0.4)";
+      ctx.font="72px serif"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText(D.WEAPONS[id].icon,64,68);
+      ctx.restore();
+    }
+
+    const previewWeapon=()=>{
+      if(weaponRackEditing||!b.weapons.includes(id)) return;
+      triggerArmoryWeaponPreview(b,id);
+      rack.querySelectorAll(".fx-rack-weapon").forEach(el=>el.classList.toggle("equipped",+el.dataset.rackWeapon===id));
     };
-    holo.addEventListener("pointerup",endHolo);
-    holo.addEventListener("pointercancel",endHolo);
-    holo.addEventListener("contextmenu",ev=>{
-      if(!compEditing) return;
-      const el=ev.target.closest("[data-holo]"); if(!el) return;
-      ev.preventDefault();
-      const pos=holoPositions.find(p=>p.id===el.dataset.holo);
-      if(pos){ pos.flip=!pos.flip; applyHoloItemPos(el,pos); saveHoloPositions(); }
+
+    button.addEventListener("pointerenter",ev=>{
+      if(ev.pointerType!=="mouse") return;
+      previewWeapon();
     });
-    holo.addEventListener("wheel",ev=>{
-      if(!compEditing) return;
-      const el=ev.target.closest("[data-holo]"); if(!el) return;
-      ev.preventDefault(); ev.stopPropagation();
-      const pos=holoPositions.find(p=>p.id===el.dataset.holo); if(!pos) return;
-      if(ev.shiftKey) pos.angle=(pos.angle||0)+(ev.deltaY<0?5:-5);
-      else pos.size=Math.max(2,Math.min(45,(pos.size||16)+(ev.deltaY<0?1.2:-1.2)));
-      applyHoloItemPos(el,pos); saveHoloPositions();
-    },{passive:false});
-  }
-  if(holo){
-    holo.classList.toggle("is-editing",compEditing);
-    if(compEditing){ showHolo(holo.dataset.fam||CompanionData.FAMILIES[0].key); }
-    else if(holo.dataset.fam){ showHolo(holo.dataset.fam); }
-    else if(cf){ showHolo(cf.key); }
-    else { holo.classList.add("hidden"); }
-  }
-  if(!window._compIdleLoop){
-    window._compIdleLoop=true;
-    const cache={};
-    const tick=now=>{
-      const frame=Math.floor(now/180)%4;
-      document.querySelectorAll(".fx-panel.fx-comp .comp-cv").forEach(cv=>{
-        if(!cv.offsetParent) return;
-        const src=cv.dataset.art; if(!src) return;
-        let im=cache[src];
-        if(!im){ im=cache[src]=new Image(); im.src=src; }
-        if(!im.complete||!im.naturalWidth) return;
-        const fw=im.naturalWidth/4, fh=im.naturalHeight/4, ctx=cv.getContext("2d");
-        ctx.clearRect(0,0,64,64);
-        ctx.imageSmoothingEnabled=false;
-        ctx.globalCompositeOperation="source-over";
-        ctx.drawImage(im,frame*fw,0,fw,fh,0,0,64,64);
-        if(cv.closest(".locked")){
-          ctx.globalCompositeOperation="source-atop";
-          const grd=ctx.createRadialGradient(32,32,4,32,32,30);
-          grd.addColorStop(0,"rgba(8, 42, 54, 0.88)");
-          grd.addColorStop(1,"rgba(14, 116, 144, 0.94)");
-          ctx.fillStyle=grd;
-          ctx.fillRect(0,0,64,64);
-          ctx.fillStyle="rgba(56, 232, 255, 0.24)";
-          for(let y=0;y<64;y+=4) ctx.fillRect(0,y,64,1);
-          ctx.globalCompositeOperation="source-over";
-        }
-      });
-      requestAnimationFrame(tick);
+
+    button.onclick=ev=>{
+      if(weaponRackEditing) return;
+      ev.stopPropagation();
+      showTip(button);
+      previewWeapon();
     };
-    requestAnimationFrame(tick);
-  }
+  });
+  startArmoryHeroLoop();
+  if (typeof renderCompanionsPanel === "function") renderCompanionsPanel(b);
   // Colonne 2 : identité
   $("#fx-name").textContent=b.name;
   $("#fx-rename").hidden=b.hasBeenRenamed;

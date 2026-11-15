@@ -1,0 +1,21 @@
+Create a 4x4 pixel-art sprite sheet (16 frames total, 4 columns by 4 rows) of the exact character from Image 1 wielding the exact heavy melee weapon from Image 2 with both hands, in 3/4 side view, 2.5D beat-'em-up perspective, facing right.
+
+STRICT 16-FRAME GRID & HIT-FRAME TIMING (MATCHING IMAGE 1'S EXACT CELL SPACING):
+- Row 1 (Frames 1-4): Frames 1-2 = idle battle stance resting the heavy weapon on his shoulder; Frames 3-4 = hoisting/equipping the heavy weapon with both hands into battle stance.
+- Row 2 (Frames 5-8 — Jumping Overhead Smash Attack):
+  * Frame 5: lifting the heavy weapon high overhead in a jump wind-up.
+  * Frame 6 (HIT FRAME): crushing downward overhead slam forward at full extension with a heavy impact smear.
+  * Frame 7: ground impact follow-through.
+  * Frame 8: recovery back to battle stance.
+- Row 3 (Frames 9-12 — Critical Meteor Jump Slam):
+  * Frame 9: high leap charging golden/energy aura overhead.
+  * Frame 10 (CRITICAL HIT FRAME): vertical meteor crash slam downward with a bright shockwave burst at the feet.
+  * Frame 11: heavy ground tremor follow-through.
+  * Frame 12: recovery back to battle stance.
+- Row 4 (Frames 13-16): Frames 13-14 = hurling/tossing the heavy weapon forward with both hands (Frame 13 = wind-up, Frame 14 = release follow-through with empty hands); Frames 15-16 = heavy dash / dodge carrying the weapon.
+
+CONSISTENCY & PIXEL ART RULES:
+- Keep the exact character proportions, face, outfit, colors, 1-pixel pure black (#000000) outer outline, and 16-bit retro pixel-art shading from Image 1.
+- Keep the exact heavy weapon design, colors, and large two-handed proportions from Image 2 firmly gripped across frames (except on Frame 14 where it is just released).
+- Every frame must stay strictly centered within its own grid cell with zero bleeding into adjacent cells and zero text or grid lines.
+- Keep the background 100% flat solid chroma-key bright green (#00FF00) — or pure magenta (#FF00FF) for Hazmat/Frankenstein — with zero anti-aliasing, zero blur, and zero drop shadows.
