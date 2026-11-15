@@ -57,6 +57,7 @@ C:.
 |   |   |           afk-3.jpeg
 |   |   |           
 |   |   +---arsenal
+|   |   |       background-greybox-old.jpg
 |   |   |       background-greybox.jpg
 |   |   |       
 |   |   +---boss
@@ -216,6 +217,10 @@ C:.
 |   |               sheet-1.png
 |   |               
 |   +---characters
+|   |   |   Capture d’écran 2026-11-15 004800.png
+|   |   |   heavy.txt
+|   |   |   light.txt
+|   |   |   
 |   |   +---empereur
 |   |   |   |   portrait.png
 |   |   |   |   sprite.png
@@ -418,9 +423,16 @@ C:.
 |   |               weapon-1-transparent.png
 |   |               
 |   +---companion
+|   |   |   background-greybox.jpg
+|   |   |   image_15544ee3.jpg
+|   |   |   image_a3079ac0.jpg
+|   |   |   image_bfb224d7.jpg
+|   |   |   prompt-background.txt
+|   |   |   
 |   |   +---empereur
 |   |   |       background.jpeg
 |   |   |       foreground.png
+|   |   |       image_f6603f04.jpg
 |   |   |       
 |   |   +---form-1
 |   |   |       aqua.png
@@ -470,14 +482,17 @@ C:.
 |   |   +---frankenstein
 |   |   |       background.jpeg
 |   |   |       foreground.png
+|   |   |       image_f9788fbd.jpg
 |   |   |       
 |   |   +---general
 |   |   |       background.jpeg
 |   |   |       foreground.png
+|   |   |       image_4ee21b13.jpg
 |   |   |       
 |   |   +---hazmat
 |   |   |       background.jpeg
 |   |   |       foreground.png
+|   |   |       image_28a77d2c.jpg
 |   |   |       
 |   |   +---human
 |   |   |       background.jpeg
@@ -490,14 +505,17 @@ C:.
 |   |   +---momie
 |   |   |       background.jpeg
 |   |   |       foreground.png
+|   |   |       image_b48401da.jpg
 |   |   |       
 |   |   +---samourai
 |   |   |       background.jpeg
 |   |   |       foreground.png
+|   |   |       image_319e839.jpg
 |   |   |       
 |   |   \---zeus
 |   |           background.jpeg
 |   |           foreground.png
+|   |           image_aa95009f.jpg
 |   |           
 |   \---weapons_cut
 |       |   greybox-weapons.png
@@ -773,6 +791,7 @@ C:.
 |           armurerie.js
 |           caserne.js
 |           character-select.js
+|           compagnons.js
 |           devlayout.js
 |           game-frame.js
 |           recorder.js

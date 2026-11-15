@@ -1,0 +1,13 @@
+Transform the exact 16:9 2.5D monochrome greybox laboratory from Image 1 into a bespoke thematic Companion Sanctuary & Evolution Chamber tailored specifically to the character, era, materials, and color palette shown in Image 2, while keeping every single structural element, camera angle, and prop position 100% identical to Image 1:
+
+ARCHITECTURAL & MATERIAL CONVERSION (LOCKED TO IMAGE 1'S EXACT COORDINATES):
+- WALLS, BALCONY & FLOOR: Convert the curved industrial grey walls, mezzanine walkway, and floor tiles into thematic architecture, stonework, wood, metal, or energy paneling inspired directly by the costume, origin, and color palette of the character in Image 2, adorned with subtle thematic emblems and trim.
+- 14 CYLINDRICAL CONTAINMENT PODS (7 TOP + 7 BOTTOM, EXACT POSITIONS): Transform the 14 vertical cylindrical tanks from Image 1 into thematic containment cylinders matching Image 2's materials and accent colors, with translucent tinted glass tubes and deep dark matte interiors (#0B0D12) so companion sprites inside remain 100% readable.
+- CENTER 3 EVOLUTION PEDESTALS: Convert the three circular escalating pedestals in the lower center into thematic evolution altars matching Image 2's style, linked by glowing floor energy conduits in Image 2's signature accent color.
+- BOTTOM-LEFT FEEDING TROUGH ("GAMELLE"): Convert the left wall-pipe and feeding trough into a thematic dispenser spout (such as a carved totem, pipe, or ornate basin) pouring thematic food/energy into a matching trough.
+- BOTTOM-RIGHT TRANSMUTATION ALTAR: Convert the right hexagonal pedestal socket into a thematic transmutation brazier or crystal cradle glowing with Image 2's signature accent color.
+- SIDE TERMINALS & PIPES: Convert the side wall pipes and small control consoles into thematic conduits, shrines, or instruments fitting Image 2's universe.
+
+STRICT NEGATIVE CONSTRAINTS:
+- Keep the exact position, size, and perspective of all 14 cylinders, the 3 central pedestals, the left trough, and the right hexagonal socket from Image 1.
+- NO creatures, NO characters, NO text, NO numbers, NO UI—empty background scene only, crisp 16-bit retro pixel art with bold 2px black ink outlines matching Image 2.

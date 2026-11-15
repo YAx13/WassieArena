@@ -286,25 +286,10 @@ function fitWeaponRack(rack){
   weapons.forEach(button=>{ const p=saved[+button.dataset.rackWeapon]; if(p) applyRackPosition(button,p,grid); });
 }
 const weaponRackObserver=typeof ResizeObserver==="undefined"?null:new ResizeObserver(entries=>entries.forEach(({target})=>fitWeaponRack(target)));
-const ARMORY_DEFAULT_LAYOUT=[
-  {id:0,  x:91.35, y:49.83, size:18,   angle:75,  flip:false},
-  {id:1,  x:10.12, y:48.85, size:15.5, angle:35,  flip:false},
-  {id:2,  x:17.37, y:38.34, size:15.5, angle:40,  flip:false},
-  {id:3,  x:24.24, y:26.72, size:20.5, angle:-15, flip:false},
-  {id:4,  x:93.64, y:34.3,  size:18.5, angle:75,  flip:true},
-  {id:5,  x:85.3,  y:27.82, size:16.5, angle:-35, flip:false},
-  {id:6,  x:82.89, y:39.92, size:16.5, angle:75,  flip:false},
-  {id:7,  x:14.31, y:28.07, size:18.5, angle:-67, flip:false},
-  {id:8,  x:22.14, y:78.19, size:16,   angle:68,  flip:true},
-  {id:9,  x:81.49, y:71.96, size:21.5, angle:297, flip:true},
-  {id:10, x:74.11, y:22.56, size:29,   angle:-10, flip:false},
-  {id:11, x:17.75, y:94.21, size:10,   angle:10,  flip:false},
-  {id:12, x:23.28, y:94.5,  size:10,   angle:-6,  flip:false},
-  {id:13, x:28.37, y:89.2,  size:12.5, angle:11,  flip:true}
-];
+const ARMORY_DEFAULT_LAYOUT=[{"id":0,"x":89.76,"y":50.13,"size":18,"angle":325,"flip":true},{"id":1,"x":10.12,"y":48.85,"size":15.5,"angle":35,"flip":false},{"id":2,"x":17.37,"y":38.34,"size":15.5,"angle":40,"flip":false},{"id":3,"x":25.96,"y":24.58,"size":20.5,"angle":65,"flip":true},{"id":4,"x":93.64,"y":34.3,"size":18.5,"angle":75,"flip":true},{"id":5,"x":82.95,"y":26.66,"size":16.5,"angle":-20,"flip":false},{"id":6,"x":82.89,"y":39.92,"size":16.5,"angle":75,"flip":false},{"id":7,"x":7,"y":35.58,"size":18.5,"angle":-72,"flip":false},{"id":8,"x":22.14,"y":78.19,"size":16,"angle":68,"flip":true},{"id":9,"x":81.49,"y":71.96,"size":21.5,"angle":297,"flip":true},{"id":10,"x":74.11,"y":22.56,"size":29,"angle":-10,"flip":false},{"id":11,"x":17.75,"y":94.21,"size":10,"angle":10,"flip":false},{"id":12,"x":23.28,"y":94.5,"size":10,"angle":-6,"flip":false},{"id":13,"x":28.37,"y":89.2,"size":12.5,"angle":11,"flip":true}];
 
 const ARMORY_HERO_KEY="arene_armory_hero_pos_v2";
-const ARMORY_HERO_DEFAULT={x:51.15,y:37.97,size:20,flip:false};
+const ARMORY_HERO_DEFAULT={x:54.00,y:32.65,size:22.5,flip:false};
 let armoryHeroPos=null, armoryHeroDrag=null;
 
 function readArmoryHeroPos(){
