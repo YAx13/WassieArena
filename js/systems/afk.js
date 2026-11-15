@@ -9,8 +9,7 @@ const AFKMode={
   get RATE(){ return GameState.tauxOrAfk(); },               // Or par seconde (source unique : state.js)
   CAP_SEC:4*3600,                                            // plafond de la jauge de butin (4 h hors-ligne = 28 800 Or). Modifiable.
   COLORS:["#c0392b","#e67e22","#8e44ad","#16a085","#2980b9","#f1c40f"],
-  run:false,raf:0,last:0,minions:[],dying:[],wave:1,nextWave:0,W:300,hudT:0,_bgKey:"",bgWidth:1376,bgHeight:768,
-  attacks:[["punch",5],["thrust",5],["overhead",4],["uppercut",1.5],["pierce",1.5],["meteor",1]],
+  run:false,raf:0,last:0,minions:[],dying:[],wave:1,nextWave:0,W:300,_bgKey:"",bgWidth:1376,bgHeight:768,  attacks:[["punch",5],["thrust",5],["overhead",4],["uppercut",1.5],["pierce",1.5],["meteor",1]],
   KILLS:{punch:1,thrust:1,overhead:2,uppercut:1,pierce:2,meteor:3},   // minions tués par attaque
   lastAttack:"",recoilDistance:40,heroX:0,heroPhase:"idle",heroAnim:"idle",heroFrom:0,heroTo:0,heroPhaseStart:0,heroDuration:0,attackImpactAt:0,attackImpact:false,
   centerX(){ return Math.max(0,(this.W-AFK_ASSETS.HERO_SIZE)/2); },

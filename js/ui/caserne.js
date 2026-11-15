@@ -10,8 +10,7 @@
    ===================================================================== */
 const CaserneUI = {
   NIV_SLOTS: [1, 5, 10],        // niveau requis pour les slots 1, 2, 3
-  ARME_SELECTOR: "[data-arme],[data-weapon],[data-weapon-id]",  // éléments de l'UI représentant une arme possédée (id lu dans data-arme / data-weapon / data-weapon-id)
-  _ok: false,
+  ARME_SELECTOR: "[data-rack-weapon]",  // boutons d'armes de l'armurerie (id lu dans data-rack-weapon)  _ok: false,
     _lastChestHTML: "",
   Q(s){ return document.querySelector(s); },
   esc(s){ return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); },
@@ -70,8 +69,8 @@ const CaserneUI = {
   actionCaisse(count = 1){
     const GS = GameState, b = S.cur; if (!b) return;
     const target = Math.max(1, Math.min(50, count | 0));
-    let opened = 0, gearCnt = 0, weapCnt = 0, dupGold = 0, bestRar = -1;
-    for (let i = 0; i < target; i++) {
+    let opened = 0, gearCnt = 0, weapCnt = 0, dupCnt = 0, bestRar = -1;
+        for (let i = 0; i < target; i++) {
       if ((GS.ressources.caisses || 0) <= 0) {
         if (!depenserRessource("or", GS.PRIX_CAISSE)) break;
         donnerRecompense("caisses", 1);
@@ -90,7 +89,7 @@ const CaserneUI = {
       if (r.type === "gear") { gearCnt++; bestRar = Math.max(bestRar, r.rarity); }
       else if (r.type === "weapon") { weapCnt++; }
       else if (r.type === "dup") {
-        dupGold += 25;
+        dupCnt++;
         const m = GS.maitriseArmes[r.w.id] || 0;
         if (m < GS.MAITRISE_MAX) GS.maitriseArmes[r.w.id] = m + 1;
         else GS.ressources.parchemins++;
@@ -99,8 +98,7 @@ const CaserneUI = {
     if (!opened) { toast("Or insuffisant (" + GS.PRIX_CAISSE + " Or requis)."); return; }
     if (opened > 1) {
       const rarTag = bestRar >= 0 ? ` · Max <b style="color:${DataEngine.RARITIES[bestRar].color}">${DataEngine.RARITIES[bestRar].name}</b>` : "";
-      this._lastChestHTML = `📦 <b>×${opened}</b> : ${gearCnt} pièce(s)${weapCnt ? `, ${weapCnt} arme(s)` : ""}${dupGold ? `, +${dupGold} Or` : ""}${rarTag}`;
-      toast(`Ouverture ×${opened} terminée !`);
+      this._lastChestHTML = `📦 <b>×${opened}</b> : ${gearCnt} pièce(s)${weapCnt ? `, ${weapCnt} arme(s)` : ""}${dupCnt ? `, ${dupCnt} doublon(s) → maîtrise` : ""}${rarTag}`;      toast(`Ouverture ×${opened} terminée !`);
     }
     persist();
   },
@@ -147,12 +145,10 @@ const CaserneUI = {
   /* ---------- Rendu des ajouts dans la Caserne (appelé après chaque renderFiche) ---------- */
   render(){
     const b = S.cur; if (!b || !this.Q("#cs-skills")) return;
-    const D = DataEngine, GS = GameState, eq = this.equipees(), R = GS.ressources, E = this.esc;
-    // Rang de maîtrise (+1, +2…) sur les armes possédées
+    const D = DataEngine, GS = GameState, eq = this.equipees(), E = this.esc;    // Rang de maîtrise (+1, +2…) sur les armes possédées
     const maitrise = GS.maitriseArmes || {};
     document.querySelectorAll(this.ARME_SELECTOR).forEach(el => {
-      const id = el.dataset.arme ?? el.dataset.weapon ?? el.dataset.weaponId, rang = maitrise[id] | 0;
-      const old = el.querySelector(":scope > .cs-rank"); if (old) old.remove();
+      const id = el.dataset.rackWeapon, rang = maitrise[id] | 0;      const old = el.querySelector(":scope > .cs-rank"); if (old) old.remove();
       if (rang > 0) {
         if (getComputedStyle(el).position === "static") el.style.position = "relative";
         const bd = document.createElement("span"); bd.className = "cs-rank"; bd.textContent = "+" + rang; el.appendChild(bd);
@@ -346,8 +342,7 @@ const CaserneUI = {
     toast(res.evolved ? `✨ ${c.name} évolue en Forme ${res.form} !` : res.levels > 0 ? `🐾 ${c.name} passe niveau ${c.level} !` : `🍖 +50 XP (${c.xp}/${c.xpMax})`);
     renderGame();
   },
-  peutForme3(c){ return c && c.form === 2 && c.level >= CompanionData.EVO_LEVELS && GameState.ressources.pierres >= 1; },
-  evoluerForme3(key){
+  peutForme3(c){ return c && c.form === 2 && c.level >= CompanionData.LEVEL_CAP && GameState.ressources.pierres >= 1; },  evoluerForme3(key){
     const c = S.cur && S.cur.companion;
     if (!c) { toast("Aucun compagnon actif."); return; }
     if (c.level < CompanionData.LEVEL_CAP) { toast("Niveau " + CompanionData.LEVEL_CAP + " requis pour la Transmutation."); return; }
@@ -355,14 +350,11 @@ const CaserneUI = {
     if (!depenserRessource("pierres", 1)) { toast("Pierre de Transmutation requise (💎)."); return; }
     CompanionData.transmute(c);
     persist();
-    toast(`💎 Transmutation réussie : ${c.name} (Forme Légendaire) !`);
-    renderGame();
-  },
+    toast(`💎 Transmutation réussie : ${c.name} (Forme Légendaire) !`);  },
   attacherEvo(key){                                                           // ajoute le panneau sous la frise existante
     const f = CompanionData.FAMILIES.find(x => x.key === key), c = S.cur && S.cur.companion, body = this.Q("#evo-body");
     if (!f || !c || CompanionData.family(c) !== f || !body) return;
-    const R = GameState.ressources, max = CompanionData.LEVEL_CAP, nivReq = CompanionData.EVO_LEVELS, form = c.form || 1;
-    const box = document.createElement("div"); box.className = "cs-evo";
+    const R = GameState.ressources, max = CompanionData.LEVEL_CAP, nivReq = max, form = c.form || 1;    const box = document.createElement("div"); box.className = "cs-evo";
     let h = `<div class="cs-evo-h"><b>${this.esc(c.name)}</b> · Forme ${form} · niv. ${c.level}/${max}${c.level < max ? " · XP " + c.xp + "/" + c.xpMax : ""}</div>`;
     h += `<button class="btn" id="cs-feed" ${c.level >= max || R.nourriture < 1 ? "disabled" : ""}>🍖 Nourrir : +50 XP (1 Nourriture · vous : ${R.nourriture})</button>`;
     if (form === 3) {
@@ -389,10 +381,8 @@ const CaserneUI = {
   /* ---------- Démarrage ---------- */
   init(){
     if (this._ok) return; this._ok = true;
-    const rf = window.renderFiche, oe = window.openEvo;                     // on greffe l'UI sans réécrire les fonctions d'origine
-    window.renderFiche = b => { rf(b); CaserneUI.render(); };
-    window.openEvo = key => { oe(key); CaserneUI.attacherEvo(key); };
-    const shopBub = this.Q(".bub.b-shop");
+    const rf = window.renderFiche;                     // on greffe l'UI sans réécrire les fonctions d'origine
+    window.renderFiche = b => { rf(b); CaserneUI.render(); };    const shopBub = this.Q(".bub.b-shop");
     if (shopBub) shopBub.style.display = "none";
     setTab(2);
     if (typeof Caserne !== "undefined") Caserne.snap = idx => setTab(idx);
@@ -767,9 +757,10 @@ const CaserneUI = {
     }, { passive: false, capture: true });
 
     if (typeof ResizeObserver !== "undefined") {
-      new ResizeObserver(() => this.applyEquipLayout()).observe(stage);
-    }
-  }
+      if (!this._equipRO) this._equipRO = new ResizeObserver(() => this.applyEquipLayout());
+      this._equipRO.disconnect();
+      this._equipRO.observe(stage);
+    }  }
 };
 
 /* ---------- Forge cybernétique (sous-pop-up) : affichage ---------- */

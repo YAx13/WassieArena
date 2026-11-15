@@ -107,16 +107,6 @@ body {
   max-height: calc(var(--frame-h) - 12px);
 }
 
-.game-frame-content .tr-brutes {
-  display: grid;
-  grid-template-columns: repeat(9, minmax(0, 1fr));
-  overflow: visible;
-}
-
-.game-frame-content .tr-b {
-  width: auto;
-}
-
 .game-frame-content .fx-right {
   min-width: 0;
 }
@@ -126,11 +116,9 @@ body {
   white-space: normal;
 }
 
-.game-frame-content #g-combat > .ov-bar,
-.game-frame-content #g-train > .ov-bar {
+.game-frame-content #g-combat > .ov-bar {
   margin-bottom: 6px;
 }
-
 .game-frame-content #g-combat.active {
   display: grid;
   grid-template-columns: minmax(0, .72fr) minmax(0, 1.28fr);
@@ -207,76 +195,15 @@ body {
   padding: 8px;
 }
 
-.game-frame-content #g-train > .plank.panel {
-  box-sizing: border-box;
-  display: grid;
-  width: min(960px, 100%);
-  height: calc(100% - 42px);
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  grid-template-rows: auto auto auto auto minmax(0, 1fr) auto;
-  align-content: stretch;
-  gap: 4px 12px;
-  padding: 10px;
-}
-
-.game-frame-content #g-train > .plank.panel > .termbar {
-  grid-column: 1 / -1;
-  margin: 0;
-  padding: 6px 8px;
-}
-
-.game-frame-content #g-train #tr-brutes {
-  grid-column: 1 / -1;
-  gap: 4px;
-  padding: 2px;
-}
-
-.game-frame-content #g-train .tr-b {
-  padding: 2px;
-  font-size: .58rem;
-  line-height: 1;
-}
-
-.game-frame-content #g-train .tr-b canvas {
-  width: 34px;
-  height: 34px;
-}
-
-.game-frame-content #g-train .arena-top {
-  grid-column: 1 / -1;
-  margin: 0;
-}
-
-.game-frame-content #g-train .arenawrap {
-  grid-column: 1;
-  grid-row: 4 / 6;
-  display: flex;
-  align-items: center;
-  min-width: 0;
-}
-
 .game-frame-content #g-train #cv-train {
   height: auto;
   max-height: 100%;
 }
 
-.game-frame-content #g-train .tr-ctrl {
-  grid-column: 2;
-  grid-row: 4;
-  gap: 4px;
-  margin: 0;
-}
-
-.game-frame-content #g-train .tr-ctrl .btn,
 .game-frame-content #g-train #tr-wpn {
   padding: 4px 6px;
   font-size: .68rem;
 }
-
-.game-frame-content #g-train .tr-opt {
-  font-size: .68rem;
-}
-
 .game-frame-content #g-train #tr-select-decor {
   max-width: 100px;
 }

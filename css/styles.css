@@ -281,10 +281,6 @@ body.fx-open{overflow:hidden}
 .fx-sl{display:flex;justify-content:space-between;gap:.3em;font-size:1.7em;font-weight:700;white-space:nowrap}
 .fx-sv{color:var(--neon)}.fx-sv i{font-style:normal;color:#39ff14;margin-left:.3em}
 .fx .seg{gap:.2em}.fx .seg i{height:1.25em;border-radius:.1em}
-.fx-gear{display:flex;gap:.5em;height:max(5.4em,40px)}
-.fx-gslot{flex:1;font-size:3.8em;line-height:1;background:rgba(0,0,0,.55);border:1px solid var(--line);border-radius:.2em;opacity:.5}
-.fx-gslot.on{opacity:1;border-color:var(--c);box-shadow:0 0 .5em var(--c)}
-.fx-gslot:hover{border-color:var(--neon)}
 
 /* colonne 3 : compétences */
 .fx-skills{flex:1}
@@ -452,7 +448,6 @@ button{touch-action:manipulation}
 .fx-s i{font-size:.65rem}
 .fx-hero{flex:1;min-height:0}
 .fx-fi{font-size:4em}
-#fx-gear{display:none !important}
 
 /* ===== Raids (boss) ===== */
 #rd-panel{width:min(520px,100%);display:flex;flex-direction:column;gap:10px;margin:10px auto 0;padding:12px;background:rgba(0,0,0,.75);border:1px solid var(--neon);box-shadow:var(--glow)}
@@ -554,13 +549,8 @@ button{touch-action:manipulation}
   position: relative;
 }
 
-.fx-panel.fx-comp {
-  position: relative;
-}
-
 .fx-panel.fx-comp > :first-child {
   position: relative;
-  z-index: 4;
   pointer-events: none;
 }
 

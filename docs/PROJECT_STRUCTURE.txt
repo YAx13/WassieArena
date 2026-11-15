@@ -2,6 +2,7 @@ Structure du dossier
 Le numéro de série du volume est 8455-7515
 C:.
 |   .gitattributes
+|   index.hmtl.txt
 |   index.html
 |   
 +---assets

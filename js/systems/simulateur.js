@@ -142,12 +142,13 @@ const TRAIN={
     const item = this.decorList[this.decorIdx];
     const select = $("#tr-select-decor");
     if(select) select.value = this.decorIdx;
+    const tok = this._decorTok = (this._decorTok || 0) + 1;
     const chargerImage = (chemin) => {
       const img = new Image();
       img.src = chemin;
-      img.onload = () => { if (this.A) { this.A.pan = 0; this.A.customBg = img; } };
+      img.onload = () => { if (this.A && tok === this._decorTok) { this.A.pan = 0; this.A.customBg = img; } };
       img.onerror = () => {
-        if (chemin.endsWith(".jpg")) chargerImage(chemin.replace(".jpg", ".jpeg"));
+        if (tok !== this._decorTok) return;        if (chemin.endsWith(".jpg")) chargerImage(chemin.replace(".jpg", ".jpeg"));
         else if (chemin.endsWith(".jpeg")) {
           const parties = chemin.split('/');
           const nomFichier = parties[parties.length - 1];

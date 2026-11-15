@@ -22,7 +22,6 @@ const OV={
     cargos:{pane:"g-shop"},
     sim:{pane:"g-train",onOpen(){ TRAIN.open(); }},
     forge:{pane:"g-forge",onOpen(){ renderForge(); }},
-    evo:{pane:"g-evo"},
     expe:{pane:"g-expe"},
     bossArmes:{pane:"g-boss",boss:"armes"},
     bossParchemins:{pane:"g-boss",boss:"parchemins"},
@@ -81,8 +80,7 @@ function loadAfkMenuPositions(){
   }catch(error){ console.error("Impossible de charger la disposition des boutons AFK.",error); }
   return validAfkMenuPositions(AFK_MENU_FROZEN)?JSON.parse(JSON.stringify(AFK_MENU_FROZEN)):null;
 }
-let afkMenuPositions=loadAfkMenuPositions(), afkButtonDrag=null, afkClickToSuppress=null, afkLastOpenTs=0, devMenuWasOpen=false;
-function setAfkMenuOpen(open){
+let afkMenuPositions=loadAfkMenuPositions(), afkButtonDrag=null, afkClickToSuppress=null, afkLastOpenTs=0;function setAfkMenuOpen(open){
   const menu=$("#afk-menu"), toggle=$("#afk-menu-toggle");
   menu.classList.toggle("open",open);
   toggle.setAttribute("aria-expanded",String(open)); toggle.setAttribute("aria-label",open?"Fermer le menu":"Ouvrir le menu");
@@ -165,28 +163,13 @@ document.addEventListener("keydown",e=>{
   const fb=$("#fx-best"); if(fb&&!fb.classList.contains("hidden")){ fb.classList.add("hidden"); return; }
   OV.closeTop();
 });
-/* ---------- Frise d'évolution d'un compagnon (clic sur une case allumée) ---------- */
-const EVO_SPRITES={};   // ← VOS SPRITES : EVO_SPRITES["chien:0"]="sprites/cyber-chauve.png" (clé = famille:index 0-2). Vide = emoji de la famille.
-function openEvo(key){
-  const f=CompanionData.FAMILIES.find(x=>x.key===key), c=S.cur&&S.cur.companion, E=FX.esc; if(!f) return;
-  const form=(c&&CompanionData.family(c)===f)?(c.form||1):0;       // 0 = famille non débloquée
-  const bgUrl=DataEngine.getCompanionBg(S.cur&&S.cur.sprite);
-  const evoPane=$("#g-evo");
-  if(evoPane) evoPane.style.background=`linear-gradient(rgba(10,8,6,.55),rgba(10,8,6,.75)),url("${bgUrl}") center/cover no-repeat`;
-  $("#evo-title").textContent=f.name+" · évolutions";
-  $("#evo-body").innerHTML='<div class="evo-line">'+f.stages.map((n,i)=>{
-    const un=form>i, im=EVO_SPRITES[key+":"+i]||DataEngine.getCompanionArt(key,i+1);
-    return (i?'<span class="evo-arrow">➜</span>':"")+`<div class="evo-card st${i+1} ${un?"on":"off"} ${form===i+1?"cur":""}"><div class="evo-spr"><img src="${E(im)}" alt="${E(n)}"></div><b>${E(n)}</b><small>${FX.STAGE[i]} · niv. ${CompanionData.EVO_LEVELS[i]}</small>${un?"":"<em>🔒</em>"}</div>`; }).join("")
-    +`</div><p class="evo-spec">${E(f.spec)}${f.legend?" · "+E(f.legend):""}</p>`;
-  OV.open("evo");
-}
 // Compatibilité avec les anciens appels gameTab("combat"|"fiche"|"forge"|"shop"|"train")
 function gameTab(n){ const k={combat:"pvp",fiche:"caserne",forge:"forge",shop:"cargos",train:"sim"}[n]; if(k) OV.open(k); else OV.closeAll(); }
 
 /* ---------- Caserne : carrousel 2D plat en boucle infinie (PORTRAIT) ---------- */
 /* En PAYSAGE, le CSS garde les 3 colonnes côte à côte : ce code ne fait alors rien (aucune transformation CSS n'est appliquée). */
 const Caserne={
-  idx:2,N:5,prev:[],mode:"",sx:0,sy:0,st:0,dx:0,swiped:0,
+  idx:2,N:5,mode:"",sx:0,sy:0,st:0,dx:0,swiped:0,
   portrait(){ return matchMedia("(orientation:portrait)").matches; },
   init(){
     this.body=$("#fx .fx-body"); this.cols=[...this.body.children]; this.pager=$$("#fx-pager button[data-p]");
@@ -202,15 +185,13 @@ const Caserne={
       if(!this.mode){                                   // verrouillage d'axe : horizontal = swipe, vertical = défilement natif
         if(Math.abs(dx)<8&&Math.abs(dy)<8) return;
         this.mode=Math.abs(dx)>Math.abs(dy)*1.2?"h":"v";
-        if(this.mode==="h"){ bd.classList.add("drag"); hideTip(); }
+        if(this.mode==="h") hideTip();
       }
-      if(this.mode==="h"){ this.dx=dx; bd.style.setProperty("--drag",dx+"px"); }
-    },{passive:true});
+      if(this.mode==="h") this.dx=dx;    },{passive:true});
     const end=e=>{
       if(this.mode!=="h"){ this.mode=""; return; }
       const dx=this.dx, dt=Math.max(1,e.timeStamp-this.st), w=bd.clientWidth||1;
       this.mode=""; this.swiped=Date.now();
-      bd.classList.remove("drag"); bd.style.setProperty("--drag","0px");
       if(e.type==="touchend"&&(Math.abs(dx)>w*.22||(Math.abs(dx)>28&&Math.abs(dx)/dt>.45))) this.go(dx<0?1:-1);   // distance OU vitesse (flick)
     };
     bd.addEventListener("touchend",end,{passive:true}); bd.addEventListener("touchcancel",end,{passive:true});
@@ -237,14 +218,7 @@ function setTab(i){
 /* La variable existante b.energy / b.energyMax est réutilisée (aucun doublon). On ajoute seulement b.energyTs = début du cycle de recharge (Date.now()). */
 const Energy={
   INTERVAL:15*60*1000,
-  init(b){
-    if(!Number.isFinite(b.energyMax)||b.energyMax<=0) b.energyMax=15;
-    if(!Number.isFinite(b.energy)) b.energy=b.energyMax;
-    b.energy=Math.max(0,Math.min(b.energyMax,Math.floor(b.energy)));
-    if(!Number.isFinite(b.energyTs)) b.energyTs=Date.now();
-    return this.sync(b);
-  },
-  sync(b,now=Date.now()){
+  init(b){ return this.sync(b); },  sync(b,now=Date.now()){
     if(!b) return false;
     if(b.energy>=b.energyMax){ b.energyTs=now; return false; }      // jauge pleine : le cycle redémarrera à la 1re dépense
     let changed=false;

@@ -328,7 +328,7 @@ st.textContent = ".fx-panel.fx-hero{position:relative;flex:1;min-height:0;paddin
       tb.onclick = e => { e.stopPropagation(); if (!this._statsEditing) this.entrainer(); };
       stStage.appendChild(tb);
 
-      hero.innerHTML = '<div id="fx-gear" hidden></div>';
+      hero.innerHTML = "";
       hero.appendChild(stStage);
       this.applyStatsLayout();
       this.initStatsDevUI();

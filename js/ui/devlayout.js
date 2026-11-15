@@ -32,7 +32,7 @@ const DevLayout = {
     if (!stage) { console.warn("DevLayout : stage introuvable pour", opt.key); return null; }
     const old = this.instances[opt.key];
     if (old && old.stage === stage) return old;
-    const host = $(opt.host) || stage;
+    if (old && old.destroy) old.destroy();    const host = $(opt.host) || stage;
     if (getComputedStyle(stage).position === "static") stage.style.position = "relative";
     if (getComputedStyle(host).position === "static") host.style.position = "relative";
 
@@ -132,17 +132,21 @@ const DevLayout = {
       sel = p; applyOne(el, p); save();
     }, { passive: false });
     // Flèches = ajustement fin de l'élément sélectionné (Maj = x10)
-    document.addEventListener("keydown", ev => {
+    const onKey = ev => {
       if (!editing || !sel || !stage.isConnected || !ev.key.startsWith("Arrow")) return;
       const s = ev.shiftKey ? 1 : 0.1;
       if (ev.key === "ArrowLeft") sel.x -= s; else if (ev.key === "ArrowRight") sel.x += s;
       else if (ev.key === "ArrowUp") sel.y -= s; else sel.y += s;
       ev.preventDefault(); refresh(sel); save();
-    });
+    };
+    document.addEventListener("keydown", onKey);
     // Ré-applique automatiquement si le module re-génère son contenu (innerHTML)
-    new MutationObserver(applyAll).observe(stage, { childList: true, subtree: true });
+    const mo = new MutationObserver(applyAll);
+    mo.observe(stage, { childList: true, subtree: true });
 
     applyAll();
-    return this.instances[opt.key] = { stage, apply: applyAll, sync, get, save };
-  }
+    return this.instances[opt.key] = {
+      stage, apply: applyAll, sync, get, save,
+      destroy(){ document.removeEventListener("keydown", onKey); mo.disconnect(); bar.remove(); }
+    };  }
 };

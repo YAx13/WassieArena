@@ -408,15 +408,14 @@ function renderFiche(b){
   const nw=D.WEAPONS.filter(w=>b.weapons.includes(w.id)).length;
   $("#fx-wcount").textContent=nw+"/"+D.WEAPONS.length;
   updateWeaponRackDevUI();
-  const rack=$("#fx-wrack"), rackBrute=D.BRAWLERS.includes(b.sprite)?b.sprite:"general";
+  const rack=$("#fx-wrack"), rackBrute=D.BRAWLERS.includes(b.sprite)?b.sprite:"dummy";
   rack.style.backgroundImage=`url("assets/backgrounds/arsenal/${rackBrute}/background.jpg"),url("assets/backgrounds/arsenal/background-greybox.jpg")`;
   rack.style.backgroundSize="cover";
   rack.style.backgroundPosition="center";
 
   if(armoryShowcase.bruteId!==b.id){
     armoryShowcase.bruteId=b.id;
-    armoryShowcase.wid=b.weapons.length?b.weapons:null;
-    armoryShowcase.anim="idle";
+    armoryShowcase.wid=b.weapons.length?b.weapons[0]:null;    armoryShowcase.anim="idle";
     armoryShowcase.animStart=0;
   }
 
