@@ -1,0 +1,23 @@
+Generate ONE SINGLE standalone 16-bit retro pixel-art sprite in a tall vertical 9:16 portrait aspect ratio on a 100% pure solid chroma-key bright green (#00FF00) background. STRICTLY ZERO BLACK BORDERS OR FRAMES: Every pixel outside the wolf's 1-pixel pure black (#000000) outer outline must be pure solid #00FF00 green with zero anti-aliasing, zero blur, and zero drop shadows.
+
+PROPORTION & POSE (FORM 1 — SMALL & FLOATING, ~44% HEIGHT):
+- Compact young-pup-proportioned version of the scruffy grey-brown scarred wolf wearing a spiked brown collar from Image 1, occupying only ~44% of the vertical height in the center of the tall 9:16 canvas (with generous empty #00FF00 green above, below, and on both sides).
+- Pose: Floating vertically in zero-gravity stasis while lazily scratching behind one pointed ear with its hind paw, bushy tail tucked neatly forward against its belly, and eyes half-closed peacefully asleep.
+
+
+
+
+Generate ONE SINGLE standalone 16-bit retro pixel-art sprite in a tall vertical 9:16 portrait aspect ratio on a 100% pure solid chroma-key bright green (#00FF00) background. STRICTLY ZERO BLACK BORDERS OR FRAMES: Every pixel outside the dire-wolf's 1-pixel pure black (#000000) outer outline must be pure solid #00FF00 green with zero anti-aliasing, zero blur, and zero drop shadows.
+
+PROPORTION & POSE (FORM 2 — TALL SEATED HOWL, ~74% HEIGHT):
+- Re-pose the scruffy grey-brown scarred dire-wolf with glowing red eyes and riveted grey steel shoulder plates from Image 1 into a tall, narrow upright seated posture occupying ~74% of the vertical height (leaving empty #00FF00 green above and below) and staying narrow enough to never touch the sides.
+- Pose: Seated upright on its haunches on an invisible flat floor with its bushy tail wrapped tightly around its hind legs, riveted grey steel shoulder armor tucked cleanly along its shoulders, and its head tilted straight upward toward the top with jaws slightly parted in a silent mid-stasis howl and glowing red eyes glaring.
+
+
+
+
+Generate ONE SINGLE standalone 16-bit retro pixel-art sprite in a tall vertical 9:16 portrait aspect ratio on a 100% pure solid chroma-key bright green (#00FF00) background. STRICTLY ZERO BLACK BORDERS OR FRAMES: Every pixel outside the Fenrir wolf's 1-pixel pure black (#000000) outer outline must be pure solid #00FF00 green with zero anti-aliasing, zero blur, and zero drop shadows.
+
+DO NOT COPY THE FOUR-LEGGED SIDE PROFILE — DRAW A TERRIFYING FRONT-FACING UPRIGHT POSE (~95% HEIGHT):
+- Re-pose the hulking black-blue Fenrir wolf with frosted pale dorsal fur, icy pale eyes, bared fangs, and broken glowing cyan spectral chains around its neck from Image 1 into a colossal, narrow front-facing bipedal horror posture occupying ~95% of the vertical height and almost the full narrow width.
+- Pose: Jammed upright on two hind legs inside a tight vertical space—its broad shaggy black-blue shoulders and glowing cyan chains are flattened into straight vertical left and right edges as if pressed directly against invisible side glass, two huge clawed front paws are raised and slammed flat palms-forward against an invisible front glass window, its snarling fanged snout and piercing icy eyes press aggressively forward right up to the front window, its pointed ears bend slightly at the top, and its thick tail tucks behind its legs.

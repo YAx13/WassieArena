@@ -9,7 +9,15 @@ const StatsUI = {
   STATS_PRESETS: {
     global: {
       plate:  { quad: [[13.24, 13.28], [30.09, 16.69], [29.25, 36.67], [12.2, 34.96]], baseW: 250, baseH: 88 },
-      crt:    { quad: [[72.0, 9.68], [95.36, 6.88], [95.62, 42.09], [71.87, 42.46]], baseW: 340, baseH: 230 },
+      crt:    { quad: [[72, 9.68], [95.36, 6.88], [95.62, 42.09], [71.87, 42.46]], baseW: 340, baseH: 230 },
+      power:  { quad: [[41.02, 73.53], [59.11, 73.28], [63.99, 88.51], [36.27, 88.15]], baseW: 260, baseH: 68 },
+      train:  { quad: [[68.42, 64.2], [95.09, 72.85], [95.29, 89.06], [68.29, 75.66]], baseW: 360, baseH: 108 },
+      totem:  { quad: [[17.37, 53.67], [27.59, 53.91], [27.45, 77.91], [17.43, 77.79]], baseW: 160, baseH: 260 },
+      avatar: { x: 50.11, y: 52.77, size: 17.5 }
+    },
+    dummy: {
+      plate:  { quad: [[13.24, 13.28], [30.09, 16.69], [29.25, 36.67], [12.2, 34.96]], baseW: 250, baseH: 88 },
+      crt:    { quad: [[72, 9.68], [95.36, 6.88], [95.62, 42.09], [71.87, 42.46]], baseW: 340, baseH: 230 },
       power:  { quad: [[41.02, 73.53], [59.11, 73.28], [63.99, 88.51], [36.27, 88.15]], baseW: 260, baseH: 68 },
       train:  { quad: [[68.42, 64.2], [95.09, 72.85], [95.29, 89.06], [68.29, 75.66]], baseW: 360, baseH: 108 },
       totem:  { quad: [[17.37, 53.67], [27.59, 53.91], [27.45, 77.91], [17.43, 77.79]], baseW: 160, baseH: 260 },
@@ -503,10 +511,19 @@ st.textContent = ".fx-panel.fx-hero{position:relative;flex:1;min-height:0;paddin
       };
       bar.querySelector("#std-copy").onclick = e => {
         e.stopPropagation();
-        const clean = JSON.stringify(this.loadStatsStore());
+        const ck = this.getStatsCharKey();
+        const compAll = typeof exportCompLayoutStore === "function" ? exportCompLayoutStore() : { pods: {}, holo: {} };
+        const rackAll = typeof exportRackLayoutStore === "function" ? exportRackLayoutStore() : { rack: {}, hero: {} };
+        const unified = {
+          char: ck,
+          stats: this.getStatsLayoutFor(ck),
+          compagnons: { pods: compAll.pods?.[ck] || null, holo: compAll.holo?.[ck] || null },
+          arsenal: { rack: rackAll.rack?.[ck] || null, hero: rackAll.hero?.[ck] || null }
+        };
+        const clean = JSON.stringify(unified);
         if (navigator.clipboard) navigator.clipboard.writeText(clean);
-        console.log("STATS_PRESETS =", clean);
-        if (typeof toast === "function") toast("Matrices 3D copiées dans le presse-papiers !");
+        console.log("UNIFIED_LAYOUT_JSON =", clean);
+        if (typeof toast === "function") toast(`JSON unifié copié (Stats + Compagnons + Arsenal · ${ck}) !`);
       };
       bar.querySelector("#std-reset").onclick = e => {
         e.stopPropagation();

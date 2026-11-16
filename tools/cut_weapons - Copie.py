@@ -1,34 +1,65 @@
 import os
-import shutil
-from PIL import Image
+from PIL import Image, ImageDraw
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-ROOT = os.path.abspath(os.path.join(HERE, "..")) if os.path.basename(HERE).lower() == "tools" else HERE
-GREYBOX_SRC = os.path.join(ROOT, "assets", "weapons_cut", "greybox-weapons.png")
-DUMMY_WPN_DIR = os.path.join(ROOT, "assets", "characters", "dummy", "weapons")
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BG_ROOT = os.path.join(BASE_DIR, "assets", "backgrounds", "companion")
 
-if not os.path.isfile(GREYBOX_SRC):
-    raise RuntimeError(f"Introuvable : {GREYBOX_SRC}")
+PODS = [
+    {"key": "chien", "x": 16.38, "y": 16.33, "size": 27.5},
+    {"key": "loup", "x": 72.11, "y": 53.13, "size": 20.0},
+    {"key": "ours", "x": 27.70, "y": 52.52, "size": 22.5},
+    {"key": "serpent", "x": 38.96, "y": 15.35, "size": 22.5},
+    {"key": "oiseau", "x": 61.10, "y": 16.21, "size": 22.5},
+    {"key": "arthropode", "x": 83.36, "y": 15.72, "size": 27.5},
+    {"key": "felin", "x": 71.95, "y": 20.30, "size": 10.0},
+    {"key": "taureau", "x": 16.76, "y": 56.67, "size": 27.5},
+    {"key": "aquatique", "x": 27.96, "y": 15.72, "size": 23.5},
+    {"key": "chimere", "x": 38.90, "y": 51.29, "size": 20.0},
+    {"key": "lezard", "x": 49.78, "y": 16.94, "size": 20.0},
+    {"key": "spectre", "x": 50.00, "y": 51.17, "size": 26.0},
+    {"key": "tempete", "x": 83.36, "y": 57.16, "size": 23.5},
+]
 
-os.makedirs(DUMMY_WPN_DIR, exist_ok=True)
-dst_sheet = os.path.join(DUMMY_WPN_DIR, "weapon-1-transparent.png")
-shutil.copy2(GREYBOX_SRC, dst_sheet)
+count = 0
+for char in sorted(os.listdir(BG_ROOT)):
+    char_dir = os.path.join(BG_ROOT, char)
+    if not os.path.isdir(char_dir):
+        continue
+    bg_path = None
+    for ext in ("background.jpeg", "background.jpg", "background.png"):
+        p = os.path.join(char_dir, ext)
+        if os.path.exists(p):
+            bg_path = p
+            break
+    if not bg_path:
+        continue
 
-WEAPON_CELLS = {
-    0: 0, 1: 1, 2: 2, 3: 3,
-    4: 4, 5: 5, 6: 6, 7: 7,
-    8: 8, 9: 10, 10: 11,
-    11: 12, 12: 13, 13: 14
-}
+    with Image.open(bg_path).convert("RGBA") as bg:
+        w, h = bg.size
+        fg = bg.copy()
+        mask = Image.new("L", (w, h), 255)
+        draw = ImageDraw.Draw(mask)
+        glass = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+        gdraw = ImageDraw.Draw(glass)
 
-img = Image.open(dst_sheet).convert("RGBA")
-w, h = img.size
-cw, ch = w // 4, h // 4
+        for pod in PODS:
+            ph = h * (pod["size"] / 100.0) * 0.90
+            pw = ph * 0.48
+            cx = w * (pod["x"] / 100.0)
+            cy = h * (pod["y"] / 100.0)
+            x0, y0 = int(cx - pw / 2), int(cy - ph / 2)
+            x1, y1 = int(cx + pw / 2), int(cy + ph / 2)
+            r = max(4, int(pw * 0.16))
+            draw.rounded_rectangle([x0, y0, x1, y1], radius=r, fill=0)
+            sx0 = x0 + max(2, int(pw * 0.16))
+            sx1 = sx0 + max(1, int(pw * 0.08))
+            gdraw.rectangle([sx0, y0 + r, sx1, y1 - r], fill=(200, 245, 255, 42))
 
-for wid, cell in WEAPON_CELLS.items():
-    col, row = cell % 4, cell // 4
-    x0, y0 = col * cw, row * ch
-    y1 = y0 + (ch * 2 if wid == 10 else ch)
-    img.crop((x0, y0, x0 + cw, y1)).save(os.path.join(DUMMY_WPN_DIR, f"wpn-{wid}.png"))
+        fg.putalpha(mask)
+        fg = Image.alpha_composite(fg, glass)
+        out_path = os.path.join(char_dir, "foreground.png")
+        fg.save(out_path)
+        count += 1
+        print(f"[OK] Generated depth foreground.png for {char}")
 
-print("[OK] Armes greybox installées et découpées dans assets/characters/dummy/weapons/ !")
+print(f"Done! Created {count} depth foreground layers.")

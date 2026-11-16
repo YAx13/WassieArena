@@ -1,0 +1,28 @@
+Generate ONE SINGLE standalone 16-bit retro pixel-art sprite in a tall vertical 9:16 portrait aspect ratio on a 100% pure solid chroma-key bright magenta (#FF00FF) background. STRICTLY ZERO BLACK BORDERS OR FRAMES: Every pixel outside the viper's 1-pixel pure black (#000000) outer outline must be pure solid #FF00FF magenta with zero anti-aliasing, zero blur, and zero drop shadows.
+
+PROPORTION & POSE (FORM 1 — SMALL & FLOATING, ~44% HEIGHT):
+- Compact young-viper-proportioned version of the scarred olive-green snake with a red cybernetic eye implant, tan belly scales, and studded brown neck collar from Image 1, occupying only ~44% of the vertical height in the center of the tall 9:16 canvas (with generous empty #FF00FF magenta above, below, and on both sides).
+- Pose: Floating weightlessly in zero-gravity stasis tied into a cute, loose figure-eight pretzel knot, resting its chin lazily on top of its own coiled loop with its red cyber-eye half-closed in a deep sleep.
+
+
+
+
+
+
+
+Generate ONE SINGLE standalone 16-bit retro pixel-art sprite in a tall vertical 9:16 portrait aspect ratio on a 100% pure solid chroma-key bright magenta (#FF00FF) background. STRICTLY ZERO BLACK BORDERS OR FRAMES: Every pixel outside the Basilisk's 1-pixel pure black (#000000) outer outline must be pure solid #FF00FF magenta with zero anti-aliasing, zero blur, and zero drop shadows.
+
+PROPORTION & POSE (FORM 2 — TALL VERTICAL SPRING COIL, ~74% HEIGHT):
+- Re-pose the olive-green scarred Basilisk cobra with silver dorsal crown spikes, flared hood, and three glowing white eyes on the side of its head from Image 1 into a tall, narrow vertical coiled posture occupying ~74% of the vertical height (leaving empty #FF00FF magenta above and below) and staying narrow enough to never touch the sides.
+- Pose: Coiled tightly upward into three stacked vertical rings like a compressed spring, resting its spiked head forward on top of the upper coil with its hood tucked neatly inward and glowing white eyes glaring ahead.
+
+
+
+
+
+
+Generate ONE SINGLE standalone 16-bit retro pixel-art sprite in a tall vertical 9:16 portrait aspect ratio on a 100% pure solid chroma-key bright magenta (#FF00FF) background. STRICTLY ZERO BLACK BORDERS OR FRAMES: Every pixel outside the Hydra's 1-pixel pure black (#000000) outer outline must be pure solid #FF00FF magenta with zero anti-aliasing, zero blur, and zero drop shadows.
+
+GLASS-SQUISHED POSE (FORM 3 — TOO BIG FOR THE POD, ~95% HEIGHT):
+- Re-pose the colossal three-headed dark olive-brown Hydra bound by a bolted rusty iron chestplate, with glowing neon-green eyes, silver dorsal spines, and dripping bright green acid venom from Image 1 so it fills ~95% of the tall 9:16 vertical height and almost the full narrow width.
+- Pose: Stuffed tightly from bottom to top inside a narrow vertical space like an overfilled specimen jar—its thick muscular olive-brown coils and bolted rusty iron chestplate are compressed into straight vertical left and right edges as if squished directly against invisible side glass, while all three snarling serpent heads are wedged tightly together at the top pressing forward toward the viewer with glowing neon-green eyes and bright green acid venom dripping down.

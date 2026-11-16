@@ -138,26 +138,34 @@ document.addEventListener("click",hideTip); addEventListener("scroll",hideTip,tr
   fx.addEventListener("click",e=>{ const el=T(e); if(el){ e.stopPropagation(); showTip(el); } });
 })();
 
-/* --- Rendu de la fiche --- */
-const WEAPON_RACK_LAYOUT_KEY="arene_armory_layout_global_v2";
-let weaponRackEditing=false, weaponRackPositions=null, weaponRackDrag=null;
+/* --- Rendu de la fiche (isolé par personnage : dummy + fine-tuning individuel) --- */
+const WEAPON_RACK_LAYOUT_KEY="arene_armory_layout_by_char_v1";
+const ARMORY_BRAWLER_OVERRIDES={};
+let weaponRackEditing=false, weaponRackPositions=null, weaponRackDrag=null, activeRackSprite=null;
+function getRackCharKey(b=S.cur){
+  return (b&&DataEngine.BRAWLERS.find(n=>String(b.sprite||"").toLowerCase().startsWith(n)))||"dummy";
+}
 function validRackPositions(p){
   return Array.isArray(p)&&p.length===DataEngine.WEAPONS.length&&p.every((q,i)=>q&&q.id===i&&[q.x,q.y,q.size,q.angle].every(Number.isFinite));
 }
-function readWeaponRackPositions(){
+function readRackStore(){
   try{
-    const saved=localStorage.getItem(WEAPON_RACK_LAYOUT_KEY);
-    if(saved){
-      const positions=JSON.parse(saved);
-      if(validRackPositions(positions)) return positions;
-    }
-  }catch(error){}
+    const raw=JSON.parse(localStorage.getItem(WEAPON_RACK_LAYOUT_KEY)||"null");
+    return (raw&&typeof raw==="object"&&!Array.isArray(raw))?raw:{};
+  }catch(error){ return {}; }
+}
+function readWeaponRackPositions(charKey=getRackCharKey()){
+  const store=readRackStore();
+  if(validRackPositions(store[charKey])) return store[charKey].map(p=>({...p}));
+  if(validRackPositions(ARMORY_BRAWLER_OVERRIDES[charKey])) return ARMORY_BRAWLER_OVERRIDES[charKey].map(p=>({...p}));
   return null;
 }
 function saveWeaponRackPositions(){
   if(!weaponRackPositions) return;
-  try{ localStorage.setItem(WEAPON_RACK_LAYOUT_KEY,JSON.stringify(weaponRackPositions)); }catch(error){}
-  console.log("ARMORY_DEFAULT_LAYOUT =",JSON.stringify(weaponRackPositions.map(({id,x,y,size,angle,flip})=>({id,x:+x.toFixed(2),y:+y.toFixed(2),size:+size.toFixed(2),angle:+angle.toFixed(1),flip:!!flip}))));
+  const ck=getRackCharKey(), store=readRackStore();
+  store[ck]=weaponRackPositions.map(({id,x,y,size,angle,flip})=>({id,x:+x.toFixed(2),y:+y.toFixed(2),size:+size.toFixed(2),angle:+angle.toFixed(1),flip:!!flip}));
+  try{ localStorage.setItem(WEAPON_RACK_LAYOUT_KEY,JSON.stringify(store)); }catch(error){}
+  console.log(`ARMORY_OVERRIDE_${ck.toUpperCase()} =`,JSON.stringify(store[ck]));
 }
 function rackPositionBounds(position,grid){
   const angle=position.angle*Math.PI/180, size=position.size/100;
@@ -251,9 +259,12 @@ function updateWeaponRackDevUI(){
     bar.appendChild(edit);
     edit.style.cssText="position:static!important;width:auto!important;height:auto!important;min-height:0!important;padding:4px 8px!important;font-size:11px!important";
     bar.querySelector("#fx-rack-reset").onclick=()=>{
-      try{ localStorage.removeItem(WEAPON_RACK_LAYOUT_KEY); localStorage.removeItem(ARMORY_HERO_KEY); }catch(e){}
-      weaponRackPositions=ARMORY_DEFAULT_LAYOUT.map(p=>({...p}));
-      armoryHeroPos={...ARMORY_HERO_DEFAULT};
+      const ck=getRackCharKey();
+      const rs=readRackStore(); delete rs[ck];
+      const hs=readHeroStore(); delete hs[ck];
+      try{ localStorage.setItem(WEAPON_RACK_LAYOUT_KEY,JSON.stringify(rs)); localStorage.setItem(ARMORY_HERO_KEY,JSON.stringify(hs)); }catch(e){}
+      weaponRackPositions=(ARMORY_BRAWLER_OVERRIDES[ck]||ARMORY_DEFAULT_LAYOUT).map(p=>({...p}));
+      armoryHeroPos={...ARMORY_HERO_DEFAULT,...(ARMORY_HERO_OVERRIDES[ck]||{})};
       applyArmoryHeroStage($("#fx-armory-stage"));
       const grid=$("#fx-wrack .fx-rack-grid");
       if(grid) fitWeaponRack(grid.parentElement);
@@ -276,28 +287,47 @@ function updateWeaponRackDevUI(){
 function fitWeaponRack(rack){
   const grid=rack.querySelector(".fx-rack-grid"), weapons=grid?[...grid.children]:[];
   if(!grid||!weapons.length||!grid.clientWidth||!grid.clientHeight) return;
-  const saved=weaponRackPositions||(weaponRackPositions=readWeaponRackPositions())||ARMORY_DEFAULT_LAYOUT.map(p=>({...p}));
+  const ck=getRackCharKey();
+  if(activeRackSprite!==ck){
+    activeRackSprite=ck;
+    weaponRackPositions=readWeaponRackPositions(ck)||ARMORY_DEFAULT_LAYOUT.map(p=>({...p}));
+    armoryHeroPos=readArmoryHeroPos(ck);
+  }
+  const saved=weaponRackPositions||(weaponRackPositions=readWeaponRackPositions(ck))||ARMORY_DEFAULT_LAYOUT.map(p=>({...p}));
   grid.classList.toggle("is-editing",weaponRackEditing);
   weapons.forEach(button=>{ const p=saved[+button.dataset.rackWeapon]; if(p) applyRackPosition(button,p,grid); });
 }
 const weaponRackObserver=typeof ResizeObserver==="undefined"?null:new ResizeObserver(entries=>entries.forEach(({target})=>fitWeaponRack(target)));
-const ARMORY_DEFAULT_LAYOUT=[{"id":0,"x":89.76,"y":50.13,"size":18,"angle":325,"flip":true},{"id":1,"x":10.12,"y":48.85,"size":15.5,"angle":35,"flip":false},{"id":2,"x":17.37,"y":38.34,"size":15.5,"angle":40,"flip":false},{"id":3,"x":25.96,"y":24.58,"size":20.5,"angle":65,"flip":true},{"id":4,"x":93.64,"y":34.3,"size":18.5,"angle":75,"flip":true},{"id":5,"x":82.95,"y":26.66,"size":16.5,"angle":-20,"flip":false},{"id":6,"x":82.89,"y":39.92,"size":16.5,"angle":75,"flip":false},{"id":7,"x":7,"y":35.58,"size":18.5,"angle":-72,"flip":false},{"id":8,"x":22.14,"y":78.19,"size":16,"angle":68,"flip":true},{"id":9,"x":81.49,"y":71.96,"size":21.5,"angle":297,"flip":true},{"id":10,"x":74.11,"y":22.56,"size":29,"angle":-10,"flip":false},{"id":11,"x":17.75,"y":94.21,"size":10,"angle":10,"flip":false},{"id":12,"x":23.28,"y":94.5,"size":10,"angle":-6,"flip":false},{"id":13,"x":28.37,"y":89.2,"size":12.5,"angle":11,"flip":true}];
+const ARMORY_DEFAULT_LAYOUT=[{"id":0,"x":89.76,"y":50.13,"size":18,"angle":325,"flip":true},{"id":1,"x":10.12,"y":48.85,"size":15.5,"angle":35,"flip":false},{"id":2,"x":17.37,"y":38.34,"size":15.5,"angle":40,"flip":false},{"id":3,"x":25.96,"y":24.58,"size":20.5,"angle":65,"flip":true},{"id":4,"x":93.64,"y":34.3,"size":18.5,"angle":75,"flip":true},{"id":5,"x":82.95,"y":26.66,"size":16.5,"angle":-20,"flip":false},{"id":6,"x":80.72,"y":40.54,"size":16.5,"angle":225,"flip":false},{"id":7,"x":7,"y":35.58,"size":18.5,"angle":-72,"flip":false},{"id":8,"x":22.14,"y":78.19,"size":16,"angle":68,"flip":true},{"id":9,"x":81.49,"y":71.96,"size":21.5,"angle":297,"flip":true},{"id":10,"x":74.11,"y":22.56,"size":29,"angle":-10,"flip":false},{"id":11,"x":17.75,"y":94.21,"size":10,"angle":10,"flip":false},{"id":12,"x":23.28,"y":94.5,"size":10,"angle":-6,"flip":false},{"id":13,"x":28.37,"y":89.2,"size":12.5,"angle":11,"flip":true}];
 
-const ARMORY_HERO_KEY="arene_armory_hero_pos_v3";
-const ARMORY_HERO_DEFAULT={x:53.50,y:31.00,size:37.5,flip:false};
+const ARMORY_HERO_KEY="arene_armory_hero_by_char_v1";
+const ARMORY_HERO_DEFAULT={x:49.43,y:34.79,size:37.5,flip:false};
+const ARMORY_HERO_OVERRIDES={};
 let armoryHeroPos=null, armoryHeroDrag=null;
 
-function readArmoryHeroPos(){
+function readHeroStore(){
   try{
     const raw=JSON.parse(localStorage.getItem(ARMORY_HERO_KEY)||"null");
-    if(raw&&[raw.x,raw.y,raw.size].every(Number.isFinite)) return {...ARMORY_HERO_DEFAULT,...raw};
-  }catch(e){}
+    return (raw&&typeof raw==="object"&&!Array.isArray(raw))?raw:{};
+  }catch(e){ return {}; }
+}
+function readArmoryHeroPos(charKey=getRackCharKey()){
+  const store=readHeroStore();
+  const raw=store[charKey]||ARMORY_HERO_OVERRIDES[charKey];
+  if(raw&&[raw.x,raw.y,raw.size].every(Number.isFinite)) return {...ARMORY_HERO_DEFAULT,...raw};
   return {...ARMORY_HERO_DEFAULT};
 }
 function saveArmoryHeroPos(){
   if(!armoryHeroPos) return;
-  try{ localStorage.setItem(ARMORY_HERO_KEY,JSON.stringify(armoryHeroPos)); }catch(e){}
-  console.log("ARMORY_HERO_DEFAULT =",JSON.stringify({x:+armoryHeroPos.x.toFixed(2),y:+armoryHeroPos.y.toFixed(2),size:+armoryHeroPos.size.toFixed(1),flip:!!armoryHeroPos.flip}));
+  const ck=getRackCharKey(), store=readHeroStore();
+  store[ck]={x:+armoryHeroPos.x.toFixed(2),y:+armoryHeroPos.y.toFixed(2),size:+armoryHeroPos.size.toFixed(1),flip:!!armoryHeroPos.flip};
+  try{ localStorage.setItem(ARMORY_HERO_KEY,JSON.stringify(store)); }catch(e){}
+  console.log(`ARMORY_HERO_${ck.toUpperCase()} =`,JSON.stringify(store[ck]));
+}
+function exportRackLayoutStore(){
+  const rack=Object.assign({global:ARMORY_DEFAULT_LAYOUT},JSON.parse(JSON.stringify(ARMORY_BRAWLER_OVERRIDES)),readRackStore());
+  const hero=Object.assign({global:ARMORY_HERO_DEFAULT},JSON.parse(JSON.stringify(ARMORY_HERO_OVERRIDES)),readHeroStore());
+  return {rack,hero};
 }
 function applyArmoryHeroStage(stage){
   if(!stage) return;

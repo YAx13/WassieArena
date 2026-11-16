@@ -1,0 +1,29 @@
+Generate ONE SINGLE standalone 16-bit retro pixel-art sprite in a tall vertical 9:16 portrait aspect ratio on a 100% pure solid chroma-key bright green (#00FF00) background. STRICTLY ZERO BLACK BORDERS OR FRAMES: Every pixel outside the bear's 1-pixel pure black (#000000) outer outline must be pure solid #00FF00 green with zero anti-aliasing, zero blur, and zero drop shadows.
+
+PROPORTION & POSE (FORM 1 — SMALL & FLOATING, ~44% HEIGHT):
+- Compact baby-cub-proportioned version of the scarred brown bear with a riveted grey scrap-metal shoulder pad and brown rope chest harness from Image 1, occupying only ~44% of the vertical height in the center of the tall 9:16 canvas (with generous empty #00FF00 green above, below, and on both sides).
+- Pose: Floating upside-down on its back in zero-gravity stasis in a cute, sleepy pose—lazily sucking on one front paw with its round brown belly facing upward, riveted scrap-metal shoulder pad tucked neatly against its side, hind paws curled inward, and eyes shut peacefully asleep.
+
+
+
+
+
+
+
+Generate ONE SINGLE standalone 16-bit retro pixel-art sprite in a tall vertical 9:16 portrait aspect ratio on a 100% pure solid chroma-key bright green (#00FF00) background. STRICTLY ZERO BLACK BORDERS OR FRAMES: Every pixel outside the bear's 1-pixel pure black (#000000) outer outline must be pure solid #00FF00 green with zero anti-aliasing, zero blur, and zero drop shadows.
+
+DO NOT COPY THE STANDING SIDE-ROAR POSE — DRAW A SEATED, RELAXED UPRIGHT POSE (~74% HEIGHT):
+- Re-pose the scarred brown bear with riveted steel chestplate, shoulder pauldron, and heavy bolted right-arm cyber-gauntlet from Image 1 into a tall, narrow seated posture occupying ~74% of the vertical height (leaving empty #00FF00 green above and below) and staying narrow enough to never touch the sides.
+- Pose: Slumped seated upright on an invisible flat floor like a tired human—thick hind legs stretched forward on the floor, heavy bolted right-arm cyber-gauntlet resting lazily between its knees, riveted steel shoulder pauldron tucked narrowly inward so its shoulders stay slim, and head bowed slightly with eyes half-closed in stasis.
+
+
+
+
+
+
+
+Generate ONE SINGLE standalone 16-bit retro pixel-art sprite in a tall vertical 9:16 portrait aspect ratio on a 100% pure solid chroma-key bright green (#00FF00) background. STRICTLY ZERO BLACK BORDERS OR FRAMES: Every pixel outside the Behemoth bear's 1-pixel pure black (#000000) outer outline must be pure solid #00FF00 green with zero anti-aliasing, zero blur, and zero drop shadows.
+
+DO NOT COPY THE SIDE-WALKING POSE — DRAW A TERRIFYING FRONT-FACING GLASS-SQUISHED POSE (~96% HEIGHT):
+- Re-pose the hulking grey-brown mutated Behemoth bear with glowing red eyes, deep red claw scars, green-grey chest armor housing a glowing red core, and massive twin green-grey steel gauntlets from Image 1 into a colossal, narrow front-facing upright posture occupying ~96% of the vertical height and almost the full narrow width.
+- Pose: Jammed upright from bottom to top inside a tight vertical space—its massive scarred shoulders and thick twin green-grey steel gauntlets are flattened into straight vertical left and right edges as if pressed directly against invisible side glass, both colossal steel gauntlets are raised and slammed flat forward against an invisible front glass window framing the glowing red core on its chest, and its snarling fanged snout and piercing glowing red eyes press aggressively forward right up to the front window.

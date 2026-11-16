@@ -1,0 +1,32 @@
+Generate ONE SINGLE standalone 16-bit retro pixel-art sprite in a tall vertical 9:16 portrait aspect ratio on a 100% pure solid chroma-key bright green (#00FF00) background. STRICTLY ZERO BLACK BORDERS OR FRAMES: Every pixel outside the bird's 1-pixel pure black (#000000) outer outline must be pure solid #00FF00 green with zero anti-aliasing, zero blur, and zero drop shadows.
+
+PROPORTION & POSE (FORM 1 — SMALL & FLOATING, ~42% HEIGHT):
+- Compact baby-fledgling-proportioned version of the scarred brown hawk-sparrow with speckled tan chest, grey riveted steel beak, and small yellow talons from Image 1, occupying only ~42% of the vertical height in the center of the tall 9:16 canvas (with generous empty #00FF00 green above, below, and on both sides).
+- Pose: Puffed up into a cute, chubby, round sleeping ball of feathers floating weightlessly in zero-gravity stasis, both wings tucked flat against its round sides, grey steel beak nestled downward into its fluffy speckled chest, tiny yellow talons tucked under its belly, and eyes shut peacefully asleep.
+
+
+
+
+
+
+
+
+Generate ONE SINGLE standalone 16-bit retro pixel-art sprite in a tall vertical 9:16 portrait aspect ratio on a 100% pure solid chroma-key bright green (#00FF00) background. STRICTLY ZERO BLACK BORDERS OR FRAMES: Every pixel outside the falcon's 1-pixel pure black (#000000) outer outline must be pure solid #00FF00 green with zero anti-aliasing, zero blur, and zero drop shadows.
+
+PROPORTION & POSE (FORM 2 — TALL SLEEK RAPTOR TUCK, ~74% HEIGHT):
+- Re-pose the brown cyber-falcon with black-and-yellow hazard-striped wing plates, speckled tan chest, grey steel beak, and grey metal talons from Image 1 into a tall, narrow upright posture occupying ~74% of the vertical height (leaving empty #00FF00 green above and below) and staying narrow enough to never touch the sides.
+- Pose: Suspended vertically upright in a sleek, narrow raptor posture—both wings are folded tightly against its body so the yellow-and-black hazard stripes run vertically along its sides without sticking out wide, grey metal talons are tucked neatly together beneath its speckled chest, tail feathers hang straight down, and its steel-beaked head glares forward.
+
+
+
+
+
+
+
+Generate ONE SINGLE standalone 16-bit retro pixel-art sprite in a tall vertical 9:16 portrait aspect ratio on a 100% pure solid chroma-key bright green (#00FF00) background. STRICTLY ZERO BLACK BORDERS OR FRAMES: Every pixel outside the Phoenix's 1-pixel pure black (#000000) outer outline must be pure solid #00FF00 green with zero anti-aliasing, zero blur, and zero drop shadows.
+
+DO NOT COPY THE WIDE-WINGED FLYING POSE — DRAW A FRONT-FACING UPRIGHT GLASS-SQUISHED POSE (~95% HEIGHT):
+- Re-pose the charcoal-black Cyber-Phoenix with glowing orange eyes, blazing orange-gold head crest, charcoal wings with flaming orange tips, grey steel chestplate with glowing orange magma core, and orange-tipped tail feathers from Image 1 into a colossal, narrow front-facing upright posture occupying ~95% of the vertical height and almost the full narrow width.
+- Pose: Jammed upright from bottom to top inside a tight vertical space—its huge charcoal-black wings with blazing orange feather tips are folded sharply forward into straight vertical left and right edges as if pressed directly against invisible side glass, framing its grey steel chestplate and glowing orange magma core in the middle, while its fierce black head, hooked grey beak, and glowing orange eyes press forward right up to an invisible front window and its blazing orange crest feathers bend slightly at the top.
+
+

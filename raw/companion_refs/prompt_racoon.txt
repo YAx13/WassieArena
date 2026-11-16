@@ -1,0 +1,28 @@
+Generate ONE SINGLE standalone 16-bit retro pixel-art sprite in a tall vertical 9:16 portrait aspect ratio on a 100% pure solid chroma-key bright green (#00FF00) background. STRICTLY ZERO BLACK BORDERS OR FRAMES: Every pixel outside the raccoon's 1-pixel pure black (#000000) outer outline must be pure solid #FF00FF or #00FF00—use pure solid #00FF00 green everywhere outside the creature with zero anti-aliasing, zero blur, and zero drop shadows.
+
+PROPORTION & POSE (FORM 1 — SMALL & FLOATING, ~44% HEIGHT):
+- Compact baby-proportioned version of the cute winged raccoon with blue-lensed aviator goggles on its forehead, brown crossbody satchel strap, small brown feathered back wings, and striped tail from Image 1, occupying only ~44% of the vertical height in the center of the tall 9:16 canvas (with generous empty #00FF00 green above, below, and on both sides).
+- Pose: Floating weightlessly in zero-gravity stasis in a cheeky, sleepy pose—hugging its own bushy striped tail tightly against its chest with both little paws, small feathered wings folded neatly behind its back, aviator goggles resting on its forehead, and eyes shut peacefully asleep.
+
+
+
+
+
+Generate ONE SINGLE standalone 16-bit retro pixel-art sprite in a tall vertical 9:16 portrait aspect ratio on a 100% pure solid chroma-key bright green (#00FF00) background. STRICTLY ZERO BLACK BORDERS OR FRAMES: Every pixel outside the creature's 1-pixel pure black (#000000) outer outline must be pure solid #00FF00 green with zero anti-aliasing, zero blur, and zero drop shadows.
+
+PROPORTION & POSE (FORM 2 — TALL NARROW CLOAKED GRIFFIN, ~74% HEIGHT):
+- Re-pose the cockatrice-griffin hybrid (red-combed rooster head with yellow beak, studded brown leather collar, brown feathered wings, and scarred grey feline body/legs) from Image 1 into a tall, narrow upright seated posture occupying ~74% of the vertical height (leaving empty #00FF00 green above and below) and staying narrow enough to never touch the sides.
+- Pose: Seated tall on its grey feline haunches on an invisible flat floor facing three-quarters forward, folding both brown feathered wings tightly inward across its shoulders and sides like a closed cloak so the wings never stick out wide, with its fierce rooster head and spiked collar held proud and glaring forward.
+
+
+
+
+
+
+
+
+Generate ONE SINGLE standalone 16-bit retro pixel-art sprite in a tall vertical 9:16 portrait aspect ratio on a 100% pure solid chroma-key bright green (#00FF00) background. STRICTLY ZERO BLACK BORDERS OR FRAMES: Every pixel outside the Chimera's 1-pixel pure black (#000000) outer outline must be pure solid #00FF00 green with zero anti-aliasing, zero blur, and zero drop shadows.
+
+DO NOT COPY THE FOUR-LEGGED SIDE PROFILE — DRAW A FRONT-FACING UPRIGHT GLASS-SQUISHED POSE (~95% HEIGHT):
+- Re-pose the full Chimera (red-combed rooster head with yellow beak, red-eyed grey goat skull head on its shoulder, studded collar, brown feathered wings, scarred grey feline torso with spiked iron leg bracer, and dark green viper tail) from Image 1 into a colossal, narrow front-facing bipedal posture occupying ~95% of the vertical height and almost the full narrow width.
+- Pose: Jammed upright on two hind legs inside a tight vertical space—its brown feathered wings are folded tightly inward into straight vertical left and right edges as if pressed directly against invisible side glass, the fierce rooster head and the red-eyed grey goat skull head are crammed cheek-to-cheek pressing forward toward the viewer, its front paws with spiked iron bracer are raised and pressed flat palms-forward against an invisible front glass window, and its dark green viper tail coils tightly upward around its legs inside the narrow frame without sticking out to the side.

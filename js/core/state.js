@@ -252,6 +252,9 @@ const GameState = {
         b.paragonXp -= this.paragonXpPour(b.paragon);
         b.paragon++;
         paragonUps++;
+        const k = DataEngine.pick(["hp", "str", "agi", "spd"]);
+        b.stats[k]++; st.push(k);
+        this.ressources.or += 500;
       }
       b.xp = b.paragonXp;
       b.xpMax = this.paragonXpPour(b.paragon);
@@ -419,9 +422,9 @@ function calculerPuissance(b = GameState.brute){
     masteryMult += totalM * 0.015; // jusqu'à +210% avec 14 armes à +10
   }
 
-  // 2. Multiplicateur de Rareté d'Équipement & Sets (2/4 et 4/4)
+  // 2. Multiplicateur de Rareté d'Équipement (pièces équipées uniquement) & Sets (2/4 et 4/4)
   let gearMult = 1;
-  (b.gear || []).forEach(g => {
+  DataEngine.getEquippedGear(b).all.forEach(g => {
     if (!g) return;
     const r = Math.max(0, +g.rarity || 0);
     gearMult += [0.03, 0.07, 0.14, 0.25, 0.42, 0.68][Math.min(5, r)];
@@ -437,13 +440,10 @@ function calculerPuissance(b = GameState.brute){
     synMult *= 1 + 0.14 * (syn.idx + 1);
   });
 
-  // 4. Bonus de Collection & Évolution des Compagnons (tactique RPS + progression globale)
+  // 4. Bonus du Compagnon équipé uniquement (les autres servent de contres tactiques RPS)
   let compMult = 1;
   if (b.companion) {
-    compMult += (+b.companion.level || 1) * 0.015 + ((b.companion.form || 1) - 1) * 0.15;
-  }
-  if (joueur && Array.isArray(b.companions) && b.companions.length > 1) {
-    compMult += (b.companions.length - 1) * 0.08; // +8% par compagnon supplémentaire dans le labo
+    compMult += (+b.companion.level || 1) * 0.02 + ((b.companion.form || 1) - 1) * 0.25;
   }
 
   // 5. Niveau Brute & Parangon infini (+2% par niveau Parangon après niv. 50)
