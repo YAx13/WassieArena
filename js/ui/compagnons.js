@@ -62,9 +62,33 @@ const HOLO_FROZEN = [
   { id: "st3", x: 63.32, y: 68.47, size: 2.6, angle: 0, flip: false }
 ];
 
-// Légers ajustements par personnage par-dessus le modèle global (ex: momie: [{ key: "serpent", x: 40.5, y: 21.5 }])
-const COMP_BRAWLER_OVERRIDES = {};
-const HOLO_BRAWLER_OVERRIDES = {};
+// Ajustements spécifiques par personnage par-dessus le modèle global
+const COMP_BRAWLER_OVERRIDES = {
+  momie: [
+    { key: "chien", x: 16.64, y: 16.51, size: 27.5, angle: 0, flip: false },
+    { key: "loup", x: 72.11, y: 53.13, size: 20, angle: 0, flip: false },
+    { key: "ours", x: 27.7, y: 52.52, size: 22.5, angle: 0, flip: false },
+    { key: "serpent", x: 38.96, y: 15.35, size: 22.5, angle: 0, flip: false },
+    { key: "oiseau", x: 61.23, y: 17, size: 22.5, angle: 0, flip: false },
+    { key: "arthropode", x: 83.49, y: 14.92, size: 27.5, angle: 0, flip: false },
+    { key: "felin", x: 71.95, y: 20.3, size: 10, angle: 0, flip: false },
+    { key: "taureau", x: 16.64, y: 57.35, size: 25, angle: 0, flip: false },
+    { key: "aquatique", x: 27.96, y: 15.72, size: 26, angle: 0, flip: false },
+    { key: "chimere", x: 38.9, y: 51.29, size: 20, angle: 0, flip: false },
+    { key: "lezard", x: 49.78, y: 16.94, size: 20, angle: 0, flip: false },
+    { key: "spectre", x: 50.03, y: 52.46, size: 26, angle: 0, flip: false },
+    { key: "tempete", x: 83.36, y: 57.16, size: 23.5, angle: 0, flip: false }
+  ]
+};
+const HOLO_BRAWLER_OVERRIDES = {
+  momie: [
+    { id: "st1", x: 33.65, y: 74.01, size: 8, angle: 0, flip: false },
+    { id: "ar1", x: 43.2, y: 75, size: 4.5, angle: 0, flip: false },
+    { id: "st2", x: 49.78, y: 68.77, size: 10.8, angle: 0, flip: false },
+    { id: "ar2", x: 56, y: 73, size: 4.5, angle: 0, flip: false },
+    { id: "st3", x: 68.89, y: 65.36, size: 11, angle: 0, flip: false }
+  ]
+};
 
 function defaultCompPositions(spriteKey) {
   const cols = 7;
@@ -168,8 +192,33 @@ function updateCompDevUI() {
     bar = document.createElement("div");
     bar.id = "fx-comp-devbar";
     bar.style.cssText = "position:absolute;right:12px;bottom:12px;z-index:25;display:flex;gap:6px;align-items:center";
-    bar.innerHTML = `<button type="button" id="fx-comp-reset" class="fx-btn" style="position:static!important;width:auto!important;height:auto!important;padding:4px 8px!important;font-size:11px!important">↺ Reset (${activeCompSprite || "dummy"})</button><button type="button" id="fx-comp-edit" class="fx-btn" style="position:static!important;width:auto!important;height:auto!important;padding:4px 8px!important;font-size:11px!important"></button>`;
+    const bSt = "position:static!important;width:auto!important;height:auto!important;padding:4px 8px!important;font-size:11px!important";
+    bar.innerHTML = `<button type="button" data-dev-form="1" class="fx-btn" style="${bSt}" title="Unlock all 13 pets at Form 1">🐾 F1</button>`
+      + `<button type="button" data-dev-form="2" class="fx-btn" style="${bSt}" title="Unlock all 13 pets at Form 2">🐾 F2</button>`
+      + `<button type="button" data-dev-form="3" class="fx-btn" style="${bSt}" title="Unlock all 13 pets at Form 3">🐾 F3</button>`
+      + `<button type="button" id="fx-comp-reset" class="fx-btn" style="${bSt}">↺ Reset (${activeCompSprite || "dummy"})</button>`
+      + `<button type="button" id="fx-comp-edit" class="fx-btn" style="${bSt}"></button>`;
     compPanel.appendChild(bar);
+    bar.querySelectorAll("[data-dev-form]").forEach(btn => {
+      btn.onclick = e => {
+        e.stopPropagation();
+        const b = S.cur; if (!b) return;
+        const targetForm = +btn.dataset.devForm;
+        const lvForForm = [1, 10, 20][targetForm - 1] || 1;
+        if (!Array.isArray(b.companions)) b.companions = b.companion ? [b.companion] : [];
+        CompanionData.FAMILIES.forEach(f => {
+          let pet = b.companions.find(x => x && CompanionData.family(x) === f);
+          if (!pet) { pet = CompanionData.create(f.species || f.key); b.companions.push(pet); }
+          pet.form = targetForm;
+          pet.level = lvForForm;
+          pet.xp = 0;
+        });
+        if (!b.companion && b.companions.length) b.companion = b.companions[0];
+        if (typeof persist === "function") persist();
+        renderFiche(b);
+        if (typeof toast === "function") toast(`🐾 All 13 pets set to Form ${targetForm} (Lv.${lvForForm})!`);
+      };
+    });
   }
   const dev = !!$("#devbox"), edit = $("#fx-comp-edit"), rst = $("#fx-comp-reset");
   bar.style.display = dev ? "flex" : "none";
