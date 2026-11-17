@@ -259,10 +259,13 @@ C:.
 |   +---characters
 |   |   +---dummy
 |   |   |   +---sheets
+|   |   |   |       image_b40db9e2.jpg
+|   |   |   |       image_e12d10bf.jpg
 |   |   |   |       sheet-1.png
 |   |   |   |       sheet-2.png
 |   |   |   |       sheet-3.png
 |   |   |   |       sheet-4.png
+|   |   |   |       w.png
 |   |   |   |       wpn-0.png
 |   |   |   |       wpn-1.png
 |   |   |   |       wpn-10.png
