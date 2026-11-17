@@ -29,7 +29,7 @@ class BattleEngine {
       return {br,el:BattleEngine.elOf(br),name:br.name,max:mx,hp:mx,str:BattleEngine.eff(br,"str",bf),agi:BattleEngine.eff(br,"agi",bf),spd:Math.max(1,Math.round(BattleEngine.eff(br,"spd",bf)*spdMult)),next:0,bag:[...(br.weapons||[])],held:null,st:{stun:0,slow:0,spdUp:0,rage:0,accD:null,dr:null,dodge:null,reflect:null,dot:[],shield:0,block:0}};
     });
     this.f.forEach(x=>x.next=(100/x.spd)*(.5+Math.random()*.5));
-    this.h={}; this.round=0; this.over=false; this.winner=null;
+    this.h={}; this.round=0; this.over=false; this.winner=null; this.lastActor=-1;
   }
   on(e,fn){ (this.h[e]=this.h[e]||[]).push(fn); return this; }
   emit(e,p){ p.type=e; (this.h[e]||[]).forEach(fn=>fn(p)); }
@@ -88,12 +88,14 @@ class BattleEngine {
       }
       sk = { name: c.name, pet: c, el, t: "A", pw, fx, desc: "" };
     }
-    // Recours à l'arme : dégainage persistant (light / heavy) et lancer à distance (throw)
-    let drewWpn=false, droppedWpn=null;
+    // Recours à l'arme : dégainage aléatoire (impossible de lâcher l'arme en plein combo)
+    const inCombo=this.lastActor===i;
+    this.lastActor=i;
+    let drewWpn=false, droppedWpn=null, threwWpn=false;
     if(!sk){
-      if(A.held!==null && A.bag.length>0 && Math.random()<0.12){
+      if(!inCombo && A.held!==null && Math.random()<0.14){
         const oldW=DataEngine.WEAPONS[A.held];
-        if(oldW) droppedWpn={id:oldW.id,icon:oldW.icon};
+        if(oldW) droppedWpn={id:oldW.id,icon:oldW.icon,name:oldW.name};
         A.held=null;
       }
       if(A.held===null && A.bag.length>0 && Math.random()<0.38){
@@ -107,18 +109,26 @@ class BattleEngine {
         wl=wp.name+(m>0?" +"+m:"");
         const wfx=Object.assign({acc:(wp.prec-5)*3,crit:(wp.crit-5)*.012+m*.01},wp.fx||{});
         if(wp.fx&&wp.fx.crit) wfx.crit=(wp.crit-5)*.012+m*.01+wp.fx.crit;
-        sk={name:wl,weapon:wp,t:"A",pw:(.8+wp.dmg*.08)*(1+m*.10),fx:wfx,desc:""};
+        let pw=(.8+wp.dmg*.08)*(1+m*.10);
+        if(wp.type==="throw"){
+          threwWpn=true; A.held=null;
+        } else if(!drewWpn && Math.random()<(wp.id===10?0.30:0.15)){
+          threwWpn=true; A.held=null; pw*=1.15;
+          if(wp.id===10) wfx.disarm=1;
+        }
+        if(threwWpn) this.lastActor=-1;
+        sk={name:wl,weapon:wp,t:"A",pw,fx:wfx,desc:""};
         A.next-=(100/A.spd)*(wp.spd-5)*.03;
-        if(wp.type==="throw" && wp.id!==10) A.held=null;
       }
     }
     let dot=0; S.dot.forEach(d=>{dot+=d.dmg; d.n--}); S.dot=S.dot.filter(d=>d.n>0);
     if(dot){ A.hp=Math.max(0,A.hp-dot); out.push({type:"on_dot",i,j,dmg:dot,hpA:A.hp,msg:A.name+" subit "+dot+" dégâts d’altération."}); }
     const stunned=A.hp>0&&S.stun>0, dead=A.hp<=0;
     if(stunned) S.stun--;
-    const wpnVerb={light:"frappe vivement avec",heavy:"abat lourdement",throw:"lance"}[wp?wp.type||"light":"light"];
+    const wpnVerb=threwWpn?(wp.id===10?"projette pour désarmer avec":"balance à la tête"):({light:"frappe vivement avec",heavy:"abat lourdement",throw:"lance"}[wp?wp.type||"light":"light"]);
+    const dropPrefix=droppedWpn?A.name+" lâche "+droppedWpn.icon+" "+droppedWpn.name+" ! ":"";
     const wpnMsg=wp?(drewWpn?A.name+" dégaine "+wp.icon+" "+wl+" et "+wpnVerb+" son arme !":A.name+" "+wpnVerb+" "+wp.icon+" "+wl+" !"):"";
-    this.emit("on_attack",{i,j,round:this.round,self:!!(stunned||dead||(sk&&sk.pw===0)),drewWpn,droppedWpn,skill:sk&&!wp?sk.name:null,weapon:wp?{name:wl,icon:wp.icon,id:wp.id}:null,pet:sk&&sk.pet?{name:sk.pet.name,species:sk.pet.species,form:sk.pet.form||1}:null,msg:dead?A.name+" vacille…":stunned?A.name+" est étourdi et perd son tour.":sk&&sk.pet?A.name+" siffle : "+sk.pet.name+" passe à l’attaque !":wp?wpnMsg:sk?A.name+" utilise "+sk.name+" !":A.name+" fonce en avant !"});
+    this.emit("on_attack",{i,j,round:this.round,self:!!(stunned||dead||(sk&&sk.pw===0)),drewWpn,droppedWpn,threwWpn,skill:sk&&!wp?sk.name:null,weapon:wp?{name:wl,icon:wp.icon,id:wp.id}:null,pet:sk&&sk.pet?{name:sk.pet.name,species:sk.pet.species,form:sk.pet.form||1}:null,msg:dead?A.name+" vacille…":stunned?A.name+" est étourdi et perd son tour.":sk&&sk.pet?A.name+" siffle : "+sk.pet.name+" passe à l’attaque !":wp?dropPrefix+wpnMsg:sk?dropPrefix+A.name+" utilise "+sk.name+" !":dropPrefix+A.name+" fonce en avant !"});
     out.forEach(e=>this.emit(e.type,e));
     if(dead){ this.over=true; this.winner=j; this.emit("on_death",{i,j,dead:i,msg:A.name+" succombe à ses blessures."}); }
     else if(!stunned){
@@ -158,10 +168,17 @@ class BattleEngine {
           let dmg=Math.max(1,Math.round((A.str*.95+1+Math.random()*4-D.br.stats.hp*.03*(1-pierceVal))*m));
           if(D.st.shield>0){ const x=Math.min(D.st.shield,dmg); D.st.shield-=x; dmg-=x; if(x) fl.push("le bouclier absorbe "+x); }
           D.hp=Math.max(0,D.hp-dmg);
+          let disarm=null;
+          if(fx.disarm&&D.held!==null){
+            const dw=DataEngine.WEAPONS[D.held];
+            disarm={id:D.held,name:dw?dw.name:"arme"};
+            D.held=null;
+            fl.push(D.name+" lâche "+disarm.name);
+          }
           let back=0; if(D.st.reflect&&dmg>0) back+=Math.round(dmg*D.st.reflect.v); if(fx.recoil) back+=Math.round(dmg*fx.recoil);
           if(setsD.some(sb=>sb.set.id==="mutant"&&sb.tier===4)&&dmg>0) back+=Math.max(1,Math.round(dmg*0.20));
           if(back){ A.hp=Math.max(1,A.hp-back); fl.push(A.name+" encaisse "+back+" de recul"); }
-          this.emit("on_hit",{i,j,dmg,crit,prop:!!fx.push,hp:D.hp,hpA:A.hp,msg:crit?"Coup critique : -"+dmg+" HP !":D.name+" perd "+dmg+" HP."});
+          this.emit("on_hit",{i,j,dmg,crit,prop:!!fx.push,disarm,hp:D.hp,hpA:A.hp,msg:crit?"Coup critique : -"+dmg+" HP !":D.name+" perd "+dmg+" HP."});
           if(D.hp>0){
             if(fx.stun&&Math.random()<fx.stun){ D.st.stun=1; fl.push(D.name+" est étourdi"); }
             if(fx.dot){ D.st.dot.push({dmg:Math.max(2,Math.round(A.str*.3*fx.dot[0])),n:fx.dot[1]}); fl.push(D.name+" subit "+fx.dot[2]); }
@@ -346,24 +363,32 @@ const Combat={
   },
   next(c){
     this.q=[]; this.stepEng(); this.proj=null;
-    const at=this.q[0], ev=this.q.slice(1), ht=ev.find(e=>e.type==="on_hit"), crit=!!(ht&&ht.crit), A=this.V[at.i], bx=this.V[at.j].bx, dir=at.i?-1:1;
+    const at=this.q[0], ev=this.q.slice(1), ht=ev.find(e=>e.type==="on_hit"), crit=!!(ht&&ht.crit), A=this.V[at.i], D=this.V[at.j], bx=D.bx, dir=at.i?-1:1;
     let kind;
     if(at.pet) kind="pet"; else if(at.self) kind=at.skill?"self":"idle";
-    else if(at.weapon){ const wt=at.weapon.id===10?"heavy":((DataEngine.WEAPONS[at.weapon.id]&&DataEngine.WEAPONS[at.weapon.id].type)||"light"); kind=crit?{light:"pierce",heavy:"meteor",throw:"salto"}[wt]:{light:"estoc",heavy:"overhead",throw:"throw"}[wt]; }
+    else if(at.weapon){ const wt=at.threwWpn?"throw":((DataEngine.WEAPONS[at.weapon.id]&&DataEngine.WEAPONS[at.weapon.id].type)||"light"); kind=crit?{light:"pierce",heavy:"meteor",throw:"salto"}[wt]:{light:"estoc",heavy:"overhead",throw:"throw"}[wt]; }
     else kind=crit?"uppercut":"punch";
     const baseK=this.K[kind]||this.K.idle;
     const widKey=at.weapon?at.weapon.id:-1, fxSet=this.WPN_FX[widKey]||this.WPN_FX["-1"], fx=crit?fxSet.crit:fxSet.atk;
-    const K=!baseK.ranged&&kind!=="pet"&&!at.self?Object.assign({},baseK,{T:[fx.dashT,fx.dashT+fx.dur,fx.dashT+fx.dur+200],h:fx.dashT+Math.round(fx.dur*0.45),jump:fx.air,amp:fx.shake,hits:fx.hits,freeze:fx.freeze}):baseK;
-    const dist=fx.dist||46;
+    const dist=fx.dist||46, isMelee=!baseK.ranged&&kind!=="pet"&&!at.self;
+    const nextIdx=this.eng.f[0].next<=this.eng.f[1].next?0:1;
+    const stay=!this.eng.over&&isMelee&&!at.threwWpn&&nextIdx===at.i;
+    const inCombo=isMelee&&!at.threwWpn&&Math.abs(A.x-A.bx)>12;
+    const combo=inCombo?((this.ph&&this.ph.i===at.i?this.ph.combo:1)||1)+1:1;
+    const dashT=inCombo?0:fx.dashT;
+    const K=isMelee?Object.assign({},baseK,{T:[dashT,dashT+fx.dur,dashT+fx.dur+(stay?0:200)],h:dashT+Math.round(fx.dur*0.45),jump:inCombo?0:fx.air,amp:fx.shake,hits:fx.hits,freeze:fx.freeze}):baseK;
     const heldId=this.eng.f[at.i].held;
     const hasDrawAnim=!!(at.drewWpn&&at.weapon&&Number.isInteger(at.weapon.id)&&at.weapon.id>=0&&at.weapon.id<=13&&renderer.loadImg(DataEngine.spriteBase(A.b.sprite,at.weapon.id)));
     const drawDelay=hasDrawAnim?240:0;
     const dropInfo=at.droppedWpn||null;
     const hasDropSheet=!!(dropInfo&&dropInfo.id>=0&&dropInfo.id<=13&&renderer.loadImg(DataEngine.spriteBase(A.b.sprite,dropInfo.id)));
-    this.ph={k:"act",kind,K,t0:c,drawDelay,dropInfo,hasDropSheet,i:at.i,j:at.j,ev,hit:0,hitStep:0,wicon:at.weapon&&at.weapon.icon,wid:at.weapon&&at.weapon.id,
-      tx:K.ranged||at.self||kind==="pet"?(kind==="pet"?bx+(at.i?42:-42):A.bx):K.through?bx-dir*60:bx+(at.i?dist:-dist)};
+    if(Math.abs(D.x-D.bx)>12){ D.x=D.bx; D.air=0; D.flip=D.flip0; }
+    if((!isMelee||at.threwWpn)&&Math.abs(A.x-A.bx)>12){ A.x=A.bx; A.air=0; A.flip=A.flip0; }
+    const tx=K.ranged||at.self||kind==="pet"?(kind==="pet"?bx+(at.i?42:-42):A.bx):K.through?bx-dir*60:bx+(at.i?dist:-dist);
+    if(inCombo) A.x=tx;
+    this.ph={k:"act",kind,K,t0:c,drawDelay,dropInfo,hasDropSheet,i:at.i,j:at.j,ev,hit:0,hitStep:0,wicon:at.weapon&&at.weapon.icon,wid:at.weapon&&at.weapon.id,tx,stay,combo};
     this.amp=K.amp||5;
-    if(dropInfo&&!at.drewWpn) A.wpn={ic:dropInfo.icon,id:dropInfo.id};
+    if(dropInfo&&!at.drewWpn&&!at.threwWpn) A.wpn={ic:dropInfo.icon,id:dropInfo.id};
     else if(at.weapon&&!at.pet) A.wpn={ic:at.weapon.icon,id:at.weapon.id};
     else A.wpn=heldId!==null?{ic:DataEngine.WEAPONS[heldId].icon,id:heldId}:null;
     if(kind==="pet"){ this.ph.pt=this.P.find(p=>p.i===at.i); }
@@ -375,17 +400,26 @@ const Combat={
     for(const e of p.ev){
       this.lg(e.msg,this.cls(e));
       if(e.type==="on_hit"){
-        d.hp=e.hp; d.flash0=c; this.shake0=c; if(e.crit||p.kind==="pet") renderer.freeze(100);
+        d.hp=e.hp; d.flash0=c; this.shake0=c;
+        d.sx=1.22; d.sy=0.82; d.knock=(p.i?-1:1)*(e.crit?11:6);
+        if(e.crit||p.kind==="pet") renderer.freeze(100);
         if(!this.vfx) this.vfx=[];
+        this.vfx.push({kind:"slash",x:d.bx,y:d.y-36,dir:p.i?-1:1,crit:!!e.crit,t0:c,dur:240});
         if(p.wid===13) this.vfx.push({kind:"molotov",x:d.bx,y:d.y,t0:c,dur:750});
         else if(p.wid===12) this.vfx.push({kind:"grenade",x:d.bx,y:d.y,t0:c,dur:420});
         else if([4,5,6,7,10].includes(p.wid)) this.vfx.push({kind:"slam",x:d.bx,y:d.y,crit:!!e.crit,t0:c,dur:420});
         else if(e.crit) this.vfx.push({kind:"crit",x:d.bx,y:d.y,t0:c,dur:340});
         this.V[p.i].hp=e.hpA; this.fl.push({s:e.dmg>0?"-"+e.dmg:"Absorbé",x:d.bx,y:d.y-CanvasRenderer.HEAD,c0:c,col:e.crit?"#ffb000":"#ffffff",big:e.crit});
+        if(e.disarm){
+          const dw=DataEngine.WEAPONS[e.disarm.id];
+          if(dw){ this.proj={ic:dw.icon,id:dw.id,b:d.b,x0:d.bx,y0:d.y-42,x1:d.bx+(p.j?38:-38),y1:d.y-6,t0:c,t1:c+280}; }
+          this.fl.push({s:"Désarmé !",x:d.bx,y:d.y-CanvasRenderer.HEAD-16,c0:c,col:"#ff5e5e",big:true});
+        }
+        if(p.combo>=2) this.fl.push({s:"COMBO x"+p.combo+" !",x:this.V[p.i].x,y:this.V[p.i].y-CanvasRenderer.HEAD-14,c0:c,col:"#38e8ff",big:true});
         if((e.crit||e.prop)&&this.pan===1) p.prop=p.j;   // propulsion possible UNIQUEMENT depuis l'arène centrale
         if(!dying||e.crit) this.setA(d,"hit",c);
       }
-      if(e.type==="on_dodge"){ this.setA(d,"dodge",c); this.fl.push({s:"Esquive",x:d.bx,y:d.y-CanvasRenderer.HEAD,c0:c,col:"#e8a830"}); }
+      if(e.type==="on_dodge"){ d.knock=(p.i?-1:1)*12; d.air=10; this.setA(d,"dodge",c); this.fl.push({s:"Esquive",x:d.bx,y:d.y-CanvasRenderer.HEAD,c0:c,col:"#e8a830"}); }
       if(e.type==="on_dot"){ const a=this.V[e.i]; a.hp=e.hpA; a.flash0=c; this.fl.push({s:"-"+e.dmg,x:a.bx,y:a.y-CanvasRenderer.HEAD,c0:c,col:"#c58be0"}); }
       if(e.type==="on_skill"){ const a=this.V[e.i], t=this.V[e.j]; if(e.hpA>a.hp) this.fl.push({s:"+"+(e.hpA-a.hp),x:a.bx,y:a.y-CanvasRenderer.HEAD,c0:c,col:"#9be15d"}); a.hp=e.hpA; t.hp=e.hp; if(e.fl) this.fl.push({s:e.fl,x:a.bx,y:a.y-CanvasRenderer.HEAD-24,c0:c,col:"#ffd27a"}); }
       if(e.type==="on_death"&&(e.dead!==p.j||p.prop==null)){
@@ -401,13 +435,14 @@ const Combat={
     if(p.k==="intro"){ if(c>=p.t) this.next(c); return; }
     if(p.k==="end"){ if(c>=p.t){ this.ph=null; this.finish(); } return; }
     if(p.k==="prop"){ this.prop(p,c); return; }
-    if(p.k==="swap"){ if(c>=p.t){ this.idx++; this.fl=[]; this.spawn(c,false); this.annonce(false); this.ph={k:"intro",t:c+500}; } return; }   // ennemi suivant
+    if(p.k==="swap"){ if(c>=p.t){ this.idx++; this.fl=[]; this.spawn(c,false); this.annonce(false); this.ph={k:"intro",t:c+500}; } return; }
     const rawE=c-p.t0, a=this.V[p.i];
     if(p.kind==="pet"){ this.tickPet(p,c,rawE,a); return; }
     const d=this.V[p.j];
-    // Phase optionnelle : lâcher l'arme précédente (throw_wpn) ou dégainer la nouvelle (draw_wpn)
+
+    // Phase optionnelle : lâcher ou dégainer une arme
     if(p.drawDelay>0 && rawE<p.drawDelay){
-      a.x=a.bx; a.air=0; a.flip=a.flip0;
+      a.x=a.bx; a.air=0; a.flip=a.flip0; a.sx=1; a.sy=1; a.rot=0;
       if(p.dropInfo && rawE<120){
         if(!this.proj) this.proj={ic:p.dropInfo.icon,id:p.dropInfo.id,b:a.b,x0:a.bx+(p.i?-18:18),y0:a.y-42,x1:a.bx+(p.i?34:-34),y1:a.y-6,t0:p.t0+40,t1:p.t0+260};
         if(p.hasDropSheet){ a.wpn={ic:p.dropInfo.icon,id:p.dropInfo.id}; this.setA(a,"throw_wpn",p.t0); return; }
@@ -416,21 +451,76 @@ const Combat={
       this.setA(a,"draw_wpn",p.t0+(p.dropInfo?120:0));
       return;
     }
+
     const e=rawE-p.drawDelay, K=p.K, T=K.T, hits=K.hits||1;
+    if(!this.vfx) this.vfx=[];
+
+    // Multi-hits (ex: Scie, Trident)
     if(hits>1 && e>=T[0] && e<T[1]){
       const step=Math.floor(((e-T[0])/Math.max(1,T[1]-T[0]))*hits)+1;
       if(step>(p.hitStep||0) && step<hits && e>=T[0]+(T[1]-T[0])*0.25){
-        p.hitStep=step; d.flash0=c; this.shake0=c; this.setA(d,"hit",c);
+        p.hitStep=step; d.flash0=c; this.shake0=c; d.sx=1.18; d.sy=0.84; this.setA(d,"hit",c);
+        this.vfx.push({kind:"slash",x:d.bx,y:d.y-36,dir:p.i?-1:1,crit:false,t0:c,dur:220});
       }
     }
-    if(!p.hit&&e>=K.h){ p.hit=1; if(K.freeze) renderer.freeze(K.freeze); this.impact(p,c); }
-    if(K.rel&&e>=K.rel&&e<K.h){ a.wpn=null; if(!this.proj&&p.wicon) this.proj={ic:p.wicon,id:p.wid,b:a.b,x0:a.bx+(p.i?-28:28),y0:a.y-48,x1:d.bx,y1:d.y-42,t0:p.t0+p.drawDelay+K.rel,t1:p.t0+p.drawDelay+K.h}; }
-    if(e<T[0]){ const k=e/T[0]; a.x=a.bx+(p.tx-a.bx)*k; a.air=K.jump?Math.sin(Math.PI*k)*K.jump:0; a.flip=a.flip0; this.setA(a,"dash",p.t0+p.drawDelay); }
-    else if(e<T[1]){ a.x=p.tx; a.air=0; a.flip=a.flip0; this.setA(a,K.a,p.t0+p.drawDelay+T[0]); }
-    else if(e<T[2]){ a.x=p.tx+(a.bx-p.tx)*(e-T[1])/(T[2]-T[1]); a.flip=!a.flip0; this.setA(a,"dash",p.t0+p.drawDelay+T[1]); }
-    else { const heldId=this.eng.f[p.i].held; a.wpn=heldId!==null?{ic:DataEngine.WEAPONS[heldId].icon,id:heldId}:null; a.air=0; a.x=a.bx; a.flip=a.flip0; this.setA(a,"idle",c);
-      if(p.prop!=null){ this.ph={k:"prop",t0:c,j:p.prop,sw:0}; return; }
-      this.after(c); }
+
+    // Déclenchement de l'impact
+    if(!p.hit&&e>=K.h){
+      p.hit=1;
+      renderer.freeze(K.freeze || 42); // Micro-hitstop même sur les coups normaux !
+      this.impact(p,c);
+    }
+
+    // Lancer de projectile
+    if(K.rel&&e>=K.rel&&e<K.h){
+      a.wpn=null;
+      if(!this.proj&&p.wicon) this.proj={ic:p.wicon,id:p.wid,b:a.b,x0:a.bx+(p.i?-28:28),y0:a.y-48,x1:d.bx,y1:d.y-42,t0:p.t0+p.drawDelay+K.rel,t1:p.t0+p.drawDelay+K.h};
+    }
+
+    // 1. ALLER : Anticipation (squash) + Dash explosif (Ease-Out Cubique)
+    if(e<T[0]){
+      const k=e/T[0];
+      if(k<0.18 && T[0]>0){
+        // Le personnage fléchit les genoux avant de bondir
+        a.x=a.bx; a.air=0; a.sx=1.14; a.sy=0.86; a.rot=-0.06;
+      } else {
+        if(!p.dustOut){ p.dustOut=1; this.vfx.push({kind:"dust",x:a.bx,y:a.y,dir:p.i?-1:1,t0:c,dur:260}); }
+        const dk=T[0]>0 ? (k-0.18)/0.82 : 1;
+        const ease=1-Math.pow(1-dk,3); // Départ canon, freinage sec
+        a.x=a.bx+(p.tx-a.bx)*ease;
+        a.air=K.jump?Math.sin(Math.PI*dk)*K.jump:0;
+        a.sx=1.10-ease*0.10; a.sy=0.92+ease*0.08; a.rot=0.14*(1-ease);
+      }
+      a.flip=a.flip0; this.setA(a,"dash",p.t0+p.drawDelay);
+    }
+    // 2. ATTAQUE : Écrasement/étirement sur la frame d'impact
+    else if(e<T[1]){
+      const ak=(e-T[0])/Math.max(1,T[1]-T[0]);
+      const punchPop=Math.max(0, 1 - Math.abs(e-K.h)/110);
+      a.x=p.tx; a.air=0; a.flip=a.flip0;
+      a.sx=1+punchPop*0.16; a.sy=1-punchPop*0.12; a.rot=punchPop*0.08;
+      this.setA(a,K.a,p.t0+p.drawDelay+T[0]);
+    }
+    // 3. RETOUR : Petit bond arrière (sauf si enchaînement de combo)
+    else if(e<T[2] && !p.stay){
+      const rk=(e-T[1])/Math.max(1,T[2]-T[1]);
+      const ease=rk<0.5 ? 2*rk*rk : 1-Math.pow(-2*rk+2,2)/2;
+      a.x=p.tx+(a.bx-p.tx)*ease;
+      a.air=Math.sin(Math.PI*rk)*14; // Petit saut arrière au lieu de glisser !
+      a.sx=0.94; a.sy=1.06; a.rot=-0.08*Math.sin(Math.PI*rk);
+      a.flip=!a.flip0; this.setA(a,"dash",p.t0+p.drawDelay+T[1]);
+      if(rk>0.92 && !p.dustIn){ p.dustIn=1; this.vfx.push({kind:"dust",x:a.bx,y:a.y,dir:p.i?1:-1,t0:c,dur:240}); }
+    }
+    // 4. FIN DU TOUR : Retour à la normale (ou maintien au corps-à-corps)
+    else {
+      const heldId=this.eng.f[p.i].held;
+      a.wpn=heldId!==null?{ic:DataEngine.WEAPONS[heldId].icon,id:heldId}:null;
+      a.air=0; a.flip=a.flip0; a.sx=1; a.sy=1; a.rot=0;
+      if(!p.stay) a.x=a.bx;
+      this.setA(a,"idle",c);
+      if(p.prop!=null){ a.x=a.bx; this.ph={k:"prop",t0:c,j:p.prop,sw:0}; return; }
+      this.after(c);
+    }
   },
   // Séquence Dresseur : sifflet -> course du familier -> morsure (+freeze + shake) -> retour -> idle
   tickPet(p,c,e,a){

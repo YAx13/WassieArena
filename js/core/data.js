@@ -76,7 +76,7 @@ class DataEngine {
     { id: 7,  name: "Os",        icon: "🦴", type: "heavy", dmg: 8,  spd: 4, prec: 5, crit: 4, desc: "Fémur de mutant, très lourd.", fx: { stun: 0.25 } },
     { id: 8,  name: "Boomerang", icon: "🪃", type: "throw", dmg: 5,  spd: 7, prec: 7, crit: 7, desc: "Il revient. Parfois.", fx: {} },
     { id: 9,  name: "Trident",   icon: "🔱", type: "heavy", dmg: 8,  spd: 5, prec: 7, crit: 6, desc: "Piques soudées sur un tuyau.", fx: { pierce: 0.20 } },
-    { id: 10, name: "Pilier",    icon: "🏛️", type: "throw", dmg: 11, spd: 2, prec: 5, crit: 5, desc: "Bloc de béton arraché du sol.", fx: { stun: 0.40, push: 1 } },
+    { id: 10, name: "Pilier",    icon: "🏛️", type: "heavy", dmg: 11, spd: 2, prec: 5, crit: 5, desc: "Bloc de béton arraché du sol. Peut être lancé pour déséquiper l'adversaire.", fx: { stun: 0.40, push: 1 } },
     { id: 11, name: "Shuriken",  icon: "💠", type: "throw", dmg: 4,  spd: 9, prec: 9, crit: 9, desc: "Étoile d'acier lancée à haute vitesse.", fx: { crit: 0.15 } },
     { id: 12, name: "Grenade",   icon: "💣", type: "throw", dmg: 10, spd: 4, prec: 6, crit: 6, desc: "Explose à l'impact et sonne la cible.", fx: { stun: 0.35 } },
     { id: 13, name: "Molotov",   icon: "🔥", type: "throw", dmg: 6,  spd: 6, prec: 7, crit: 5, desc: "Embrase l'adversaire pendant 2 tours.", fx: { dot: [0.35, 2, "brûlure"] } }
@@ -177,7 +177,7 @@ class DataEngine {
   static WEAPON_SKINS = Object.fromEntries(Object.entries(this.WEAPON_COUNT).map(([k, n]) =>
     [k, Array.from({ length: n }, (_, i) => assetPath.weapon(k, i + 1))]));
   // Style d'attaque par arme : light (légère), heavy (lourde), throw (jet)
-  static WEAPON_STYLE = ["light","light","light","light","heavy","heavy","heavy","heavy","throw","heavy","throw","throw","throw","throw"];
+  static WEAPON_STYLE = ["light","light","light","light","heavy","heavy","heavy","heavy","throw","heavy","heavy","throw","throw","throw"];
   static WEAPON_CELLS = new Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14);
   static GREYBOX_WEAPONS = "assets/characters/dummy/weapons/weapon-1-transparent.png";
   // Équipement : 4 armures (Casque=HP, Plastron=AGI, Bottes=SPD, Collier=STR) + 2 Anneaux (Stat ou Élément)

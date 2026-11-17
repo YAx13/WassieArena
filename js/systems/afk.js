@@ -25,7 +25,139 @@ const AFKMode={
   attacks:[["punch",5],["thrust",5],["overhead",4],["uppercut",1.5],["pierce",1.5],["meteor",1]],
   KILLS:{punch:1,thrust:1,overhead:2,uppercut:1,pierce:2,meteor:3},
   lastAttack:"",recoilDistance:40,heroX:0,heroPhase:"idle",heroAnim:"idle",heroFrom:0,heroTo:0,heroPhaseStart:0,heroDuration:0,attackImpactAt:0,attackImpact:false,
-  compX:0,compAnim:"idle",compT0:0,compNextAtk:0,
+  compX:0,compAnim:"idle",compT0:0,compNextAtk:0,wpnSelectorEl:null,
+
+  AFK_WPN_PERKS:{
+    0:  { label:"Entaille double (+25% double élimination)", bonusKillChance:0.25, atkSpdMult:1.10, vfx:"slash",   color:"#38bdf8" }, // Épée
+    1:  { label:"Exécution éclair (Cadence +35%)",          atkSpdMult:1.35, bonusKillChance:0.15, vfx:"crit",    color:"#f472b6" }, // Dague
+    2:  { label:"Coupe-jarret (+25% cadence & +Or/coup)",    atkSpdMult:1.25, goldHit:1.5,          vfx:"slash",   color:"#9be15d" }, // Couteau
+    3:  { label:"Déchiquetage (+1 élimination / coup)",      flatKills:1,    atkSpdMult:0.95,      vfx:"saw",     color:"#fbbf24" }, // Scie
+    4:  { label:"Fendoir brutal (+35% double élimination)",  bonusKillChance:0.35, launchMode:"rocket", vfx:"slam", color:"#ff6b6b" }, // Hache
+    5:  { label:"Onde sismique (Étourdit la file)",          stunNext:900,   launchMode:"uppercut", vfx:"slam",  color:"#f59e0b" }, // Marteau
+    6:  { label:"Filon d'or (+Or garanti à chaque coup)",    goldHit:3.0,    bonusKillChance:0.20, vfx:"spark",   color:"#ffd166" }, // Pioche
+    7:  { label:"Coup de massue (Étourdit & Éjecte)",        stunNext:700,   launchMode:"rocket",  vfx:"slam",    color:"#e2e8f0" }, // Os
+    8:  { label:"Rebond (+45% double élimination)",          bonusKillChance:0.45, atkSpdMult:1.15, vfx:"arc",     color:"#4ff0e6" }, // Boomerang
+    9:  { label:"Empalement (+1 élimination / coup)",        flatKills:1,    atkSpdMult:1.05,      vfx:"pierce",  color:"#60a5fa" }, // Trident
+    10: { label:"Écrasement colossal (+2 éliminations)",     flatKills:2,    atkSpdMult:0.85, launchMode:"uppercut", vfx:"slam", color:"#ffd43b" }, // Pilier
+    11: { label:"Rafale ninja (Cadence +40%)",               atkSpdMult:1.40, bonusKillChance:0.20, vfx:"arc",     color:"#a78bfa" }, // Shuriken
+    12: { label:"Explosion (+1 élimination & Éjecte)",       flatKills:1,    launchMode:"rocket",  vfx:"boom",    color:"#ff5e5e" }, // Grenade
+    13: { label:"Brûlure de zone (+Or & +1 élimination)",    flatKills:1,    goldHit:1.5,          vfx:"fire",    color:"#ff7b00" }  // Molotov
+  },
+  weaponAfkPerk(wid){
+    if(wid===null||wid===undefined) return { label:"Mains nues", atkSpdMult:1 };
+    return this.AFK_WPN_PERKS[wid]||{ label:"Bonus d'arme", atkSpdMult:1 };
+  },
+  weaponPowerMult(wid){
+    const w=DataEngine.WEAPONS[wid];
+    if(!w) return 1;
+    const m=(typeof GameState!=="undefined"&&GameState.maitriseArmes&&GameState.maitriseArmes[wid])||0;
+    return 1 + (w.dmg * 0.025) + (m * 0.06);
+  },
+  triggerWeaponAfkVfx(wid,target){
+    if(!this.field||!target) return;
+    const perk=this.weaponAfkPerk(wid), r=this.at(target,target.x,target.y||0), col=perk.color||"#fff";
+    if(perk.vfx==="fire"){
+      for(let k=-1;k<=1;k++) this.fx(this.field,r.cx+k*16,r.cy+12,{width:"10px",height:"18px",background:k===0?"#ffd43b":"#ff6a00",transform:"translate(-50%,-50%)"},{transform:"translate(-50%,-150%) scale(1.4)",opacity:"0"},320);
+    } else if(perk.vfx==="boom"){
+      this.fx(this.field,r.cx,r.cy,{width:"24px",height:"24px",borderRadius:"50%",border:"4px solid #ff5e5e",background:"rgba(255,220,90,0.6)",transform:"translate(-50%,-50%)"},{transform:"translate(-50%,-50%) scale(2.8)",opacity:"0"},300);
+    } else if(perk.vfx==="slam"){
+      this.fx(this.field,r.cx,r.cy+r.h*0.35,{width:"44px",height:"10px",borderRadius:"50%",border:"3px solid "+col,transform:"translate(-50%,-50%)"},{transform:"translate(-50%,-50%) scale(2.2,1.4)",opacity:"0"},280);
+    } else if(perk.vfx==="arc"||perk.vfx==="pierce"){
+      this.fx(this.field,r.cx-24,r.cy,{width:"54px",height:"4px",background:col,boxShadow:"0 0 8px "+col,transform:"translate(-50%,-50%)"},{transform:"translate(40%,-50%) scaleX(1.5)",opacity:"0"},220);
+    } else if(perk.vfx==="saw"||perk.vfx==="spark"){
+      for(let k=0;k<4;k++){
+        const ox=(Math.random()-0.5)*28, oy=(Math.random()-0.5)*24;
+        this.fx(this.field,r.cx+ox,r.cy+oy,{width:"6px",height:"6px",background:col,transform:"translate(-50%,-50%)"},{transform:`translate(${ox*2}px,${oy*2-18}px) scale(0.3)`,opacity:"0"},250);
+      }
+    } else if(perk.vfx==="slash"||perk.vfx==="crit"){
+      this.fx(this.field,r.cx,r.cy,{width:"42px",height:"4px",background:col,transform:"translate(-50%,-50%) rotate(-32deg)"},{transform:"translate(-50%,-50%) rotate(-32deg) scale(1.6)",opacity:"0"},210);
+    }
+  },
+  unlockedWeapons(b=S.cur){
+    if(!b||!Array.isArray(b.weapons)) return [];
+    return [...new Set(b.weapons)].filter(id=>Number.isInteger(id)&&!!DataEngine.WEAPONS[id]);
+  },
+  selectedWeaponId(b=S.cur){
+    const unlocked=this.unlockedWeapons(b);
+    if(!unlocked.length){ if(b) b.afkWeaponId=null; return null; }
+    if(b.afkWeaponId===null) return null;
+    if(Number.isInteger(b.afkWeaponId)&&unlocked.includes(b.afkWeaponId)) return b.afkWeaponId;
+    b.afkWeaponId=unlocked[0];
+    return b.afkWeaponId;
+  },
+  cycleWeapon(dir){
+    const b=S.cur, unlocked=this.unlockedWeapons(b);
+    if(!unlocked.length) return;
+    const list=[null,...unlocked];
+    const cur=this.selectedWeaponId(b);
+    const idx=list.indexOf(cur);
+    const next=list[(idx+dir+list.length)%list.length];
+    b.afkWeaponId=next;
+    this.lastAttack="";
+    persist();
+    this.hud();
+  },
+  renderWeaponSelector(){
+    if(!this.stage) return;
+    const b=S.cur;
+    const hasWeapons=this.unlockedWeapons(b).length>0;
+    if(!hasWeapons){
+      if(this.wpnSelectorEl){ this.wpnSelectorEl.remove(); this.wpnSelectorEl=null; }
+      return;
+    }
+    if(!this.wpnSelectorEl){
+      const wrap=document.createElement("div");
+      wrap.id="afk-weapon-selector";
+      Object.assign(wrap.style,{
+        position:"absolute",right:"14px",bottom:"86px",zIndex:"28",
+        display:"flex",flexDirection:"column",alignItems:"center",gap:"3px",padding:"5px 8px",
+        background:"rgba(12,16,24,0.88)",border:"1px solid #c9953a",
+        borderRadius:"6px",boxShadow:"0 4px 14px rgba(0,0,0,0.7)",pointerEvents:"auto"
+      });
+      wrap.innerHTML=`
+        <div style="display:flex;align-items:center;gap:6px">
+          <button type="button" id="afk-wpn-prev" aria-label="Arme précédente" style="background:#261a0c;border:1px solid #c9953a;color:#ffd35c;font:bold 13px monospace;padding:4px 7px;border-radius:4px;cursor:pointer">◀</button>
+          <div id="afk-wpn-slot" style="width:42px;height:42px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);border:1px solid rgba(201,149,58,0.45);border-radius:4px">
+            <canvas id="cv-afk-wpn" width="64" height="64" style="width:38px;height:38px;image-rendering:pixelated"></canvas>
+          </div>
+          <button type="button" id="afk-wpn-next" aria-label="Arme suivante" style="background:#261a0c;border:1px solid #c9953a;color:#ffd35c;font:bold 13px monospace;padding:4px 7px;border-radius:4px;cursor:pointer">▶</button>
+        </div>
+        <div id="afk-wpn-perk" style="font:bold 9px monospace;color:#ffd35c;text-align:center;max-width:145px;line-height:1.15"></div>
+      `;
+      this.stage.appendChild(wrap);
+      this.wpnSelectorEl=wrap;
+      wrap.querySelector("#afk-wpn-prev").onclick=e=>{ e.stopPropagation(); this.cycleWeapon(-1); };
+      wrap.querySelector("#afk-wpn-next").onclick=e=>{ e.stopPropagation(); this.cycleWeapon(1); };
+    }
+    const wid=this.selectedWeaponId(b);
+    const slot=this.wpnSelectorEl.querySelector("#afk-wpn-slot");
+    const perkEl=this.wpnSelectorEl.querySelector("#afk-wpn-perk");
+    const cv=this.wpnSelectorEl.querySelector("#cv-afk-wpn");
+    const ctx=cv.getContext("2d");
+    ctx.imageSmoothingEnabled=false;
+    ctx.clearRect(0,0,64,64);
+    if(wid===null){
+      slot.title="Mains nues (+0% Puissance)";
+      perkEl.textContent="👊 Mains nues";
+      perkEl.style.color="#94a3b8";
+      ctx.font="28px serif"; ctx.textAlign="center"; ctx.textBaseline="middle";
+      ctx.fillText("👊",32,34);
+    } else {
+      const w=DataEngine.WEAPONS[wid], perk=this.weaponAfkPerk(wid);
+      const bonusPct=Math.round((this.weaponPowerMult(wid)-1)*100);
+      slot.title=`${w?w.name:"Arme"} (+${bonusPct}% Puissance) · ${perk.label}`;
+      perkEl.textContent=`+${bonusPct}% ⚔️ · ${perk.label.split("(")[0].trim()}`;
+      perkEl.style.color=perk.color||"#ffd35c";
+      const skin=renderer.weaponSprite(b,wid,()=>this.renderWeaponSelector());
+      if(skin){
+        const sc=Math.min(58/skin.width,58/skin.height), dw=skin.width*sc, dh=skin.height*sc;
+        ctx.drawImage(skin.sheet,skin.x,skin.y,skin.width,skin.height,(64-dw)/2,(64-dh)/2,dw,dh);
+      } else if(w){
+        ctx.font="28px serif"; ctx.textAlign="center"; ctx.textBaseline="middle";
+        ctx.fillText(w.icon,32,34);
+      }
+    }
+  },
 
   canisterStatus(){
     GameState.syncCanister();
@@ -55,6 +187,8 @@ const AFKMode={
       const fk = fam ? fam.key : b.companion.species;
       p *= zone.counters.includes(fk) ? 1.25 : 0.90;
     }
+    const wid = this.selectedWeaponId(b);
+    if (wid !== null) p *= this.weaponPowerMult(wid);
     if (can.s2) p *= 1.35;
     if (can.s4) p *= 1 + (b.weapons ? b.weapons.length : 0) * 0.03;
     if (now < this.riftUntil) p *= 1.25;
@@ -99,10 +233,12 @@ const AFKMode={
     this.hero.style.setProperty("--hero-x",this.heroX.toFixed(2)+"px");
     this.updateCompanion(c);
     if (this.cloneEl && !this.cloneEl.hidden) {
-      this.cloneEl.style.transform = `translateX(${Math.max(0, this.heroX - 38).toFixed(1)}px)`;
-      if (this.cloneCtx && S.cur) {
+      this.cloneEl.style.setProperty("--hero-x", Math.max(0, this.heroX - 12).toFixed(2) + "px");
+      this.cloneEl.style.transform = `translateX(${Math.max(0, this.heroX - 12).toFixed(2)}px)`;
+      const hcv = $("#cv-afk-hero");
+      if (this.cloneCtx && hcv) {
         this.cloneCtx.clearRect(0, 0, this.cloneCv.width, this.cloneCv.height);
-        this.drawHero(this.cloneCtx, c);
+        this.cloneCtx.drawImage(hcv, 0, 0, this.cloneCv.width, this.cloneCv.height);
       }
     }
   },
@@ -170,31 +306,78 @@ const AFKMode={
     if (this.cloneEl) this.cloneEl.hidden = !this.canisterStatus().s2;
   },
   drawHero(ctx,t){
-    const anim=this.heroAnim, elapsed=this.heroPhase==="attack"?Math.max(0,renderer.clock-this.heroPhaseStart):t;
-    const A=CanvasRenderer.ANIMS[anim]||CanvasRenderer.ANIMS.idle;
-    const frame=this.heroPhase==="attack"?Math.min(3,Math.floor(elapsed*A.fps/1000)):null;
-    renderer.drawBrute(ctx,S.cur,elapsed,anim,frame);
+    const wid=this.selectedWeaponId();
+    const anim=this.heroAnim, elapsed=this.heroPhase==="attack"?Math.max(0,t-this.heroPhaseStart):t;
+    const hasSheet=wid!==null&&!!renderer.loadImg(DataEngine.spriteBase(S.cur.sprite,wid));
+    const WA=hasSheet?CanvasRenderer.WPN_ANIMS?.[anim]:null;
+    const A=WA||CanvasRenderer.ANIMS[anim]||CanvasRenderer.ANIMS.idle;
+    const maxF=WA?WA.f.length:4;
+    const frame=this.heroPhase==="attack"?Math.min(maxF-1,Math.floor(elapsed*A.fps/1000)):null;
+    const cw=ctx.canvas.width||84, ch=ctx.canvas.height||84;
+    ctx.clearRect(0,0,cw,ch);
+    ctx.save();
+    if(wid===10){
+      const sc=1.34;
+      ctx.translate(cw/2,ch);
+      ctx.scale(sc,sc);
+      ctx.translate(-cw/2,-ch*0.95);
+    }
+    renderer.drawBrute(ctx,S.cur,elapsed,anim,frame,wid);
+    ctx.restore();
   },
   chooseAttack(){
-    const choices=this.attacks.filter(([name])=>name!==this.lastAttack);
-    const total=choices.reduce((sum,[,weight])=>sum+weight,0);
+    const wid=this.selectedWeaponId();
+    let pool=this.attacks;
+    if(wid!==null){
+      const w=DataEngine.WEAPONS[wid];
+      const style=w?(DataEngine.WEAPON_STYLE?.[wid]||w.type||"light"):"light";
+      if(style==="light") pool=[["thrust",5],["pierce",3]];
+      else if(style==="heavy") pool=[["overhead",5],["meteor",3]];
+      else if(style==="throw") pool=[["throw",5],["salto",3]];
+    }
+    const choices=pool.filter(([name])=>name!==this.lastAttack);
+    const list=choices.length?choices:pool;
+    const total=list.reduce((sum,[,weight])=>sum+weight,0);
     let roll=Math.random()*total;
-    for(const [name,weight] of choices){ roll-=weight; if(roll<0) return name; }
-    return choices[choices.length-1];
+    for(const [name,weight] of list){ roll-=weight; if(roll<0) return name; }
+    return list[list.length-1][0];
   },
   beginAttack(){
+    const wid=this.selectedWeaponId();
+    const perk=this.weaponAfkPerk(wid);
     const name = Date.now() < this.overdriveUntil ? "meteor" : this.chooseAttack();
-    const duration=4*1000/CanvasRenderer.ANIMS[name].fps;
+    const hasSheet=wid!==null&&!!renderer.loadImg(DataEngine.spriteBase(S.cur.sprite,wid));
+    const WA=hasSheet?CanvasRenderer.WPN_ANIMS?.[name]:null;
+    const A=WA||CanvasRenderer.ANIMS[name]||CanvasRenderer.ANIMS.punch;
+    const frames=WA?WA.f.length:4;
+    const spdMult=perk.atkSpdMult||1;
+    const duration=(frames*1000/(A.fps||10))/spdMult;
     this.lastAttack=name; this.heroPhase="attack"; this.heroAnim=name;
     this.heroPhaseStart=renderer.clock; this.heroDuration=duration/1000;
-    this.attackImpactAt=duration*.8; this.attackImpact=false;
+    this.attackImpactAt=duration*.75; this.attackImpact=false;
   },
   resolveAttack(){
     const c=renderer.clock;
-    const kills = (this.KILLS[this.lastAttack]||1) + (this.canisterStatus().s2 ? 1 : 0);
+    const wid=this.selectedWeaponId();
+    const perk=this.weaponAfkPerk(wid);
+    const extraKill=(perk.bonusKillChance&&Math.random()<perk.bonusKillChance)?1:0;
+    const kills=(this.KILLS[this.lastAttack]||1)+(this.canisterStatus().s2?1:0)+(perk.flatKills||0)+extraKill;
+    const hitList=[];
     for(let n=kills;n>0&&this.minions.length;n--){
-      const f=this.minions.shift(); f.anim="death"; f.t0=c; f.el.classList.add("die"); this.dying.push(f);
+      const f=this.minions.shift(); f.anim="death"; f.t0=c; f.el.classList.add("die");
+      if(perk.launchMode) f.forceMode=perk.launchMode;
+      this.dying.push(f);
+      hitList.push(f);
     }
+    if(perk.stunNext&&this.minions.length){
+      this.minions[0].stunUntil=c+perk.stunNext;
+    }
+    if(perk.goldHit&&hitList.length){
+      const gain=Math.max(1,Math.round(perk.goldHit*hitList.length*(1+this.wave*0.15)));
+      GameState.ressources.or+=gain;
+      if(Math.random()<0.35) this.spawnFloatingLoot(`+${gain} Or`,perk.color||"#ffd166");
+    }
+    if(hitList.length) this.triggerWeaponAfkVfx(wid,hitList[0]);
     this.attackImpact=true;
     if(!this.minions.length) {
       this.onWaveCleared();
@@ -447,11 +630,12 @@ const AFKMode={
       const cl = document.createElement("div");
       cl.className = "afk-hero afk-clone";
       cl.hidden = true;
-      cl.style.cssText = `position:absolute;bottom:0;left:0;width:${AFK_ASSETS.HERO_SIZE}px;height:${AFK_ASSETS.HERO_SIZE}px;opacity:0.52;filter:hue-rotate(155deg) brightness(1.35);pointer-events:none`;
+      cl.style.cssText = `width:${AFK_ASSETS.HERO_SIZE}px;height:${AFK_ASSETS.HERO_SIZE}px;opacity:0.55;filter:hue-rotate(175deg) brightness(1.2) drop-shadow(0 0 6px #38bdf8);pointer-events:none;z-index:1`;
       const cv = document.createElement("canvas");
       cv.width = 64; cv.height = 64;
       cv.style.cssText = "width:100%;height:100%;display:block;image-rendering:pixelated";
       cl.appendChild(cv);
+      this.hero.style.zIndex = "5";
       this.hero.before(cl);
       this.cloneEl = cl; this.cloneCv = cv; this.cloneCtx = cv.getContext("2d");
     }
@@ -499,6 +683,7 @@ if(!Number.isFinite(b.afkWaveMax)||b.afkWaveMax<b.afkWave) b.afkWaveMax=b.afkWav
     $("#afk-rate").textContent="+"+this.RATE.toLocaleString("fr-FR")+" Or / sec";
     $("#afk-power").textContent="⚔️ Puissance : "+basePw.toLocaleString("fr-FR")+bonusTxt;
     const bt=$("#btn-harvest"); bt.disabled=g<=0; bt.classList.toggle("ready",g>0);
+    this.renderWeaponSelector();
   },
   measure(){ if(this.field) this.W=this.field.clientWidth||300; },
   start(){
@@ -512,7 +697,7 @@ if(!Number.isFinite(b.afkWaveMax)||b.afkWaveMax<b.afkWave) b.afkWaveMax=b.afkWav
     this.moveHero("dash",this.centerX(),320);
     this.last=performance.now(); this.raf=requestAnimationFrame(t=>this.loop(t));
   },
-stop(){ this.run=false; cancelAnimationFrame(this.raf); this.clearMinions(); },
+stop(){ this.run=false; cancelAnimationFrame(this.raf); this.clearMinions(); if(this.wpnSelectorEl){ this.wpnSelectorEl.remove(); this.wpnSelectorEl=null; } },
 clearMinions(){
 this.minions.forEach(m=>m.el.remove()); this.minions=[];
 this.dying.forEach(m=>m.el.remove()); this.dying=[];
@@ -577,7 +762,10 @@ this.minions.push(m);
     const c=renderer.clock, contact=this.centerX()+AFK_ASSETS.HERO_SIZE*.58, SP=72, SPEED=100;
     this.minions.forEach((m,i)=>{
       const tx=contact+i*SP;
-      if(m.x>tx){
+      const stunned=m.stunUntil&&c<m.stunUntil;
+      if(stunned){
+        if(m.anim!=="hit"){ m.anim="hit"; m.t0=c; }
+      } else if(m.x>tx){
         m.x=Math.max(tx,m.x-SPEED*dt);
         m.el.style.transform="translateX("+m.x.toFixed(1)+"px)";
         if(m.anim!=="dash"){ m.anim="dash"; m.t0=c; }
@@ -595,7 +783,7 @@ for (let i = this.dying.length - 1; i >= 0; i--) {
     d.initialized = true;
     d.y = d.y || 0;
     d.dir = Math.random() < 0.5 ? -1 : 1;
-    d.mode = Math.random() < 0.5 ? "rocket" : "uppercut";
+    d.mode = d.forceMode || (Math.random() < 0.5 ? "rocket" : "uppercut");
     d.vx = 450 + Math.random() * 350;
     d.vy = 280 + Math.random() * 180;
     d.lastTrailTime = 0;

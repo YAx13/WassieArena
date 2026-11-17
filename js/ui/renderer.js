@@ -128,9 +128,10 @@ class CanvasRenderer {
         const r=px[i], g=px[i+1], b=px[i+2];
         if(isMagenta){
           const dom=Math.min(r,b)-g;
-          if(r>140&&b>140&&dom>35){
-            const keep=Math.max(0,Math.min(1,(110-dom)/75));
+          if(r>110&&b>110&&dom>20){
+            const keep=Math.max(0,Math.min(1,(75-dom)/55));
             px[i+3]=Math.round(px[i+3]*keep);
+            if(keep<1){ px[i]=Math.min(r,g+25); px[i+2]=Math.min(b,g+25); }
           }
         } else {
           const dom=g-Math.max(r,b);
@@ -158,8 +159,12 @@ class CanvasRenderer {
     else if(A.s==="base"){ img=this.sprite(b.sprite,!!(b&&b.animationSet)); F=A.f||row; }
     else{ img=this.sheet(b.sprite,A.s); if(img) F=row; else { img=this.sprite(b.sprite); F=A.fb; } }
     const n=fi!==null?fi:Math.floor(t*A.fps/1000), k=A.loop?n%F.length:Math.min(n,F.length-1), fr=F[k];
-    ctx.clearRect(0,0,64,64); ctx.imageSmoothingEnabled=false;
-    if(img){ const fw=(img.naturalWidth||img.width)/4, fh=(img.naturalHeight||img.height)/4; ctx.drawImage(img,(fr%4)*fw,((fr/4)|0)*fh,fw,fh,0,0,64,64); return; }
+    const isOff=ctx.canvas===this.off;
+    const fw=img?(img.naturalWidth||img.width)/4:64, fh=img?(img.naturalHeight||img.height)/4:64;
+    if(isOff&&(this.off.width!==fw||this.off.height!==fh)){ this.off.width=fw; this.off.height=fh; }
+    const cw=isOff?this.off.width:(ctx.canvas.width||64), ch=isOff?this.off.height:(ctx.canvas.height||64);
+    ctx.clearRect(0,0,cw,ch); ctx.imageSmoothingEnabled=false;
+    if(img){ ctx.drawImage(img,(fr%4)*fw,((fr/4)|0)*fh,fw,fh,0,0,cw,ch); return; }
     // Placeholder 2.5D : cube de couleur, pose selon l'animation
     const bob=anim==="idle"?Math.round(Math.sin(t/280)*1.5):0, h=b.hue, c=`hsl(${h},55%,48%)`, cl=`hsl(${h},55%,64%)`, cd=`hsl(${h},55%,30%)`;
     ctx.fillStyle="rgba(0,0,0,.45)"; ctx.beginPath(); ctx.ellipse(32,56,17,6,0,0,7); ctx.fill();
@@ -277,11 +282,22 @@ class CanvasRenderer {
     const [an,n]=this.animFrame(f,c), o=this.octx, wid=!f.pet&&f.wpn&&Number.isInteger(f.wpn.id)?f.wpn.id:null;
     f.pet?this.drawPet(o,f,an,n):this.drawBrute(o,f.b,c,an,n,wid);
     const fl=Math.max(0,1-(c-f.flash0)/180);            // flash blanc à l'impact
-    if(fl>0){ o.globalCompositeOperation="source-atop"; o.fillStyle=`rgba(255,255,255,${fl})`; o.fillRect(0,0,64,64); o.globalCompositeOperation="source-over"; }
+    if(fl>0){ o.globalCompositeOperation="source-atop"; o.fillStyle=`rgba(255,255,255,${fl})`; o.fillRect(0,0,this.off.width,this.off.height); o.globalCompositeOperation="source-over"; }
+    f.sx=f.sx===undefined?1:f.sx+(1-f.sx)*0.22;
+    f.sy=f.sy===undefined?1:f.sy+(1-f.sy)*0.22;
+    f.rot=f.rot===undefined?0:f.rot*0.78;
+    f.knock=f.knock===undefined?0:f.knock*0.80;
+    if(f.anim==="idle"&&f.air>0) f.air*=0.78;
+
     const hop=(f.win?Math.abs(Math.sin(c/180))*8:0)+(f.air||0);
-    ctx.save(); ctx.translate(Math.round(f.x),Math.round(f.y-hop)); const fp=f.flip&&!f.win; if(fp) ctx.scale(-1,1);
-    const R=CanvasRenderer, sc=(wid===10&&f.wpn)?1.65:1, sw=R.SPR*sc, OY=-(sw-R.PAD*sc);
-    ctx.drawImage(this.off,-sw/2,OY,sw,sw);
+    ctx.save();
+    ctx.translate(Math.round(f.x+f.knock),Math.round(f.y-hop));
+    const fp=f.flip&&!f.win;
+    if(fp) ctx.scale(-1,1);
+    if(f.rot) ctx.rotate(f.rot);
+    ctx.scale(f.sx,f.sy);
+    const R=CanvasRenderer, isPillar=wid===10, sw=isPillar?R.SPR*1.34:R.SPR, OX=isPillar?4:0, OY=isPillar?-(sw-R.PAD*1.32):-(sw-R.PAD);
+    ctx.drawImage(this.off,-sw/2+OX,OY,sw,sw);
     ctx.restore();
   }
   drawArena(ctx,A,c){
@@ -394,7 +410,22 @@ class CanvasRenderer {
       A.vfx=A.vfx.filter(v=>c-v.t0<v.dur);
       A.vfx.forEach(v=>{
         const p=(c-v.t0)/v.dur; ctx.save();
-        if(v.kind==="molotov"){
+        if(v.kind==="dust"){
+          ctx.globalAlpha=Math.max(0,0.75*(1-p));
+          ctx.fillStyle="#d8cbb8";
+          for(let i=0;i<4;i++){
+            const dx=v.x-v.dir*(6+p*22+i*5), dy=v.y-3-Math.sin(p*Math.PI)*(6+i*2);
+            const r=Math.max(1,(4-i*0.6)*(1-p*0.6));
+            ctx.beginPath(); ctx.arc(dx,dy,r,0,7); ctx.fill();
+          }
+        } else if(v.kind==="slash"){
+          ctx.globalAlpha=Math.max(0,1-p);
+          ctx.translate(v.x,v.y);
+          ctx.scale(v.dir,1);
+          ctx.strokeStyle=v.crit?"#ffd43b":"#ffffff";
+          ctx.lineWidth=v.crit?4:2.5;
+          ctx.beginPath(); ctx.arc(-6,0,22+p*8,-0.9+p*0.5,0.9+p*0.5); ctx.stroke();
+        } else if(v.kind==="molotov"){
           ctx.globalAlpha=Math.max(0,1-p*0.85);
           ctx.fillStyle="rgba(255,95,15,0.45)"; ctx.beginPath(); ctx.ellipse(v.x,v.y,18+p*16,5+p*3,0,0,7); ctx.fill();
           for(let i=0;i<7;i++){ const fx=v.x-14+i*5+Math.sin(c/60+i)*2, fh=8+(1-p)*14+((i%3)*4);

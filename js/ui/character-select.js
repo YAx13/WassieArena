@@ -178,7 +178,12 @@ function rollLoot(b){
     flickerSigns();
   }
   function reroll(){
-    st.cands = Array.from({ length: NB_CANDIDATS }, genBrute);
+    const pool = [...DataEngine.readyKeys()].sort(() => Math.random() - 0.5);
+    st.cands = Array.from({ length: NB_CANDIDATS }, (_, i) => {
+      const b = genBrute();
+      if (pool[i]) b.sprite = pool[i];
+      return b;
+    });
     st.sel = 0;
     showCand();
   }
