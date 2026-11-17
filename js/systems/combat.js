@@ -237,7 +237,7 @@ const Combat={
     this.idx=0; this.carry=0; this.tues=0; this.degats=0; this.pas=0;
     this.pan=cfg.mode==="triptyque"?1:-1;       // pan -1 : pas de triptyque, pas de propulsion, décor = config.fond
     this.fade=0; this.done=false; this.fl=[]; this.q=[]; this.shake0=-1e6; this.proj=null; this.amp=5;
-    renderer.ar=cfg.mode==="triptyque"?this.arTriptyque:{"-1":this.fondCanvas(cfg.fond,cfg.fondSecours)};
+    this.syncBackground();
     this.majMonetisation();
     const sp=this.vitesse(); renderer.setSpeed(sp); $$(".speed [data-spd]").forEach(x=>x.classList.toggle("active",+x.dataset.spd===sp));   // vitesse persistante
     const c=renderer.clock; this.V=[]; this.P=[];
@@ -263,25 +263,13 @@ const Combat={
     this.V=[{b,name:b.name,x:90,bx:90,y:188,flip0:false,flip:false,anim:"idle",t0:c,flash0:-1e6,
       hp:max,dh:max,lastHp:max,hit0:-1e6,max,win:false,air:0,wpn:null}];
     this.P=[]; this.fl=[]; this.proj=null; this.fade=0; this.shake0=-1e6;
-    renderer.ar={"-1":this.fondCanvas("assets/backgrounds/pvp/arenaSet.jpg")};
+    this.syncBackground();
+    this.buildStage();
+    this.syncStage(c);
     $("#g-combat").classList.remove("world-boss-screen");
     $("#endscreen").className="end hidden";
     $("#btn-again").classList.add("hidden");
     $("#worldboss-actions").classList.add("hidden");
-  },
-  // Décor : couleur ("#0f172a", "rgb()", "hsl()") ou chemin d'image ; rendu via un canvas 400x225 que drawArena prend pour une image
-  // Décor : couleur ("#0f172a", "rgb()", "hsl()") ou chemin d'image cadré sans rognage (contain)
-  fondCanvas(fond,secours="#14110d"){
-    const f=String(fond||secours), couleur=/^(#|rgb|hsl)/i.test(f);
-    if(couleur){
-      const cv=document.createElement("canvas"); cv.width=800; cv.height=450; cv.complete=true; cv.naturalWidth=800; cv.naturalHeight=450;
-      const g=cv.getContext("2d"); g.fillStyle=f; g.fillRect(0,0,800,450);
-      return cv;
-    }
-    const im=new Image();
-    im.secours=secours;
-    im.src=encodeURI(f);
-    return im;
   },
   // Ennemi à partir d'une définition (voir ENNEMIS_COMBAT). Stats = points de départ du joueur (20 + niveau-1) x mult
   creerEnnemi(def,niv,mult,role){
@@ -320,6 +308,8 @@ const Combat={
       this.P=this.V.map((v,i)=>{ const cp=v.b.companion; if(!cp) return null; const hx=v.bx+(i?54:-54);
         return {pet:true,i,owner:v.b,key:cp.species+":"+(cp.form||1),x:hx,hx,y:v.y+2,flip:v.flip0,flip0:v.flip0,anim:"idle",t0:c,flash0:-1e6,win:false,air:0}; }).filter(Boolean);
     } else { this.V[1]=mk(en,1); this.V[0].hp=this.V[0].dh=E.f[0].hp; this.P=this.P.filter(p=>p.i===0); }
+    this.buildStage();
+    this.syncStage(c);
   },
   titre(){
     const ent=this.file[this.idx], en=ent.brute;
@@ -631,7 +621,8 @@ const Combat={
   },
   // ----- Branchements (à appeler une fois, à la place de l'ancien câblage de l'arène) -----
   init(){
-    this.arTriptyque=renderer.ar;                                            // triptyque d'origine (decors/arene-1..3.jpg)
+    this.arTriptyque=renderer.ar||null;
+    renderer.ar=null;
     renderer.arena=this; renderer.arenaCv=$("#cv-arena"); renderer.tick=c=>this.tick(c);
     this.patchRenderer();
     OV.reg.combat={pane:"g-combat",onOpen(){ $("#g-combat").classList.remove("pvp-screen"); },onClose(){ $("#g-combat").classList.remove("pvp-screen"); if(typeof Raids!=="undefined") Raids.fermerClassement(); Combat.stop(); }};   // écran de combat pour vagues / endurance
@@ -667,20 +658,137 @@ const Combat={
   // Petites extensions de CanvasRenderer : échelle par combattant (boss) + placeholders géométriques des ennemis sans PNG
   patchRenderer(){
     const P=CanvasRenderer.prototype; if(P._combatPatched) return; P._combatPatched=true;
-    const blit=P.blit, drawBrute=P.drawBrute;
-    P.blit=function(ctx,f,c){
-      const g=Combat.devGroup||{scale:1,dx:0,dy:0}, s=f.scale||1;
-      const hasGroup=g.scale!==1||g.dx!==0||g.dy!==0;
-      if(!hasGroup&&s===1) return blit.call(this,ctx,f,c);
-      ctx.save();
-      if(hasGroup){ ctx.translate(200+g.dx,188+g.dy); ctx.scale(g.scale,g.scale); ctx.translate(-200,-188); }
-      if(s!==1){ ctx.translate(f.x,f.y); ctx.scale(s,s); ctx.translate(-f.x,-f.y); }
-      blit.call(this,ctx,f,c);
-      ctx.restore();
-    };
+    const drawBrute=P.drawBrute;
     P.drawBrute=function(ctx,b,t,anim="idle",fi=null,wt=null){
       if(b&&b.placeholder&&!DataEngine.spriteBase(b.sprite)) return placeholderEnnemi(ctx,b,t,anim,fi);
-      return drawBrute.call(this,ctx,b,t,anim,fi,wt); };
+      return drawBrute.call(this,ctx,b,t,anim,fi,wt);
+    };
+  },
+  syncBackground(){
+    const bg=$("#arena-bg"); if(!bg) return;
+    bg.classList.remove("is-triptyque");
+    bg.innerHTML="";
+    bg.style.backgroundImage="none";
+    bg.style.backgroundColor="#0b0c0d";
+    if(this.customBg){
+      const src=typeof this.customBg==="string"?this.customBg:(this.customBg.src||"");
+      if(src) bg.style.backgroundImage=`url('${encodeURI(src)}')`;
+      return;
+    }
+    if(this.preview&&!this.act&&OV.stack.includes("pvp")){
+      const src=assetPath.pvpPreview((S.cur&&S.cur.sprite)||"general");
+      bg.style.backgroundImage=`url('${encodeURI(src)}')`;
+      return;
+    }
+    if(this.mode==="triptyque"){
+      bg.classList.add("is-triptyque");
+      bg.style.setProperty("--pan",String(Math.max(0,Math.min(2,this.pan))));
+      [0,1,2].forEach(idx=>{
+        const pan=document.createElement("div");
+        pan.className="arena-pan";
+        const im=this.arTriptyque&&this.arTriptyque[idx];
+        if(im&&im.src) pan.style.backgroundImage=`url('${im.src}')`;
+        else pan.style.backgroundImage=`url('${assetPath.pvp("nuclear",idx+1)}')`;
+        bg.appendChild(pan);
+      });
+      return;
+    }
+    const f=String((this.cfg&&this.cfg.fond)||(this.cfg&&this.cfg.fondSecours)||"#14110d");
+    if(/^(#|rgb|hsl)/i.test(f)){
+      bg.style.backgroundColor=f;
+    } else {
+      bg.style.backgroundColor=(this.cfg&&this.cfg.fondSecours)||"#14110d";
+      bg.style.backgroundImage=`url('${new URL(encodeURI(f),document.baseURI).href}')`;
+    }
+  },
+  buildStage(){
+    const field=$("#arena-field"); if(!field) return;
+    field.innerHTML="";
+    const createUnit=(f,idx,isPet)=>{
+      const el=document.createElement("div");
+      el.className="arena-unit"+(isPet?" is-pet":"")+(idx>0?" is-enemy":"");
+      const cv=document.createElement("canvas");
+      cv.width=64; cv.height=64;
+      const ctx=cv.getContext("2d");
+      ctx.imageSmoothingEnabled=false;
+      el.appendChild(cv);
+      if(!isPet&&!this.preview){
+        const oh=document.createElement("div");
+        oh.className="arena-overhead";
+        const lv=f.b&&f.b.level?` <small>Niv.${f.b.level}</small>`:"";
+        oh.innerHTML=`<div class="arena-badges"></div><div class="arena-tag">${f.name}${lv}</div><div class="arena-hpbar"><i class="dh" style="width:100%"></i><i class="hp" style="width:100%"></i></div>`;
+        el.appendChild(oh);
+        f._domDh=oh.querySelector(".dh");
+        f._domHp=oh.querySelector(".hp");
+        f._domBadges=oh.querySelector(".arena-badges");
+      }
+      field.appendChild(el);
+      f._domEl=el; f._domCv=cv; f._domCtx=ctx;
+    };
+    this.V.forEach((f,k)=>createUnit(f,k,false));
+    this.P.forEach(p=>createUnit(p,p.i,true));
+  },
+  syncStage(c){
+    const stage=$("#arena-stage"), bg=$("#arena-bg");
+    if(!stage) return;
+    if(bg&&bg.classList.contains("is-triptyque")) bg.style.setProperty("--pan",String(Math.max(0,Math.min(2,this.pan))));
+    const sw=stage.clientWidth||800, sh=stage.clientHeight||450;
+    const g=this.devGroup||{scale:1,dx:0,dy:0};
+    [...this.V,...this.P].forEach(f=>{
+      if(!f._domEl||!f._domCtx) return;
+      const [an,n]=renderer.animFrame(f,c);
+      const wid=!f.pet&&f.wpn&&Number.isInteger(f.wpn.id)?f.wpn.id:null;
+      const ctx=f._domCtx;
+      if(f.pet) renderer.drawPet(ctx,f,an,n);
+      else renderer.drawBrute(ctx,f.b,c,an,n,wid);
+      const fl=Math.max(0,1-(c-f.flash0)/180);
+      if(fl>0){
+        ctx.globalCompositeOperation="source-atop";
+        ctx.fillStyle=`rgba(255,255,255,${fl})`;
+        ctx.fillRect(0,0,64,64);
+        ctx.globalCompositeOperation="source-over";
+      }
+      f.sx=f.sx===undefined?1:f.sx+(1-f.sx)*0.22;
+      f.sy=f.sy===undefined?1:f.sy+(1-f.sy)*0.22;
+      f.rot=f.rot===undefined?0:f.rot*0.78;
+      f.knock=f.knock===undefined?0:f.knock*0.80;
+      if(f.anim==="idle"&&f.air>0) f.air*=0.78;
+      const hop=(f.win?Math.abs(Math.sin(c/180))*8:0)+(f.air||0);
+      const px=((f.x+f.knock+g.dx)/400)*sw;
+      const py=((188-f.y+hop-g.dy)/225)*sh;
+      const sc=(f.scale||1)*g.scale*(wid===10?1.34:1);
+      f._domEl.style.transform=`translate(${px.toFixed(1)}px,${py.toFixed(1)}px)`;
+      const fp=f.flip&&!f.win;
+      f._domCv.style.transform=`scale(${(fp?-1:1)*sc*f.sx},${sc*f.sy}) rotate(${f.rot}rad)`;
+      if(!f.pet&&!this.preview&&f._domHp){
+        const dt=Math.min(60,Math.max(0,c-(f.pc===undefined?c:f.pc))); f.pc=c;
+        if(f.lastHp===undefined) f.lastHp=f.hp;
+        if(f.hp<f.lastHp) f.hit0=c;
+        f.lastHp=f.hp;
+        if(f.dh<f.hp) f.dh=f.hp; else if(c-f.hit0>450) f.dh+=(f.hp-f.dh)*Math.min(1,dt/260);
+        if(f.dh-f.hp<.05) f.dh=f.hp;
+        const pct=Math.max(0,Math.min(100,(f.hp/Math.max(1,f.max))*100));
+        const dpct=Math.max(0,Math.min(100,(f.dh/Math.max(1,f.max))*100));
+        f._domHp.style.width=pct.toFixed(1)+"%";
+        f._domDh.style.width=dpct.toFixed(1)+"%";
+        if(f._domBadges&&f.st&&f.hp>0){
+          const st=f.st, bdg=[];
+          if(st.stun>0) bdg.push("💫");
+          if(st.shield>0) bdg.push("🛡️");
+          if(st.block>0) bdg.push("🧱");
+          if(st.dr) bdg.push("🔰");
+          if(st.reflect) bdg.push("🪞");
+          if(st.dodge) bdg.push("💨");
+          if(st.spdUp>0) bdg.push("⚡");
+          if(st.rage>0) bdg.push("💢");
+          if(st.slow>0) bdg.push("❄️");
+          if(st.accD) bdg.push("🌫️");
+          if(st.dot&&st.dot.some(d=>d.n>0)) bdg.push("🩸");
+          const sig=bdg.join("");
+          if(f._lastSig!==sig){ f._lastSig=sig; f._domBadges.textContent=sig; }
+        } else if(f._domBadges&&f._lastSig){ f._lastSig=""; f._domBadges.textContent=""; }
+      }
+    });
   },
   initDevGroupUI(){
     const KEY="dev_combat_group";

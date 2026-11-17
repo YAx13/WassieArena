@@ -149,9 +149,16 @@ body {
   padding: 10px;
 }
 
-.game-frame-content #g-combat #cv-arena {
-  height: auto;
+.game-frame-content #g-combat #arena-stage {
+  width: 100%;
+  height: 390px;
   max-height: 390px;
+}
+
+.game-frame-content #g-combat #cv-arena {
+  width: 100%;
+  height: 100%;
+  max-height: none;
 }
 
 .game-frame-content #g-combat .log {
@@ -259,11 +266,11 @@ body {
   inset: 0;
 }
 
+.game-frame-content #g-combat.world-boss-screen #arena-stage,
 .game-frame-content #g-combat.world-boss-screen #cv-arena {
   width: 100%;
   height: 100%;
   max-height: none;
-  object-fit: contain;
   border: 0;
   box-shadow: none;
 }
@@ -421,12 +428,12 @@ body {
   height: 100%;
 }
 
+.game-frame-content #g-combat.pvp-screen:not(.pvp-preview) #arena-stage,
 .game-frame-content #g-combat.pvp-screen:not(.pvp-preview) #cv-arena {
   display: block;
   width: 100%;
   height: 100%;
   max-height: none;
-  object-fit: contain;
   border: 0;
   box-shadow: none;
 }
@@ -494,12 +501,12 @@ body {
   height: 100%;
 }
 
+.game-frame-content #g-combat.pvp-preview #arena-stage,
 .game-frame-content #g-combat.pvp-preview #cv-arena {
   display: block;
   width: 100%;
   height: 100%;
   max-height: none;
-  object-fit: contain;
   border: 0;
   box-shadow: none;
 }

@@ -59,7 +59,8 @@ const TRAIN={
     $$("#tr-speed [data-ts]").forEach(b=>b.onclick=()=>{ this.mult=+b.dataset.ts; $$("#tr-speed [data-ts]").forEach(x=>x.classList.toggle("active",x===b)); });
     this.F=this.mk(this.keys[0],110,false);
     this.D=this.mk(this.keys[this.dummyIdx%this.keys.length],300,true);
-    this.A={V:[this.F,this.D],P:[],fl:[],pan:0,fade:0,shake0:-1e6,amp:5,proj:null,act:true};
+    this.A={V:[this.F,this.D],P:[],fl:[],pan:0,fade:0,shake0:-1e6,amp:5,proj:null,act:true,preview:true};
+    this.buildStage();
     this.pickDecor(0);
 
     document.addEventListener("keydown",e=>{
@@ -106,6 +107,7 @@ const TRAIN={
     const on=$("#tr-dummy").checked, k=this.keys[this.dummyIdx%this.keys.length];
     this.D.b.sprite=k; this.D.b.name=this.D.name=this.keyName(k);
     this.A.V=on?[this.F,this.D]:[this.F];
+    this.buildStage();
   },
   getWpnAnims(){
     const i=+$("#tr-wpn").value;
@@ -139,9 +141,17 @@ const TRAIN={
     const chargerImage = (chemin) => {
       const img = new Image();
       img.src = chemin;
-      img.onload = () => { if (this.A && tok === this._decorTok) { this.A.pan = 0; this.A.customBg = img; } };
+      img.onload = () => {
+        if (this.A && tok === this._decorTok) {
+          this.A.pan = 0;
+          this.A.customBg = img;
+          const bg = $("#tr-bg");
+          if (bg) bg.style.backgroundImage = `url('${img.src}')`;
+        }
+      };
       img.onerror = () => {
-        if (tok !== this._decorTok) return;        if (chemin.endsWith(".jpg")) chargerImage(chemin.replace(".jpg", ".jpeg"));
+        if (tok !== this._decorTok) return;
+        if (chemin.endsWith(".jpg")) chargerImage(chemin.replace(".jpg", ".jpeg"));
         else if (chemin.endsWith(".jpeg")) {
           const parties = chemin.split('/');
           const nomFichier = parties[parties.length - 1];
@@ -227,8 +237,51 @@ const TRAIN={
         }
       }
       $$("#tr-anims .tr-pose").forEach(b=>b.classList.toggle("on",b.dataset.a===this.cur));
+      this.syncStage(this.clock);
       renderer.drawArena(cv.getContext("2d"),this.A,this.clock);
     }
     requestAnimationFrame(t2=>this.tick(t2));
+  },
+  buildStage(){
+    const field=$("#tr-field"); if(!field) return;
+    field.innerHTML="";
+    (this.A.V||[]).forEach((f,idx)=>{
+      const el=document.createElement("div");
+      el.className="arena-unit"+(idx>0?" is-enemy":"");
+      const cv=document.createElement("canvas");
+      cv.width=64; cv.height=64;
+      const ctx=cv.getContext("2d");
+      ctx.imageSmoothingEnabled=false;
+      el.appendChild(cv);
+      field.appendChild(el);
+      f._domEl=el; f._domCv=cv; f._domCtx=ctx;
+    });
+  },
+  syncStage(c){
+    const stage=$("#tr-stage"); if(!stage||!this.A) return;
+    const sw=stage.clientWidth||800, sh=stage.clientHeight||450;
+    (this.A.V||[]).forEach(f=>{
+      if(!f._domEl||!f._domCtx) return;
+      const [an,n]=renderer.animFrame(f,c);
+      const wid=f.wpn&&Number.isInteger(f.wpn.id)?f.wpn.id:null;
+      const ctx=f._domCtx;
+      renderer.drawBrute(ctx,f.b,c,an,n,wid);
+      const fl=Math.max(0,1-(c-f.flash0)/180);
+      if(fl>0){
+        ctx.globalCompositeOperation="source-atop";
+        ctx.fillStyle=`rgba(255,255,255,${fl})`;
+        ctx.fillRect(0,0,64,64);
+        ctx.globalCompositeOperation="source-over";
+      }
+      f.sx=f.sx===undefined?1:f.sx+(1-f.sx)*0.22;
+      f.sy=f.sy===undefined?1:f.sy+(1-f.sy)*0.22;
+      f.rot=f.rot===undefined?0:f.rot*0.78;
+      f.knock=f.knock===undefined?0:f.knock*0.80;
+      const px=((f.x+f.knock)/400)*sw;
+      const py=((188-f.y+(f.air||0))/225)*sh;
+      const sc=wid===10?1.34:1;
+      f._domEl.style.transform=`translate(${px.toFixed(1)}px,${py.toFixed(1)}px)`;
+      f._domCv.style.transform=`scale(${(f.flip?-1:1)*sc*f.sx},${sc*f.sy}) rotate(${f.rot}rad)`;
+    });
   }
   };

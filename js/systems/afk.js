@@ -624,8 +624,13 @@ const AFKMode={
     };
     tryExt(["jpeg","jpg","png"]);
   },
+  mountField(container){
+    if(!container) return null;
+    container.classList.add("arena-field");
+    return container;
+  },
   init(){
-    this.field=$("#afk-field"); this.hero=$("#afk-hero"); this.stage=$("#afk-stage");
+    this.field=this.mountField($("#afk-field")); this.hero=$("#afk-hero"); this.stage=$("#afk-stage");
     if (this.hero && !this.cloneEl) {
       const cl = document.createElement("div");
       cl.className = "afk-hero afk-clone";
@@ -697,7 +702,7 @@ if(!Number.isFinite(b.afkWaveMax)||b.afkWaveMax<b.afkWave) b.afkWaveMax=b.afkWav
     this.moveHero("dash",this.centerX(),320);
     this.last=performance.now(); this.raf=requestAnimationFrame(t=>this.loop(t));
   },
-stop(){ this.run=false; cancelAnimationFrame(this.raf); this.clearMinions(); if(this.wpnSelectorEl){ this.wpnSelectorEl.remove(); this.wpnSelectorEl=null; } },
+stop(){ this.run=false; cancelAnimationFrame(this.raf); this.clearMinions(); this.clearDuel(); if(this.wpnSelectorEl){ this.wpnSelectorEl.remove(); this.wpnSelectorEl=null; } },
 clearMinions(){
 this.minions.forEach(m=>m.el.remove()); this.minions=[];
 this.dying.forEach(m=>m.el.remove()); this.dying=[];
@@ -705,6 +710,7 @@ this.dying.forEach(m=>m.el.remove()); this.dying=[];
 spawnWave(){
 this.hud();
 this.nextWave=0;
+if(this.isBossWave(this.wave)){ this.startBossDuel(); return; }
 const n=Math.min(3+Math.floor(this.wave/2),6), col=this.COLORS[(this.wave-1)%this.COLORS.length];
 const keys=AFK_ASSETS.MINION_SPRITES, hcv=$("#cv-afk-hero"), cw=(hcv&&hcv.width)||84, ch=(hcv&&hcv.height)||84;
 for(let i=0;i<n;i++){
@@ -867,6 +873,7 @@ for (let i = this.dying.length - 1; i >= 0; i--) {
 }
 
 
+    if(this.duel){ this.stepBossDuel(dt); return; }
     this.updateHero(c);
     if(this.heroPhase==="attack"&&!this.attackImpact&&c-this.heroPhaseStart>=this.attackImpactAt) this.resolveAttack();
     const f=this.minions[0];
@@ -874,10 +881,310 @@ for (let i = this.dying.length - 1; i >= 0; i--) {
       if(this.heroX<this.centerX()-.5&&f.x<=contact+SP+12) this.moveHero("dash",this.centerX(),320);
       else if(this.heroX>=this.centerX()-.5&&f.x<=contact+2) this.beginAttack();
     }
- if(!this.minions.length&&this.nextWave>0){ this.nextWave-=dt; if(this.nextWave<=0){ this.spawnWave(); } }
-  }
+    if(!this.minions.length&&this.nextWave>0){ this.nextWave-=dt; if(this.nextWave<=0){ this.spawnWave(); } }
+  },
+  isBossWave(w=this.wave){ return w>0 && w%10===0; },
+  createWaveBoss(w){
+    const b=S.cur, req=this.wavePower(w), cur=Math.max(1,this.effectivePower(b,w));
+    const ratio=req/cur;
+    const lv=Math.max(1,Math.round((b?b.level:1)*Math.pow(ratio,0.65)));
+    const pool=DataEngine.BRAWLERS.filter(k=>k!=="dummy"&&(!b||k!==b.sprite));
+    const spr=pool.length?pool[(Math.floor(w/10)-1)%pool.length]:"general";
+    const titles=["Gardien","Exécuteur","Colosse","Seigneur","Titan","Fléau"];
+    const name=`${titles[(Math.floor(w/10)-1)%titles.length]} V.${w}`;
+    const basePts=Math.max(10,Math.round((20+(b?b.level:1)-1)*ratio));
+    const stats=DataEngine.rollStartStats(basePts);
+    const allW=DataEngine.WEAPONS.map(x=>x.id);
+    const wCount=Math.min(4,1+Math.floor(w/20));
+    const weapons=[];
+    while(weapons.length<wCount&&allW.length){
+      const id=DataEngine.pick(allW);
+      if(!weapons.includes(id)) weapons.push(id);
+    }
+    return {
+      id:"afk_boss_"+w,name,species:"Boss",style:"boss",hue:(w*37)%360,sprite:spr,
+      stats,level:lv,weapons,gear:[],skills:DataEngine.pickSkills(Math.min(5,2+Math.floor(w/20))),
+      companion:null,scale:1.15
+    };
+  },
+  clearDuel(){
+    if(this.duel){
+      (this.duel.dom||[]).forEach(el=>el.remove());
+      this.duel=null;
+    }
+    if(this.field) this.field.classList.remove("is-duel");
+    const fxCv=$("#cv-afk-fx");
+    if(fxCv){ const ctx=fxCv.getContext("2d"); ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,fxCv.width,fxCv.height); }
+  },
+  startBossDuel(){
+    const b=S.cur; if(!b||!this.field) return;
+    this.clearMinions();
+    this.clearDuel();
+    this.field.classList.add("is-duel");
+    const c=renderer.clock;
+    const pv=Object.create(b);
+    const eq=((typeof GameState!=="undefined"&&GameState.competencesEquipees)||[]).filter(id=>b.skills.includes(id));
+    pv.skills=(eq.length?eq:b.skills).slice(0,Math.max(1,b.slotsCompetences||3));
+    const boss=this.createWaveBoss(this.wave);
+    const eng=new BattleEngine(pv,boss,ProfileManager.getBuffs());
+    const q=[];
+    ["on_attack","on_hit","on_dot","on_skill","on_dodge","on_death","on_end"].forEach(ev=>eng.on(ev,e=>q.push(e)));
+    const mk=(br,i)=>({
+      b:br,name:br.name,x:i?305:95,bx:i?305:95,y:188,flip0:!!i,flip:!!i,
+      anim:"idle",t0:c,flash0:-1e6,hp:eng.f[i].hp,dh:eng.f[i].hp,lastHp:eng.f[i].hp,
+      hit0:-1e6,max:eng.f[i].max,win:false,air:0,wpn:null,scale:br.scale||1,st:{},pet:false
+    });
+    const V=[pv,boss].map(mk);
+    const P=V.map((v,i)=>{
+      const cp=v.b.companion; if(!cp) return null;
+      const hx=v.bx+(i?54:-54);
+      return {pet:true,i,owner:v.b,key:cp.species+":"+(cp.form||1),x:hx,hx,y:v.y+2,flip:v.flip0,flip0:v.flip0,anim:"idle",t0:c,flash0:-1e6,win:false,air:0};
+    }).filter(Boolean);
+    const dom=[];
+    const mountUnit=(f,idx,isPet)=>{
+      const el=document.createElement("div");
+      el.className="arena-unit"+(isPet?" is-pet":"")+(idx>0?" is-enemy":"");
+      const cv=document.createElement("canvas");
+      cv.width=64; cv.height=64;
+      const ctx=cv.getContext("2d");
+      ctx.imageSmoothingEnabled=false;
+      el.appendChild(cv);
+      if(!isPet){
+        const oh=document.createElement("div");
+        oh.className="arena-overhead";
+        oh.innerHTML=`<div class="arena-badges"></div><div class="arena-tag">${f.name} <small>Niv.${f.b.level||1}</small></div><div class="arena-hpbar"><i class="dh" style="width:100%"></i><i class="hp" style="width:100%"></i></div>`;
+        el.appendChild(oh);
+        f._domDh=oh.querySelector(".dh");
+        f._domHp=oh.querySelector(".hp");
+        f._domBadges=oh.querySelector(".arena-badges");
+      }
+      this.field.appendChild(el);
+      dom.push(el);
+      f._domEl=el; f._domCv=cv; f._domCtx=ctx;
+    };
+    V.forEach((f,k)=>mountUnit(f,k,false));
+    P.forEach(p=>mountUnit(p,p.i,true));
+    this.duel={eng,V,P,q,fl:[],vfx:[],proj:null,ph:{k:"intro",t:c+500},dom};
+    this.spawnFloatingLoot(`⚠️ DUEL BOSS VAGUE ${this.wave} !`,"#ff6b6b");
+    this.syncBossDuel(c);
+  },
+  stepBossDuel(dt){
+    const D=this.duel; if(!D) return;
+    const c=renderer.clock, p=D.ph;
+    if(!p){ this.syncBossDuel(c); return; }
+    if(p.k==="intro"){
+      if(c>=p.t) this.nextDuelTurn(c);
+      this.syncBossDuel(c); return;
+    }
+    if(p.k==="end"){
+      if(c>=p.t) this.endBossDuel();
+      else this.syncBossDuel(c);
+      return;
+    }
+    const e=c-p.t0, a=D.V[p.i], d=D.V[p.j];
+    if(p.kind==="pet"){
+      const pt=p.pt;
+      if(!pt){ this.afterDuelTurn(c); this.syncBossDuel(c); return; }
+      a.anim=e<550?"whistle":"idle";
+      if(e<350) pt.anim="idle";
+      else if(e<750){ pt.x=pt.hx+(p.tx-pt.hx)*(e-350)/400; pt.flip=pt.flip0; pt.anim="run"; }
+      else if(e<1050){
+        pt.x=p.tx; pt.anim="bite";
+        if(!p.hit){ p.hit=1; this.applyDuelEvents(p,c); }
+      } else if(e<1400){ pt.x=p.tx+(pt.hx-p.tx)*(e-1050)/350; pt.flip=!pt.flip0; pt.anim="run"; }
+      else { pt.x=pt.hx; pt.flip=pt.flip0; pt.anim="idle"; this.afterDuelTurn(c); }
+      this.syncBossDuel(c); return;
+    }
+    const T=p.T;
+    if(!p.hit && e>=p.h){ p.hit=1; this.applyDuelEvents(p,c); }
+    if(p.ranged && e>=p.rel && e<p.h){
+      a.wpn=null;
+      if(!D.proj && p.wicon){
+        D.proj={ic:p.wicon,id:p.wid,b:a.b,x0:a.bx+(p.i?-28:28),y0:a.y-48,x1:d.bx,y1:d.y-42,t0:p.t0+p.rel,t1:p.t0+p.h};
+      }
+    }
+    if(e<T[0]){
+      const k=T[0]>0?e/T[0]:1;
+      a.x=a.bx+(p.tx-a.bx)*(1-Math.pow(1-k,3));
+      a.air=p.jump?Math.sin(Math.PI*k)*p.jump:0;
+      a.flip=a.flip0; a.anim="dash";
+    } else if(e<T[1]){
+      a.x=p.tx; a.air=0; a.flip=a.flip0; a.anim=p.anim;
+    } else if(e<T[2]){
+      const rk=(e-T[1])/Math.max(1,T[2]-T[1]);
+      a.x=p.tx+(a.bx-p.tx)*rk;
+      a.air=Math.sin(Math.PI*rk)*12;
+      a.flip=!a.flip0; a.anim="dash";
+    } else {
+      const heldId=D.eng.f[p.i].held;
+      a.wpn=heldId!==null?{ic:DataEngine.WEAPONS[heldId].icon,id:heldId}:null;
+      a.x=a.bx; a.air=0; a.flip=a.flip0; a.anim="idle";
+      this.afterDuelTurn(c);
+    }
+    this.syncBossDuel(c);
+  },
+  nextDuelTurn(c){
+    const D=this.duel; if(!D) return;
+    D.q.length=0; D.eng.step(); D.proj=null;
+    D.eng.f.forEach((f,k)=>{ if(D.V[k]) D.V[k].st=JSON.parse(JSON.stringify(f.st)); });
+    const at=D.q[0], ev=D.q.slice(1), ht=ev.find(e=>e.type==="on_hit"), crit=!!(ht&&ht.crit);
+    const A=D.V[at.i], Dd=D.V[at.j], dir=at.i?-1:1;
+    let kind="punch";
+    if(at.pet) kind="pet";
+    else if(at.self) kind=at.skill?"self":"idle";
+    else if(at.weapon){
+      const wt=at.threwWpn?"throw":((DataEngine.WEAPONS[at.weapon.id]&&DataEngine.WEAPONS[at.weapon.id].type)||"light");
+      kind=crit?{light:"pierce",heavy:"meteor",throw:"salto"}[wt]:{light:"estoc",heavy:"overhead",throw:"throw"}[wt];
+    } else kind=crit?"uppercut":"punch";
+    const map={
+      punch:{anim:"punch",T:[170,520,700],h:340},
+      estoc:{anim:"thrust",T:[150,480,660],h:300},
+      overhead:{anim:"overhead",T:[210,600,790],h:400,jump:22},
+      throw:{anim:"throw",T:[0,540,700],h:400,rel:160,ranged:1},
+      uppercut:{anim:"uppercut",T:[200,580,760],h:380,jump:26},
+      pierce:{anim:"pierce",T:[140,500,680],h:280},
+      meteor:{anim:"meteor",T:[240,680,880],h:450,jump:36},
+      salto:{anim:"salto",T:[0,640,800],h:460,rel:280,ranged:1},
+      self:{anim:"taunt",T:[0,460,460],h:160},
+      idle:{anim:"idle",T:[0,360,360],h:100},
+      pet:{anim:"whistle",T:[0,1400,1400],h:750}
+    }[kind];
+    const dist=46, tx=map.ranged||at.self||kind==="pet"?(kind==="pet"?Dd.bx+(at.i?42:-42):A.bx):Dd.bx-dir*dist;
+    const heldId=D.eng.f[at.i].held;
+    if(at.weapon&&!at.pet) A.wpn={ic:at.weapon.icon,id:at.weapon.id};
+    else A.wpn=heldId!==null?{ic:DataEngine.WEAPONS[heldId].icon,id:heldId}:null;
+    D.ph=Object.assign({k:"act",kind,t0:c,i:at.i,j:at.j,ev,hit:0,tx,wicon:at.weapon&&at.weapon.icon,wid:at.weapon&&at.weapon.id,pt:kind==="pet"?D.P.find(p=>p.i===at.i):null},map);
+  },
+  applyDuelEvents(p,c){
+    const D=this.duel; if(!D) return;
+    const d=D.V[p.j];
+    for(const e of p.ev){
+      if(e.type==="on_hit"){
+        d.hp=e.hp; d.flash0=c; d.sx=1.2; d.sy=0.84; d.knock=(p.i?-1:1)*(e.crit?10:5);
+        d.anim="hit"; d.t0=c;
+        D.V[p.i].hp=e.hpA;
+        D.vfx.push({kind:"slash",x:d.bx,y:d.y-36,dir:p.i?-1:1,crit:!!e.crit,t0:c,dur:240});
+        if(e.crit) D.vfx.push({kind:"crit",x:d.bx,y:d.y,t0:c,dur:340});
+        D.fl.push({s:e.dmg>0?"-"+e.dmg:"Absorbé",x:d.bx,y:d.y-76,c0:c,col:e.crit?"#ffb000":"#ffffff",big:e.crit});
+      }
+      if(e.type==="on_dodge"){
+        d.knock=(p.i?-1:1)*10; d.air=10; d.anim="dodge"; d.t0=c;
+        D.fl.push({s:"Esquive",x:d.bx,y:d.y-76,c0:c,col:"#e8a830"});
+      }
+      if(e.type==="on_dot"){
+        const a=D.V[e.i]; a.hp=e.hpA; a.flash0=c;
+        D.fl.push({s:"-"+e.dmg,x:a.bx,y:a.y-76,c0:c,col:"#c58be0"});
+      }
+      if(e.type==="on_skill"){
+        const a=D.V[e.i], t=D.V[e.j];
+        if(e.hpA>a.hp) D.fl.push({s:"+"+(e.hpA-a.hp),x:a.bx,y:a.y-76,c0:c,col:"#9be15d"});
+        a.hp=e.hpA; t.hp=e.hp;
+        if(e.fl) D.fl.push({s:e.fl,x:a.bx,y:a.y-96,c0:c,col:"#ffd27a"});
+      }
+      if(e.type==="on_death"){
+        const dead=D.V[e.dead]; dead.anim="death"; dead.t0=c;
+        const pt=D.P.find(q=>q.i===e.dead); if(pt){ pt.anim="death"; pt.t0=c; }
+      }
+    }
+  },
+  afterDuelTurn(c){
+    const D=this.duel; if(!D) return;
+    if(D.eng.over){
+      const w=D.V[D.eng.winner]; w.win=true; w.anim="victory"; w.t0=c;
+    D.ph={k:"end",t:c+1000};
+} else {
+this.nextDuelTurn(c);
+}
+},
+  endBossDuel(){
+    const D=this.duel, b=S.cur; if(!D||!b) return;
+    const won=D.eng.winner===0, w=this.wave;
+    this.clearDuel();
+    if(won){
+      this.rollWaveLoot(w);
+      const bonusOr=Math.max(25,w*12);
+      GameState.ressources.or+=bonusOr;
+      if(w%20===0){
+        GameState.ressources.capsules=(GameState.ressources.capsules||0)+1;
+        this.spawnFloatingLoot(`🏆 BOSS V.${w} VAINCU : +${bonusOr} Or & +1 🥚 CAPSULE !`,"#5ef2ff");
+      } else {
+        GameState.ressources.parchemins+=1;
+        this.spawnFloatingLoot(`🏆 BOSS V.${w} VAINCU : +${bonusOr} Or & +1 📜 !`,"#ffd166");
+      }
+      if(w>=(b.afkWaveMax||1)) b.afkWaveMax=w+1;
+      if(this.pushMode){ this.wave=w+1; b.afkWave=this.wave; }
+    } else {
+      this.wallWave=w;
+      this.pushMode=false;
+      this.wave=Math.max(1,w-1);
+      b.afkWave=this.wave;
+      this.spawnFloatingLoot(`💀 Défaite Boss V.${w} (Farm V.${this.wave})`,"#ff6b6b");
+    }
+    GameState.save();
+    this.spawnWave();
+  },
+  syncBossDuel(c){
+    const D=this.duel; if(!D||!this.field) return;
+    const sw=this.field.clientWidth||800, sh=this.field.clientHeight||450;
+    [...D.V,...D.P].forEach(f=>{
+      if(!f._domEl||!f._domCtx) return;
+      const [an,n]=renderer.animFrame(f,c);
+      const wid=!f.pet&&f.wpn&&Number.isInteger(f.wpn.id)?f.wpn.id:null;
+      const ctx=f._domCtx;
+      if(f.pet) renderer.drawPet(ctx,f,an,n);
+      else renderer.drawBrute(ctx,f.b,c,an,n,wid);
+      const fl=Math.max(0,1-(c-f.flash0)/180);
+      if(fl>0){
+        ctx.globalCompositeOperation="source-atop";
+        ctx.fillStyle=`rgba(255,255,255,${fl})`;
+        ctx.fillRect(0,0,64,64);
+        ctx.globalCompositeOperation="source-over";
+      }
+      f.sx=f.sx===undefined?1:f.sx+(1-f.sx)*0.22;
+      f.sy=f.sy===undefined?1:f.sy+(1-f.sy)*0.22;
+      f.knock=f.knock===undefined?0:f.knock*0.80;
+      if(f.anim==="idle"&&f.air>0) f.air*=0.78;
+      const hop=(f.win?Math.abs(Math.sin(c/180))*8:0)+(f.air||0);
+      const px=((f.x+f.knock)/400)*sw;
+      const py=((188-f.y+hop)/225)*sh;
+      const sc=(f.scale||1)*(wid===10?1.34:1);
+      f._domEl.style.transform=`translate(${px.toFixed(1)}px,${py.toFixed(1)}px)`;
+      const fp=f.flip&&!f.win;
+      f._domCv.style.transform=`scale(${(fp?-1:1)*sc*f.sx},${sc*f.sy})`;
+if(!f.pet&&f._domHp){
+const dt=Math.min(60,Math.max(0,c-(f.pc===undefined?c:f.pc))); f.pc=c;
+if(f.lastHp===undefined) f.lastHp=f.hp;
+if(f.hp<f.lastHp) f.hit0=c;
+f.lastHp=f.hp;
+if(f.dh<f.hp) f.dh=f.hp; else if(c-f.hit0>450) f.dh+=(f.hp-f.dh)*Math.min(1,dt/260);
+if(f.dh-f.hp<.05) f.dh=f.hp;
+f._domHp.style.width=Math.max(0,Math.min(100,(f.hp/Math.max(1,f.max))*100)).toFixed(1)+"%";
+f._domDh.style.width=Math.max(0,Math.min(100,(f.dh/Math.max(1,f.max))*100)).toFixed(1)+"%";
+if(f._domBadges&&f.st&&f.hp>0){
+const st=f.st, bdg=[];
+if(st.stun>0) bdg.push("💫");
+if(st.shield>0) bdg.push("🛡️");
+if(st.block>0) bdg.push("🧱");
+if(st.dr) bdg.push("🔰");
+if(st.reflect) bdg.push("🪞");
+if(st.dodge) bdg.push("💨");
+if(st.spdUp>0) bdg.push("⚡");
+if(st.rage>0) bdg.push("💢");
+if(st.slow>0) bdg.push("❄️");
+if(st.accD) bdg.push("🌫️");
+if(st.dot&&st.dot.some(d=>d.n>0)) bdg.push("🩸");
+const sig=bdg.join("");
+if(f._lastSig!==sig){ f._lastSig=sig; f._domBadges.textContent=sig; }
+} else if(f._domBadges&&f._lastSig){ f._lastSig=""; f._domBadges.textContent=""; }
+}
+});
+const fxCv=$("#cv-afk-fx");
+if(fxCv){
+const ctx=fxCv.getContext("2d");
+renderer.drawArena(ctx,{V:D.V,P:[],fl:D.fl,vfx:D.vfx,proj:D.proj,pan:-1,fade:0,shake0:-1e6,preview:true},c);
+}
+}
 };
-
 /* ---------- Configuration des panneaux boss ---------- */
 /* Les fonds des panneaux sont configurés ici ; les planches de sprites restent sur chaque définition de boss. */
 const BOSS_MODES={
