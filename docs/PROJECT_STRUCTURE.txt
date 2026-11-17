@@ -86,6 +86,7 @@ C:.
 |   |   +---companion
 |   |   |   +---dummy
 |   |   |   |       background.jpg
+|   |   |   |       foreground.png
 |   |   |   |       
 |   |   |   +---empereur
 |   |   |   |       background.jpeg
@@ -642,47 +643,46 @@ C:.
 |       |       beetle.png
 |       |       bird.png
 |       |       bull.png
+|       |       cat.png
 |       |       dog.png
+|       |       eagle.png
+|       |       lizard.png
+|       |       ours.png
+|       |       racoon.png
+|       |       snake.png
 |       |       spectre.png
+|       |       wolf.png
 |       |       
 |       +---form-2
 |       |       aqua.png
 |       |       beetle.png
 |       |       bird.png
 |       |       bull.png
+|       |       cat.png
 |       |       dog.png
+|       |       eagle.png
+|       |       lizard.png
+|       |       ours.png
+|       |       racoon.png
+|       |       snake.png
 |       |       spectre.png
+|       |       wolf.png
 |       |       
 |       \---form-3
 |               aqua.png
 |               beetle.png
 |               bird.png
 |               bull.png
+|               cat.png
 |               dog.png
+|               eagle.png
+|               lizard.png
+|               ours.png
+|               racoon.png
+|               snake.png
 |               spectre.png
+|               wolf.png
 |               
-+---companion
-|   +---empereur
-|   |       image_f6603f04.jpg
-|   |       
-|   +---frankenstein
-|   |       image_f9788fbd.jpg
-|   |       
-|   +---general
-|   |       image_4ee21b13.jpg
-|   |       
-|   +---hazmat
-|   |       image_28a77d2c.jpg
-|   |       
-|   +---momie
-|   |       image_b48401da.jpg
-|   |       
-|   +---samourai
-|   |       image_319e839.jpg
-|   |       
-|   \---zeus
-|           image_aa95009f.jpg
-|           
 +---css
 |       character-select.css
 |       game-frame.css
@@ -792,6 +792,7 @@ C:.
 |   |   ezfzf.jpg
 |   |   greybox-weapons.png
 |   |   HXKyWz9W4AACUSf.jpg
+|   |   image_2e5a66bf-transparent.png
 |   |   image_3488da6e.jpeg
 |   |   image_3557a5b1.jpg
 |   |   image_6d6b5f1a.jpeg
@@ -1765,6 +1766,35 @@ C:.
 |   |               wpn-8.png
 |   |               wpn-9.png
 |   |               
+|   +---backup_companion_backgrounds
+|   |   +---empereur
+|   |   |       background.jpeg
+|   |   |       foreground.png
+|   |   |       
+|   |   +---frankenstein
+|   |   |       background.jpeg
+|   |   |       foreground.png
+|   |   |       
+|   |   +---general
+|   |   |       background.jpeg
+|   |   |       foreground.png
+|   |   |       
+|   |   +---hazmat
+|   |   |       background.jpeg
+|   |   |       foreground.png
+|   |   |       
+|   |   +---momie
+|   |   |       background.jpeg
+|   |   |       foreground.png
+|   |   |       
+|   |   +---samourai
+|   |   |       background.jpeg
+|   |   |       foreground.png
+|   |   |       
+|   |   \---zeus
+|   |           background.jpeg
+|   |           foreground.png
+|   |           
 |   +---boss
 |   |   |   image_207d3a66.jpeg
 |   |   |   
@@ -2197,6 +2227,13 @@ C:.
 |   |       ours-form-1.png
 |   |       ours-form-2.png
 |   |       ours-form-3.png
+|   |       prompt_cat.txt
+|   |       prompt_eagle.txt
+|   |       prompt_lizard.txt
+|   |       prompt_loup.txt
+|   |       prompt_ours.txt
+|   |       prompt_racoon.txt
+|   |       prompt_snake.txt
 |   |       racoon-form-1.png
 |   |       racoon-form-2.png
 |   |       racoon-form-3.png
