@@ -163,7 +163,6 @@ function toggleDevMode() {
 
   GameFrame.mount(p);
   if (typeof DevLayoutManager !== "undefined") DevLayoutManager.mountAll(p);
-  updateRackPositionExport();
 
   const button = $("#afk-dev-toggle");
   if (button) {

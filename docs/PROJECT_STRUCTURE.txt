@@ -2,6 +2,7 @@ Structure du dossier
 Le numéro de série du volume est 8455-7515
 C:.
 |   .gitattributes
+|   index - Copie.html
 |   index.hmtl.txt
 |   index.html
 |   
@@ -259,24 +260,136 @@ C:.
 |   +---characters
 |   |   +---dummy
 |   |   |   +---sheets
-|   |   |   |       image_b40db9e2.jpg
-|   |   |   |       image_e12d10bf.jpg
-|   |   |   |       sheet-1.png
-|   |   |   |       sheet-2.png
-|   |   |   |       sheet-3.png
-|   |   |   |       sheet-4.png
-|   |   |   |       w.png
-|   |   |   |       wpn-0.png
-|   |   |   |       wpn-1.png
-|   |   |   |       wpn-10.png
-|   |   |   |       wpn-2.png
-|   |   |   |       wpn-3.png
-|   |   |   |       wpn-4.png
-|   |   |   |       wpn-5.png
-|   |   |   |       wpn-6.png
-|   |   |   |       wpn-7.png
-|   |   |   |       
+|   |   |   |   |   bon.png
+|   |   |   |   |   image_b40db9e2.jpg
+|   |   |   |   |   image_e12d10bf.jpg
+|   |   |   |   |   sheet-1.png
+|   |   |   |   |   sheet-2.png
+|   |   |   |   |   sheet-3.png
+|   |   |   |   |   sheet-4.png
+|   |   |   |   |   w.png
+|   |   |   |   |   wpn-0.png
+|   |   |   |   |   wpn-1.png
+|   |   |   |   |   wpn-10.png
+|   |   |   |   |   wpn-2.png
+|   |   |   |   |   wpn-3.png
+|   |   |   |   |   wpn-4.png
+|   |   |   |   |   wpn-5.png
+|   |   |   |   |   wpn-6.png
+|   |   |   |   |   wpn-7.jpg
+|   |   |   |   |   wpn-7.png
+|   |   |   |   |   
+|   |   |   |   +---00_sword
+|   |   |   |   |       atk.png
+|   |   |   |   |       base.png
+|   |   |   |   |       crit.png
+|   |   |   |   |       image_3211e4fc.jpg
+|   |   |   |   |       image_fd46b5bd.jpg
+|   |   |   |   |       
+|   |   |   |   +---01_dagger
+|   |   |   |   |       atk.png
+|   |   |   |   |       base.png
+|   |   |   |   |       crit.png
+|   |   |   |   |       image_543333ae.jpg
+|   |   |   |   |       image_a8d963a5.jpg
+|   |   |   |   |       
+|   |   |   |   +---02_knife
+|   |   |   |   |       atk.png
+|   |   |   |   |       base.png
+|   |   |   |   |       crit.png
+|   |   |   |   |       image_7c76d59a-transparent.png
+|   |   |   |   |       image_7c76d59a.jpg
+|   |   |   |   |       image_87731312.jpg
+|   |   |   |   |       image_cb64d12f.jpg
+|   |   |   |   |       
+|   |   |   |   +---03_saw
+|   |   |   |   |       atk.png
+|   |   |   |   |       base.png
+|   |   |   |   |       crit.png
+|   |   |   |   |       image_1e3e3e64.jpg
+|   |   |   |   |       image_2fec0262.jpg
+|   |   |   |   |       image_4ed38b83.jpg
+|   |   |   |   |       
+|   |   |   |   +---04_axe
+|   |   |   |   |       atk.png
+|   |   |   |   |       base.png
+|   |   |   |   |       crit.png
+|   |   |   |   |       image_2868d9e8.jpg
+|   |   |   |   |       image_39921092.jpg
+|   |   |   |   |       image_6053fd41.jpg
+|   |   |   |   |       
+|   |   |   |   +---05_hammer
+|   |   |   |   |       atk.png
+|   |   |   |   |       base.png
+|   |   |   |   |       crit.png
+|   |   |   |   |       image_33a5058.jpg
+|   |   |   |   |       image_3b856651.jpg
+|   |   |   |   |       image_870ac9e5.jpg
+|   |   |   |   |       image_cc9caf81.jpg
+|   |   |   |   |       
+|   |   |   |   +---06_pickaxe
+|   |   |   |   |       atk.png
+|   |   |   |   |       base.png
+|   |   |   |   |       crit.png
+|   |   |   |   |       image_c284dc6a.jpg
+|   |   |   |   |       image_dfda5e62.jpg
+|   |   |   |   |       image_f5bbdca5.jpg
+|   |   |   |   |       
+|   |   |   |   +---07_bone
+|   |   |   |   |       atk.png
+|   |   |   |   |       base.png
+|   |   |   |   |       crit.png
+|   |   |   |   |       image_6bb9f2a2.jpg
+|   |   |   |   |       image_c84959ec.jpg
+|   |   |   |   |       image_ea2e5ebe.jpg
+|   |   |   |   |       image_f7d30487.jpg
+|   |   |   |   |       
+|   |   |   |   +---08_boomerang
+|   |   |   |   |       atk.png
+|   |   |   |   |       base.png
+|   |   |   |   |       crit.png
+|   |   |   |   |       image_5347d33f.jpg
+|   |   |   |   |       image_5fa00921.jpg
+|   |   |   |   |       
+|   |   |   |   +---09_trident
+|   |   |   |   |       atk.png
+|   |   |   |   |       base.png
+|   |   |   |   |       crit.png
+|   |   |   |   |       image_cb5c240b.jpg
+|   |   |   |   |       image_d693dbfe.jpg
+|   |   |   |   |       
+|   |   |   |   +---10_pillar
+|   |   |   |   |       atk.png
+|   |   |   |   |       base.png
+|   |   |   |   |       crit.png
+|   |   |   |   |       image_58c23040.jpg
+|   |   |   |   |       image_5b0d061a.jpg
+|   |   |   |   |       image_66341951.jpg
+|   |   |   |   |       
+|   |   |   |   +---11_shuriken
+|   |   |   |   |       atk.png
+|   |   |   |   |       base.png
+|   |   |   |   |       crit.png
+|   |   |   |   |       image_a3968105.jpg
+|   |   |   |   |       image_e29449df.jpg
+|   |   |   |   |       
+|   |   |   |   +---12_grenade
+|   |   |   |   |       atk.png
+|   |   |   |   |       base.png
+|   |   |   |   |       crit.png
+|   |   |   |   |       image_46a3d8cf.jpg
+|   |   |   |   |       image_ea743f58.jpg
+|   |   |   |   |       
+|   |   |   |   \---13_molotov
+|   |   |   |           atk.png
+|   |   |   |           base.png
+|   |   |   |           crit.png
+|   |   |   |           image_79ecbaed.jpg
+|   |   |   |           image_b8597325.jpg
+|   |   |   |           
 |   |   |   \---weapons
+|   |   |           dummy_160.png
+|   |   |           row4_anchor_480x640.png
 |   |   |           weapon-1-transparent.png
 |   |   |           wpn-0.png
 |   |   |           wpn-1.png
@@ -295,19 +408,36 @@ C:.
 |   |   |           
 |   |   +---empereur
 |   |   |   +---sheets
-|   |   |   |       sheet-1.png
-|   |   |   |       sheet-2.png
-|   |   |   |       sheet-3.png
-|   |   |   |       sheet-4.png
-|   |   |   |       wpn-0.png
-|   |   |   |       wpn-1.png
-|   |   |   |       wpn-2.png
-|   |   |   |       wpn-3.png
-|   |   |   |       wpn-4.png
-|   |   |   |       wpn-5.png
-|   |   |   |       wpn-6.png
-|   |   |   |       wpn-7.png
-|   |   |   |       
+|   |   |   |   |   sheet-1.png
+|   |   |   |   |   sheet-2.png
+|   |   |   |   |   sheet-3.png
+|   |   |   |   |   sheet-4.png
+|   |   |   |   |   wpn-0.png
+|   |   |   |   |   wpn-1.png
+|   |   |   |   |   wpn-2.png
+|   |   |   |   |   wpn-3.png
+|   |   |   |   |   wpn-4.png
+|   |   |   |   |   wpn-5.png
+|   |   |   |   |   wpn-6.png
+|   |   |   |   |   wpn-7.png
+|   |   |   |   |   
+|   |   |   |   +---00_sword
+|   |   |   |   +---01_dagger
+|   |   |   |   +---02_knife
+|   |   |   |   +---03_saw
+|   |   |   |   +---04_axe
+|   |   |   |   +---05_hammer
+|   |   |   |   +---06_pickaxe
+|   |   |   |   +---07_bone
+|   |   |   |   |       bone_atk.png
+|   |   |   |   |       bone_crit.png
+|   |   |   |   |       
+|   |   |   |   +---08_boomerang
+|   |   |   |   +---09_bow
+|   |   |   |   +---10_trident
+|   |   |   |   +---11_pillar
+|   |   |   |   +---12_shuriken
+|   |   |   |   \---13_grenade
 |   |   |   \---weapons
 |   |   |           weapon-1-transparent.png
 |   |   |           wpn-0.png
@@ -327,19 +457,36 @@ C:.
 |   |   |           
 |   |   +---frankenstein
 |   |   |   +---sheets
-|   |   |   |       sheet-1.png
-|   |   |   |       sheet-2.png
-|   |   |   |       sheet-3.png
-|   |   |   |       sheet-4.png
-|   |   |   |       wpn-0.png
-|   |   |   |       wpn-1.png
-|   |   |   |       wpn-2.png
-|   |   |   |       wpn-3.png
-|   |   |   |       wpn-4.png
-|   |   |   |       wpn-5.png
-|   |   |   |       wpn-6.png
-|   |   |   |       wpn-7.png
-|   |   |   |       
+|   |   |   |   |   sheet-1.png
+|   |   |   |   |   sheet-2.png
+|   |   |   |   |   sheet-3.png
+|   |   |   |   |   sheet-4.png
+|   |   |   |   |   wpn-0.png
+|   |   |   |   |   wpn-1.png
+|   |   |   |   |   wpn-2.png
+|   |   |   |   |   wpn-3.png
+|   |   |   |   |   wpn-4.png
+|   |   |   |   |   wpn-5.png
+|   |   |   |   |   wpn-6.png
+|   |   |   |   |   wpn-7.png
+|   |   |   |   |   
+|   |   |   |   +---00_sword
+|   |   |   |   +---01_dagger
+|   |   |   |   +---02_knife
+|   |   |   |   +---03_saw
+|   |   |   |   +---04_axe
+|   |   |   |   +---05_hammer
+|   |   |   |   +---06_pickaxe
+|   |   |   |   +---07_bone
+|   |   |   |   |       bone_atk.png
+|   |   |   |   |       bone_crit.png
+|   |   |   |   |       
+|   |   |   |   +---08_boomerang
+|   |   |   |   +---09_bow
+|   |   |   |   +---10_trident
+|   |   |   |   +---11_pillar
+|   |   |   |   +---12_shuriken
+|   |   |   |   \---13_grenade
 |   |   |   \---weapons
 |   |   |           weapon-1-transparent.png
 |   |   |           wpn-0.png
@@ -373,37 +520,71 @@ C:.
 |   |   |   |       wpn-7.png
 |   |   |   |       
 |   |   |   \---weapons
-|   |   |           weapon-1-transparent.png
-|   |   |           wpn-0.png
-|   |   |           wpn-1.png
-|   |   |           wpn-10.png
-|   |   |           wpn-11.png
-|   |   |           wpn-12.png
-|   |   |           wpn-13.png
-|   |   |           wpn-2.png
-|   |   |           wpn-3.png
-|   |   |           wpn-4.png
-|   |   |           wpn-5.png
-|   |   |           wpn-6.png
-|   |   |           wpn-7.png
-|   |   |           wpn-8.png
-|   |   |           wpn-9.png
-|   |   |           
+|   |   |       |   weapon-1-transparent.png
+|   |   |       |   wpn-0.png
+|   |   |       |   wpn-1.png
+|   |   |       |   wpn-10.png
+|   |   |       |   wpn-11.png
+|   |   |       |   wpn-12.png
+|   |   |       |   wpn-13.png
+|   |   |       |   wpn-2.png
+|   |   |       |   wpn-3.png
+|   |   |       |   wpn-4.png
+|   |   |       |   wpn-5.png
+|   |   |       |   wpn-6.png
+|   |   |       |   wpn-7.png
+|   |   |       |   wpn-8.png
+|   |   |       |   wpn-9.png
+|   |   |       |   
+|   |   |       +---00_sword
+|   |   |       +---01_dagger
+|   |   |       +---02_knife
+|   |   |       +---03_saw
+|   |   |       +---04_axe
+|   |   |       +---05_hammer
+|   |   |       +---06_pickaxe
+|   |   |       +---07_bone
+|   |   |       |       bone_atk.png
+|   |   |       |       bone_crit.png
+|   |   |       |       
+|   |   |       +---08_boomerang
+|   |   |       +---09_bow
+|   |   |       +---10_trident
+|   |   |       +---11_pillar
+|   |   |       +---12_shuriken
+|   |   |       \---13_grenade
 |   |   +---hazmat
 |   |   |   +---sheets
-|   |   |   |       sheet-1.png
-|   |   |   |       sheet-2.png
-|   |   |   |       sheet-3.png
-|   |   |   |       sheet-4.png
-|   |   |   |       wpn-0.png
-|   |   |   |       wpn-1.png
-|   |   |   |       wpn-2.png
-|   |   |   |       wpn-3.png
-|   |   |   |       wpn-4.png
-|   |   |   |       wpn-5.png
-|   |   |   |       wpn-6.png
-|   |   |   |       wpn-7.png
-|   |   |   |       
+|   |   |   |   |   sheet-1.png
+|   |   |   |   |   sheet-2.png
+|   |   |   |   |   sheet-3.png
+|   |   |   |   |   sheet-4.png
+|   |   |   |   |   wpn-0.png
+|   |   |   |   |   wpn-1.png
+|   |   |   |   |   wpn-2.png
+|   |   |   |   |   wpn-3.png
+|   |   |   |   |   wpn-4.png
+|   |   |   |   |   wpn-5.png
+|   |   |   |   |   wpn-6.png
+|   |   |   |   |   wpn-7.png
+|   |   |   |   |   
+|   |   |   |   +---00_sword
+|   |   |   |   +---01_dagger
+|   |   |   |   +---02_knife
+|   |   |   |   +---03_saw
+|   |   |   |   +---04_axe
+|   |   |   |   +---05_hammer
+|   |   |   |   +---06_pickaxe
+|   |   |   |   +---07_bone
+|   |   |   |   |       bone_atk.png
+|   |   |   |   |       bone_crit.png
+|   |   |   |   |       
+|   |   |   |   +---08_boomerang
+|   |   |   |   +---09_bow
+|   |   |   |   +---10_trident
+|   |   |   |   +---11_pillar
+|   |   |   |   +---12_shuriken
+|   |   |   |   \---13_grenade
 |   |   |   \---weapons
 |   |   |           weapon-1-transparent.png
 |   |   |           wpn-0.png
@@ -423,19 +604,36 @@ C:.
 |   |   |           
 |   |   +---human
 |   |   |   +---sheets
-|   |   |   |       sheet-1.png
-|   |   |   |       sheet-2.png
-|   |   |   |       sheet-3.png
-|   |   |   |       sheet-4.png
-|   |   |   |       wpn-0.png
-|   |   |   |       wpn-1.png
-|   |   |   |       wpn-2.png
-|   |   |   |       wpn-3.png
-|   |   |   |       wpn-4.png
-|   |   |   |       wpn-5.png
-|   |   |   |       wpn-6.png
-|   |   |   |       wpn-7.png
-|   |   |   |       
+|   |   |   |   |   sheet-1.png
+|   |   |   |   |   sheet-2.png
+|   |   |   |   |   sheet-3.png
+|   |   |   |   |   sheet-4.png
+|   |   |   |   |   wpn-0.png
+|   |   |   |   |   wpn-1.png
+|   |   |   |   |   wpn-2.png
+|   |   |   |   |   wpn-3.png
+|   |   |   |   |   wpn-4.png
+|   |   |   |   |   wpn-5.png
+|   |   |   |   |   wpn-6.png
+|   |   |   |   |   wpn-7.png
+|   |   |   |   |   
+|   |   |   |   +---00_sword
+|   |   |   |   +---01_dagger
+|   |   |   |   +---02_knife
+|   |   |   |   +---03_saw
+|   |   |   |   +---04_axe
+|   |   |   |   +---05_hammer
+|   |   |   |   +---06_pickaxe
+|   |   |   |   +---07_bone
+|   |   |   |   |       bone_atk.png
+|   |   |   |   |       bone_crit.png
+|   |   |   |   |       
+|   |   |   |   +---08_boomerang
+|   |   |   |   +---09_bow
+|   |   |   |   +---10_trident
+|   |   |   |   +---11_pillar
+|   |   |   |   +---12_shuriken
+|   |   |   |   \---13_grenade
 |   |   |   \---weapons
 |   |   |           weapon-1-transparent.png
 |   |   |           weapon-1.jpeg
@@ -460,19 +658,36 @@ C:.
 |   |   |           
 |   |   +---inversebrah
 |   |   |   +---sheets
-|   |   |   |       sheet-1.png
-|   |   |   |       sheet-2.png
-|   |   |   |       sheet-3.png
-|   |   |   |       sheet-4.png
-|   |   |   |       wpn-0.png
-|   |   |   |       wpn-1.png
-|   |   |   |       wpn-2.png
-|   |   |   |       wpn-3.png
-|   |   |   |       wpn-4.png
-|   |   |   |       wpn-5.png
-|   |   |   |       wpn-6.png
-|   |   |   |       wpn-7.png
-|   |   |   |       
+|   |   |   |   |   sheet-1.png
+|   |   |   |   |   sheet-2.png
+|   |   |   |   |   sheet-3.png
+|   |   |   |   |   sheet-4.png
+|   |   |   |   |   wpn-0.png
+|   |   |   |   |   wpn-1.png
+|   |   |   |   |   wpn-2.png
+|   |   |   |   |   wpn-3.png
+|   |   |   |   |   wpn-4.png
+|   |   |   |   |   wpn-5.png
+|   |   |   |   |   wpn-6.png
+|   |   |   |   |   wpn-7.png
+|   |   |   |   |   
+|   |   |   |   +---00_sword
+|   |   |   |   +---01_dagger
+|   |   |   |   +---02_knife
+|   |   |   |   +---03_saw
+|   |   |   |   +---04_axe
+|   |   |   |   +---05_hammer
+|   |   |   |   +---06_pickaxe
+|   |   |   |   +---07_bone
+|   |   |   |   |       bone_atk.png
+|   |   |   |   |       bone_crit.png
+|   |   |   |   |       
+|   |   |   |   +---08_boomerang
+|   |   |   |   +---09_bow
+|   |   |   |   +---10_trident
+|   |   |   |   +---11_pillar
+|   |   |   |   +---12_shuriken
+|   |   |   |   \---13_grenade
 |   |   |   \---weapons
 |   |   |           weapon-1-transparent.png
 |   |   |           weapon-1.jpeg
@@ -499,19 +714,36 @@ C:.
 |   |   |           
 |   |   +---momie
 |   |   |   +---sheets
-|   |   |   |       sheet-1.png
-|   |   |   |       sheet-2.png
-|   |   |   |       sheet-3.png
-|   |   |   |       sheet-4.png
-|   |   |   |       wpn-0.png
-|   |   |   |       wpn-1.png
-|   |   |   |       wpn-2.png
-|   |   |   |       wpn-3.png
-|   |   |   |       wpn-4.png
-|   |   |   |       wpn-5.png
-|   |   |   |       wpn-6.png
-|   |   |   |       wpn-7.png
-|   |   |   |       
+|   |   |   |   |   sheet-1.png
+|   |   |   |   |   sheet-2.png
+|   |   |   |   |   sheet-3.png
+|   |   |   |   |   sheet-4.png
+|   |   |   |   |   wpn-0.png
+|   |   |   |   |   wpn-1.png
+|   |   |   |   |   wpn-2.png
+|   |   |   |   |   wpn-3.png
+|   |   |   |   |   wpn-4.png
+|   |   |   |   |   wpn-5.png
+|   |   |   |   |   wpn-6.png
+|   |   |   |   |   wpn-7.png
+|   |   |   |   |   
+|   |   |   |   +---00_sword
+|   |   |   |   +---01_dagger
+|   |   |   |   +---02_knife
+|   |   |   |   +---03_saw
+|   |   |   |   +---04_axe
+|   |   |   |   +---05_hammer
+|   |   |   |   +---06_pickaxe
+|   |   |   |   +---07_bone
+|   |   |   |   |       bone_atk.png
+|   |   |   |   |       bone_crit.png
+|   |   |   |   |       
+|   |   |   |   +---08_boomerang
+|   |   |   |   +---09_bow
+|   |   |   |   +---10_trident
+|   |   |   |   +---11_pillar
+|   |   |   |   +---12_shuriken
+|   |   |   |   \---13_grenade
 |   |   |   \---weapons
 |   |   |           weapon-1-transparent.png
 |   |   |           wpn-0.png
@@ -531,19 +763,36 @@ C:.
 |   |   |           
 |   |   +---samourai
 |   |   |   +---sheets
-|   |   |   |       sheet-1.png
-|   |   |   |       sheet-2.png
-|   |   |   |       sheet-3.png
-|   |   |   |       sheet-4.png
-|   |   |   |       wpn-0.png
-|   |   |   |       wpn-1.png
-|   |   |   |       wpn-2.png
-|   |   |   |       wpn-3.png
-|   |   |   |       wpn-4.png
-|   |   |   |       wpn-5.png
-|   |   |   |       wpn-6.png
-|   |   |   |       wpn-7.png
-|   |   |   |       
+|   |   |   |   |   sheet-1.png
+|   |   |   |   |   sheet-2.png
+|   |   |   |   |   sheet-3.png
+|   |   |   |   |   sheet-4.png
+|   |   |   |   |   wpn-0.png
+|   |   |   |   |   wpn-1.png
+|   |   |   |   |   wpn-2.png
+|   |   |   |   |   wpn-3.png
+|   |   |   |   |   wpn-4.png
+|   |   |   |   |   wpn-5.png
+|   |   |   |   |   wpn-6.png
+|   |   |   |   |   wpn-7.png
+|   |   |   |   |   
+|   |   |   |   +---00_sword
+|   |   |   |   +---01_dagger
+|   |   |   |   +---02_knife
+|   |   |   |   +---03_saw
+|   |   |   |   +---04_axe
+|   |   |   |   +---05_hammer
+|   |   |   |   +---06_pickaxe
+|   |   |   |   +---07_bone
+|   |   |   |   |       bone_atk.png
+|   |   |   |   |       bone_crit.png
+|   |   |   |   |       
+|   |   |   |   +---08_boomerang
+|   |   |   |   +---09_bow
+|   |   |   |   +---10_trident
+|   |   |   |   +---11_pillar
+|   |   |   |   +---12_shuriken
+|   |   |   |   \---13_grenade
 |   |   |   \---weapons
 |   |   |           weapon-1-transparent.png
 |   |   |           wpn-0.png
@@ -563,19 +812,36 @@ C:.
 |   |   |           
 |   |   \---zeus
 |   |       +---sheets
-|   |       |       sheet-1.png
-|   |       |       sheet-2.png
-|   |       |       sheet-3.png
-|   |       |       sheet-4.png
-|   |       |       wpn-0.png
-|   |       |       wpn-1.png
-|   |       |       wpn-2.png
-|   |       |       wpn-3.png
-|   |       |       wpn-4.png
-|   |       |       wpn-5.png
-|   |       |       wpn-6.png
-|   |       |       wpn-7.png
-|   |       |       
+|   |       |   |   sheet-1.png
+|   |       |   |   sheet-2.png
+|   |       |   |   sheet-3.png
+|   |       |   |   sheet-4.png
+|   |       |   |   wpn-0.png
+|   |       |   |   wpn-1.png
+|   |       |   |   wpn-2.png
+|   |       |   |   wpn-3.png
+|   |       |   |   wpn-4.png
+|   |       |   |   wpn-5.png
+|   |       |   |   wpn-6.png
+|   |       |   |   wpn-7.png
+|   |       |   |   
+|   |       |   +---00_sword
+|   |       |   +---01_dagger
+|   |       |   +---02_knife
+|   |       |   +---03_saw
+|   |       |   +---04_axe
+|   |       |   +---05_hammer
+|   |       |   +---06_pickaxe
+|   |       |   +---07_bone
+|   |       |   |       bone_atk.png
+|   |       |   |       bone_crit.png
+|   |       |   |       
+|   |       |   +---08_boomerang
+|   |       |   +---09_bow
+|   |       |   +---10_trident
+|   |       |   +---11_pillar
+|   |       |   +---12_shuriken
+|   |       |   \---13_grenade
 |   |       \---weapons
 |   |               sheet-1.png
 |   |               weapon-1-transparent.png
@@ -774,6 +1040,7 @@ C:.
 |   |       pvp.js
 |   |       raids.js
 |   |       simulateur.js
+|   |       TESTEIHAOEI.js
 |   |       
 |   \---ui
 |           armurerie.js

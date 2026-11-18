@@ -184,13 +184,16 @@ const TRAIN={
       if(!this.paused) this.clock+=dt*this.mult;
       const F=this.F, D=this.D, el=this.clock-F.t0, loopOn=$("#tr-auto").checked, isCrit=["uppercut","pierce","meteor","salto"].includes(this.cur), isMelee=["punch","thrust","overhead","uppercut","pierce","meteor"].includes(this.cur), isThrow=["throw","salto"].includes(this.cur);
       const wid=F.wpn?F.wpn.id:-1, fxSet=this.WPN_FX[wid]||this.WPN_FX["-1"], fx=isCrit?fxSet.crit:fxSet.atk;
-      const A=CanvasRenderer.ANIMS[this.cur]||CanvasRenderer.ANIMS.idle, L=A.f?A.f.length:4, animDur=fx.dur||Math.max(400,Math.round(L/A.fps*1000));
-      if(isMelee && $("#tr-dummy").checked){
-        const tx=F.flip0?D.bx+fx.dist:D.bx-fx.dist, dashT=fx.dashT, hitEnd=dashT+animDur, backEnd=hitEnd+180;
-        if(el<dashT){ const k=el/dashT; F.x=F.bx+(tx-F.bx)*k; F.air=fx.air?Math.sin(Math.PI*k)*fx.air:0; F.anim="dash"; F.flip=F.flip0; if(isCrit&&el<40) F.flash0=this.clock; }
+      const pInfo=wid>=0&&renderer.panoInfo?renderer.panoInfo(F.b.sprite,wid):null;
+      const hasPano=!!pInfo, isThrowPano=!!(pInfo&&pInfo.ranged);
+      const dist=pInfo?(isCrit?pInfo.critDist:pInfo.dist):fx.dist;
+      const A=CanvasRenderer.ANIMS[this.cur]||CanvasRenderer.ANIMS.idle, L=A.f?A.f.length:4, animDur=hasPano?520:(fx.dur||Math.max(400,Math.round(L/A.fps*1000)));
+      if((isMelee||isThrowPano) && $("#tr-dummy").checked){
+        const tx=F.flip0?D.bx+dist:D.bx-dist, dashT=isThrowPano?200:fx.dashT, hitEnd=dashT+animDur, backEnd=hitEnd+180;
+        if(el<dashT){ const k=el/dashT; F.x=F.bx+(tx-F.bx)*k; F.air=(fx.air&&!hasPano)?Math.sin(Math.PI*k)*fx.air:0; F.anim="dash"; F.flip=F.flip0; if(isCrit&&el<40) F.flash0=this.clock; }
         else if(el<hitEnd){
           F.x=tx; F.air=0; F.flip=F.flip0;
-          if(F.anim!==this.cur){ F.anim=this.cur; this._hitStep=0; }
+          if(F.anim!==this.cur){ F.anim=this.cur; F.t0=this.clock-dashT; this._hitStep=0; }
           const step=Math.floor(((el-dashT)/animDur)*fx.hits)+1;
           if(step>this._hitStep && el>=dashT+animDur*0.35){
             this._hitStep=step; D.anim="hit"; D.t0=this.clock; D.flash0=this.clock; this.A.amp=fx.shake; this.A.shake0=this.clock;
@@ -210,7 +213,7 @@ const TRAIN={
         F.x=F.bx; F.flip=F.flip0;
         if(el<animDur){
           if(F.anim!==this.cur){ F.anim=this.cur; this._hitStep=0; }
-          if(el>=animDur*0.35&&F.wpn){ this.A.proj={ic:F.wpn.ic,id:F.wpn.id,b:F.b,x0:F.bx+(F.flip0?-28:28),y0:F.y-48,x1:D.bx,y1:D.y-42,t0:this.clock,t1:this.clock+260}; F.wpn=null; }
+          if(!hasPano&&el>=animDur*0.35&&F.wpn){ this.A.proj={ic:F.wpn.ic,id:F.wpn.id,b:F.b,x0:F.bx+(F.flip0?-28:28),y0:F.y-48,x1:D.bx,y1:D.y-42,t0:this.clock,t1:this.clock+260}; F.wpn=null; }
           if(!this._hitStep && el>=animDur*0.35+220){
             this._hitStep=1; D.anim="hit"; D.t0=this.clock; D.flash0=this.clock; this.A.amp=isCrit?12:5; this.A.shake0=this.clock;
             if(!this.A.vfx) this.A.vfx=[];
@@ -265,12 +268,13 @@ const TRAIN={
       const [an,n]=renderer.animFrame(f,c);
       const wid=f.wpn&&Number.isInteger(f.wpn.id)?f.wpn.id:null;
       const ctx=f._domCtx;
-      renderer.drawBrute(ctx,f.b,c,an,n,wid);
+      const animClock=(an==="idle"||an==="dash"||an==="victory")?c:Math.max(0,c-f.t0);
+      renderer.drawBrute(ctx,f.b,animClock,an,n,wid);
       const fl=Math.max(0,1-(c-f.flash0)/180);
       if(fl>0){
         ctx.globalCompositeOperation="source-atop";
         ctx.fillStyle=`rgba(255,255,255,${fl})`;
-        ctx.fillRect(0,0,64,64);
+        ctx.fillRect(0,0,f._domCv.width,f._domCv.height);
         ctx.globalCompositeOperation="source-over";
       }
       f.sx=f.sx===undefined?1:f.sx+(1-f.sx)*0.22;
@@ -279,8 +283,11 @@ const TRAIN={
       f.knock=f.knock===undefined?0:f.knock*0.80;
       const px=((f.x+f.knock)/400)*sw;
       const py=((188-f.y+(f.air||0))/225)*sh;
-      const sc=wid===10?1.34:1;
+      const ratio=f._domCv.width/Math.max(1,f._domCv.height), isPano=ratio>1.2;
+      const hasSubBase=wid===10&&f.b&&renderer.loadImg("assets/characters/"+f.b.sprite+"/sheets/10_pillar/base.png");
+      const sc=isPano?1.28:(wid===10&&!hasSubBase?1.34:1);
       f._domEl.style.transform=`translate(${px.toFixed(1)}px,${py.toFixed(1)}px)`;
+      f._domCv.style.transformOrigin=isPano?"17% 100%":"50% 100%";
       f._domCv.style.transform=`scale(${(f.flip?-1:1)*sc*f.sx},${sc*f.sy}) rotate(${f.rot}rad)`;
     });
   }

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<p>Select your Bone Club 4-row strip:</p>
+<input type="file" id="f" accept="image/*">
+<script>
+document.getElementById("f").onchange = e => {
+  const img = new Image();
+  img.onload = () => {
+    const sw = img.width;
+    const sh = Math.floor(img.height / 4);
+    const sy = sh * 3 + 4; // 4th row, skipping the black divider line
+    const cropH = sh - 6;
+
+    const tmp = document.createElement("canvas");
+    tmp.width = sw;
+    tmp.height = cropH;
+    const tctx = tmp.getContext("2d");
+    tctx.drawImage(img, 0, sy, sw, cropH, 0, 0, sw, cropH);
+
+    // Key out white/near-white background
+    const id = tctx.getImageData(0, 0, sw, cropH), px = id.data;
+    for (let i = 0; i < px.length; i += 4) {
+      if (px[i] > 235 && px[i + 1] > 235 && px[i + 2] > 235) px[i + 3] = 0;
+    }
+    tctx.putImageData(id, 0, 0);
+
+    // Output 480x640 (4 rows of 480x160) on pure #FF00FF magenta
+    const cv = document.createElement("canvas");
+    cv.width = 480;
+    cv.height = 640;
+    const ctx = cv.getContext("2d");
+    ctx.imageSmoothingEnabled = false;
+    ctx.fillStyle = "#FF00FF";
+    ctx.fillRect(0, 0, 480, 640);
+
+    const scale = Math.min(480 / sw, 148 / cropH);
+    const dw = Math.round(sw * scale);
+    const dh = Math.round(cropH * scale);
+
+    for (let r = 0; r < 4; r++) {
+      ctx.drawImage(tmp, 0, 0, sw, cropH, 0, r * 160 + (154 - dh), dw, dh);
+    }
+
+    const a = document.createElement("a");
+    a.download = "row4_anchor_480x640.png";
+    a.href = cv.toDataURL();
+    a.click();
+  };
+  img.src = URL.createObjectURL(e.target.files.item(0));
+};
+</script>

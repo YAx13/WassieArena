@@ -360,23 +360,27 @@ const Combat={
     else kind=crit?"uppercut":"punch";
     const baseK=this.K[kind]||this.K.idle;
     const widKey=at.weapon?at.weapon.id:-1, fxSet=this.WPN_FX[widKey]||this.WPN_FX["-1"], fx=crit?fxSet.crit:fxSet.atk;
-    const dist=fx.dist||46, isMelee=!baseK.ranged&&kind!=="pet"&&!at.self;
+    const pInfo=at.weapon&&renderer.panoInfo?renderer.panoInfo(A.b.sprite,at.weapon.id):null;
+    const hasPano=!!pInfo, isThrowPano=!!(pInfo&&pInfo.ranged);
+    const dist=pInfo?(crit?pInfo.critDist:pInfo.dist):(fx.dist||46);
+    const isMelee=(!baseK.ranged||isThrowPano)&&kind!=="pet"&&!at.self;
     const nextIdx=this.eng.f[0].next<=this.eng.f[1].next?0:1;
-    const stay=!this.eng.over&&isMelee&&!at.threwWpn&&nextIdx===at.i;
-    const inCombo=isMelee&&!at.threwWpn&&Math.abs(A.x-A.bx)>12;
+    const stay=!this.eng.over&&isMelee&&!at.threwWpn&&!isThrowPano&&nextIdx===at.i;
+    const inCombo=isMelee&&!at.threwWpn&&!isThrowPano&&Math.abs(A.x-A.bx)>12;
     const combo=inCombo?((this.ph&&this.ph.i===at.i?this.ph.combo:1)||1)+1:1;
-    const dashT=inCombo?0:fx.dashT;
-    const K=isMelee?Object.assign({},baseK,{T:[dashT,dashT+fx.dur,dashT+fx.dur+(stay?0:200)],h:dashT+Math.round(fx.dur*0.45),jump:inCombo?0:fx.air,amp:fx.shake,hits:fx.hits,freeze:fx.freeze}):baseK;
+    const dashT=inCombo?0:(isThrowPano?220:fx.dashT);
+    const atkDur=isThrowPano?520:fx.dur;
+    const K=isMelee?Object.assign({},baseK,{T:[dashT,dashT+atkDur,dashT+atkDur+(stay?0:200)],h:dashT+Math.round(atkDur*0.45),jump:(inCombo||hasPano)?0:fx.air,amp:fx.shake,hits:fx.hits,freeze:fx.freeze}):baseK;
     const heldId=this.eng.f[at.i].held;
-    const hasDrawAnim=!!(at.drewWpn&&at.weapon&&Number.isInteger(at.weapon.id)&&at.weapon.id>=0&&at.weapon.id<=13&&renderer.loadImg(DataEngine.spriteBase(A.b.sprite,at.weapon.id)));
+    const hasDrawAnim=!!(!hasPano&&at.drewWpn&&at.weapon&&Number.isInteger(at.weapon.id)&&at.weapon.id>=0&&at.weapon.id<=13&&renderer.loadImg(DataEngine.spriteBase(A.b.sprite,at.weapon.id)));
     const drawDelay=hasDrawAnim?240:0;
     const dropInfo=at.droppedWpn||null;
     const hasDropSheet=!!(dropInfo&&dropInfo.id>=0&&dropInfo.id<=13&&renderer.loadImg(DataEngine.spriteBase(A.b.sprite,dropInfo.id)));
     if(Math.abs(D.x-D.bx)>12){ D.x=D.bx; D.air=0; D.flip=D.flip0; }
     if((!isMelee||at.threwWpn)&&Math.abs(A.x-A.bx)>12){ A.x=A.bx; A.air=0; A.flip=A.flip0; }
-    const tx=K.ranged||at.self||kind==="pet"?(kind==="pet"?bx+(at.i?42:-42):A.bx):K.through?bx-dir*60:bx+(at.i?dist:-dist);
+    const tx=(K.ranged&&!isThrowPano)||at.self||kind==="pet"?(kind==="pet"?bx+(at.i?42:-42):A.bx):(K.through&&!hasPano)?bx-dir*60:bx+(at.i?dist:-dist);
     if(inCombo) A.x=tx;
-    this.ph={k:"act",kind,K,t0:c,drawDelay,dropInfo,hasDropSheet,i:at.i,j:at.j,ev,hit:0,hitStep:0,wicon:at.weapon&&at.weapon.icon,wid:at.weapon&&at.weapon.id,tx,stay,combo};
+    this.ph={k:"act",kind,K,t0:c,drawDelay,dropInfo,hasDropSheet,i:at.i,j:at.j,ev,hit:0,hitStep:0,wicon:at.weapon&&at.weapon.icon,wid:at.weapon&&at.weapon.id,tx,stay,combo,hasPano};
     this.amp=K.amp||5;
     if(dropInfo&&!at.drewWpn&&!at.threwWpn) A.wpn={ic:dropInfo.icon,id:dropInfo.id};
     else if(at.weapon&&!at.pet) A.wpn={ic:at.weapon.icon,id:at.weapon.id};
@@ -461,8 +465,8 @@ const Combat={
       this.impact(p,c);
     }
 
-    // Lancer de projectile
-    if(K.rel&&e>=K.rel&&e<K.h){
+    // Lancer de projectile (désactivé si planche panoramique dédiée)
+    if(K.rel&&!p.hasPano&&e>=K.rel&&e<K.h){
       a.wpn=null;
       if(!this.proj&&p.wicon) this.proj={ic:p.wicon,id:p.wid,b:a.b,x0:a.bx+(p.i?-28:28),y0:a.y-48,x1:d.bx,y1:d.y-42,t0:p.t0+p.drawDelay+K.rel,t1:p.t0+p.drawDelay+K.h};
     }
@@ -739,13 +743,14 @@ const Combat={
       const [an,n]=renderer.animFrame(f,c);
       const wid=!f.pet&&f.wpn&&Number.isInteger(f.wpn.id)?f.wpn.id:null;
       const ctx=f._domCtx;
+      const animClock=(an==="idle"||an==="dash"||an==="victory")?c:Math.max(0,c-f.t0);
       if(f.pet) renderer.drawPet(ctx,f,an,n);
-      else renderer.drawBrute(ctx,f.b,c,an,n,wid);
+      else renderer.drawBrute(ctx,f.b,animClock,an,n,wid);
       const fl=Math.max(0,1-(c-f.flash0)/180);
       if(fl>0){
         ctx.globalCompositeOperation="source-atop";
         ctx.fillStyle=`rgba(255,255,255,${fl})`;
-        ctx.fillRect(0,0,64,64);
+        ctx.fillRect(0,0,f._domCv.width,f._domCv.height);
         ctx.globalCompositeOperation="source-over";
       }
       f.sx=f.sx===undefined?1:f.sx+(1-f.sx)*0.22;
@@ -756,9 +761,12 @@ const Combat={
       const hop=(f.win?Math.abs(Math.sin(c/180))*8:0)+(f.air||0);
       const px=((f.x+f.knock+g.dx)/400)*sw;
       const py=((188-f.y+hop-g.dy)/225)*sh;
-      const sc=(f.scale||1)*g.scale*(wid===10?1.34:1);
+      const ratio=f._domCv.width/Math.max(1,f._domCv.height), isPano=ratio>1.2;
+      const hasSubBase=wid===10&&f.b&&renderer.loadImg("assets/characters/"+f.b.sprite+"/sheets/10_pillar/base.png");
+      const sc=(f.scale||1)*g.scale*(isPano?1.28:(wid===10&&!hasSubBase?1.34:1));
       f._domEl.style.transform=`translate(${px.toFixed(1)}px,${py.toFixed(1)}px)`;
       const fp=f.flip&&!f.win;
+      f._domCv.style.transformOrigin=isPano?"17% 100%":"50% 100%";
       f._domCv.style.transform=`scale(${(fp?-1:1)*sc*f.sx},${sc*f.sy}) rotate(${f.rot}rad)`;
       if(!f.pet&&!this.preview&&f._domHp){
         const dt=Math.min(60,Math.max(0,c-(f.pc===undefined?c:f.pc))); f.pc=c;

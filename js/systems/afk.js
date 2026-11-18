@@ -115,9 +115,16 @@ const AFKMode = {
       this.quickBarEl.remove();
       this.quickBarEl = null;
     }
+    if (this.wpnSelectorEl) {
+      this.wpnSelectorEl.remove();
+      this.wpnSelectorEl = null;
+    }
   },
 
   /* ---- Décor & Mise à l'échelle ---- */
+  measure() {
+    if (this.field) this.W = this.field.clientWidth || 300;
+  },
   fitStage() {
     const grid = $("#home-grid");
     if (!grid || !this.stage || !grid.clientWidth || !grid.clientHeight) return;
@@ -237,6 +244,9 @@ const AFKMode = {
     const eq = (GameState.competencesEquipees || []).filter(id => b.skills.includes(id));
     pv.skills = (eq.length ? eq : b.skills).slice(0, Math.max(1, b.slotsCompetences || 3));
 
+    const selWid = this.selectedWeaponId(b);
+    pv.weapons = selWid !== null && DataEngine.WEAPONS[selWid] ? new Array(selWid) : new Array();
+
     const opp = this.createOpponent(this.wave);
     const eng = new BattleEngine(pv, opp, ProfileManager.getBuffs());
     const q = [];
@@ -335,7 +345,7 @@ return;
 }
 const T = p.T;
 if (!p.hit && e >= p.h) { p.hit = 1; this.applyDuelEvents(p, c); }
-if (p.ranged && e >= p.rel && e < p.h) {
+if (p.ranged && !p.hasPano && e >= p.rel && e < p.h) {
 a.wpn = null;
 if (!D.proj && p.wicon) {
 D.proj = { ic: p.wicon, id: p.wid, b: a.b, x0: a.bx + (p.i ? -28 : 28), y0: a.y - 48, x1: d.bx, y1: d.y - 42, t0: p.t0 + p.rel, t1: p.t0 + p.h };
@@ -347,17 +357,20 @@ a.x = a.bx + (p.tx - a.bx) * (1 - Math.pow(1 - k, 3));
 a.air = p.jump ? Math.sin(Math.PI * k) * p.jump : 0;
 a.flip = a.flip0;
 a.anim = "dash";
-} else if (e < T[1]) {
-a.x = p.tx; a.air = 0; a.flip = a.flip0; a.anim = p.anim;
-} else if (e < T[2]) {
+    } else if (e < T.at(1)) {
+      if (a.anim !== p.anim) { a.anim = p.anim; a.t0 = p.t0 + T.at(0); }
+      a.x = p.tx; a.air = 0; a.flip = a.flip0;
+    } else if (e < T.at(2)) {
 const rk = (e - T[1]) / Math.max(1, T[2] - T[1]);
 a.x = p.tx + (a.bx - p.tx) * rk;
 a.air = Math.sin(Math.PI * rk) * 12;
 a.flip = !a.flip0;
 a.anim = "dash";
 } else {
-const heldId = D.eng.f[p.i].held;
-a.wpn = heldId !== null ? { ic: DataEngine.WEAPONS[heldId].icon, id: heldId } : null;
+const lockWid = p.i === 0 ? this.selectedWeaponId(S.cur) : null;
+const heldId = lockWid !== null ? lockWid : D.eng.f[p.i].held;
+if (p.i === 0 && D.eng.f && D.eng.f.at(0)) D.eng.f.at(0).held = lockWid;
+a.wpn = heldId !== null && DataEngine.WEAPONS[heldId] ? { ic: DataEngine.WEAPONS[heldId].icon, id: heldId } : null;
 a.x = a.bx; a.air = 0; a.flip = a.flip0; a.anim = "idle";
 this.afterDuelTurn(c);
 }
@@ -366,8 +379,24 @@ this.syncDuel(c);
 nextDuelTurn(c) {
 const D = this.duel;
 if (!D) return;
+const lockWid = this.selectedWeaponId(S.cur);
+if (D.eng.f && D.eng.f.at(0)) {
+  const validW = lockWid !== null && DataEngine.WEAPONS[lockWid] ? lockWid : null;
+  D.eng.f.at(0).held = validW;
+  D.eng.f.at(0).weapons = new Array();
+}
+if (D.eng.f && D.eng.f.at(1)) {
+  D.eng.f.at(1).weapons = (D.eng.f.at(1).weapons || new Array()).filter(id => Number.isInteger(id) && !!DataEngine.WEAPONS[id]);
+}
 D.q.length = 0;
-D.eng.step();
+try {
+  D.eng.step();
+} catch (err) {
+  D.eng.over = true;
+  D.eng.winner = 0;
+  this.afterDuelTurn(c);
+  return;
+}
 D.proj = null;
 D.eng.f.forEach((f, k) => { if (D.V[k]) D.V[k].st = JSON.parse(JSON.stringify(f.st)); });
 const at = D.q[0], ev = D.q.slice(1), ht = ev.find(e => e.type === "on_hit"), crit = !!(ht && ht.crit);
@@ -392,18 +421,23 @@ self:     { anim: "taunt",    T: new Array(0, 650, 650),    h: 240 },
 idle:     { anim: "idle",     T: new Array(0, 520, 520),    h: 180 },
 pet:      { anim: "whistle",  T: new Array(0, 1700, 1700),  h: 950 }
 }[kind];
-const tx = map.ranged || at.self || kind === "pet"
+const widNow = at.weapon ? at.weapon.id : (at.i === 0 ? lockWid : null);
+const pInfo = renderer.panoInfo ? renderer.panoInfo(A.b.sprite, widNow) : null;
+const hasPano = !!pInfo;
+const isThrowPano = !!(pInfo && pInfo.ranged);
+const reachDist = pInfo ? (crit ? pInfo.critDist : pInfo.dist) : 46;
+const tx = (map.ranged && !isThrowPano) || at.self || kind === "pet"
 ? (kind === "pet" ? Dd.bx + (at.i ? 42 : -42) : A.bx)
-: Dd.bx - dir * 46;
-const heldId = D.eng.f[at.i].held;
+: Dd.bx - dir * reachDist;
+const heldId = at.i === 0 && lockWid !== null ? lockWid : D.eng.f[at.i].held;
 A.wpn = at.weapon && !at.pet
 ? { ic: at.weapon.icon, id: at.weapon.id }
-: (heldId !== null ? { ic: DataEngine.WEAPONS[heldId].icon, id: heldId } : null);
+: (heldId !== null && DataEngine.WEAPONS[heldId] ? { ic: DataEngine.WEAPONS[heldId].icon, id: heldId } : null);
 D.ph = Object.assign({
-k: "act", kind, t0: c, i: at.i, j: at.j, ev, hit: 0, tx,
+k: "act", kind, t0: c, i: at.i, j: at.j, ev, hit: 0, tx, hasPano,
 wicon: at.weapon && at.weapon.icon, wid: at.weapon && at.weapon.id,
 pt: kind === "pet" ? D.P.find(p => p.i === at.i) : null
-}, map);
+}, map, hasPano ? { jump: 0 } : {});
 },
 applyDuelEvents(p, c) {
 const D = this.duel;
@@ -505,13 +539,17 @@ syncDuel(c) {
 const D = this.duel;
 if (!D || !this.field) return;
 const sw = this.field.clientWidth || 800, sh = this.field.clientHeight || 450;
-[...D.V, ...D.P].forEach(f => {
+const fallbackWid = this.selectedWeaponId(S.cur);
+[...D.V, ...D.P].forEach((f, idx) => {
 if (!f._domEl || !f._domCtx) return;
-const [an, n] = renderer.animFrame(f, c);
-const wid = !f.pet && f.wpn && Number.isInteger(f.wpn.id) ? f.wpn.id : null;
+let [an, n] = renderer.animFrame(f, c);
+if (!f.pet && idx === 0 && (an === "hit" || an === "dodge") && f.wpn) an = "idle";
+let wid = !f.pet && f.wpn && Number.isInteger(f.wpn.id) ? f.wpn.id : null;
+if (!f.pet && idx === 0 && wid === null && fallbackWid !== null) wid = fallbackWid;
 const ctx = f._domCtx;
+const animClock = (an === "idle" || an === "dash" || an === "victory") ? c : Math.max(0, c - f.t0);
 if (f.pet) renderer.drawPet(ctx, f, an, n);
-else renderer.drawBrute(ctx, f.b, c, an, n, wid);
+else renderer.drawBrute(ctx, f.b, animClock, an, n, wid);
 const fl = Math.max(0, 1 - (c - f.flash0) / 180);
 if (fl > 0) {
 ctx.globalCompositeOperation = "source-atop";
@@ -526,9 +564,13 @@ if (f.anim === "idle" && f.air > 0) f.air *= 0.78;
 const hop = (f.win ? Math.abs(Math.sin(c / 180)) * 8 : 0) + (f.air || 0);
 const px = ((f.x + f.knock) / 400) * sw;
 const py = ((188 - f.y + hop) / 225) * sh;
-const sc = (f.scale || 1) * (wid === 10 ? 1.34 : 1);
+const ratio = f._domCv.width / Math.max(1, f._domCv.height);
+const isPano = ratio > 1.2;
+const hasSubBase = wid === 10 && f.b && renderer.loadImg("assets/characters/" + f.b.sprite + "/sheets/10_pillar/base.png");
+const sc = (f.scale || 1) * (isPano ? 1.28 : (wid === 10 && !hasSubBase ? 1.34 : 1));
 f._domEl.style.transform = "translate(" + px.toFixed(1) + "px," + py.toFixed(1) + "px)";
 const fp = f.flip && !f.win;
+f._domCv.style.transformOrigin = isPano ? "17% 100%" : "50% 100%";
 f._domCv.style.transform = "scale(" + ((fp ? -1 : 1) * sc * f.sx) + "," + (sc * f.sy) + ")";
 if (!f.pet && f._domHp) {
 const dt = Math.min(60, Math.max(0, c - (f.pc === undefined ? c : f.pc)));
@@ -587,11 +629,97 @@ if (GameState.chargerPreset(n)) toast("Preset " + n + " équipé !");
 };
 });
 },
-hud() {
-const b = S.cur;
-if (!b) return;
-this.setBg(b);
-this.renderQuickBar();
+  unlockedWeapons(b = S.cur) {
+    if (!b || !Array.isArray(b.weapons)) return new Array();
+    return b.weapons.filter((id, i, a) => Number.isInteger(id) && id >= 0 && id < DataEngine.WEAPONS.length && a.indexOf(id) === i && !!DataEngine.WEAPONS[id]);
+  },
+  selectedWeaponId(b = S.cur) {
+    const list = this.unlockedWeapons(b);
+    if (!list.length) {
+      if (b) b.afkWeaponId = null;
+      return null;
+    }
+    if (b.afkWeaponId === null) return null;
+    if (Number.isInteger(b.afkWeaponId) && list.includes(b.afkWeaponId)) return b.afkWeaponId;
+    b.afkWeaponId = list.at(0);
+    return b.afkWeaponId;
+  },
+  cycleWeapon(dir) {
+    const b = S.cur, unlocked = this.unlockedWeapons(b);
+    if (!unlocked.length) return;
+    const list = new Array(null).concat(unlocked);
+    const cur = this.selectedWeaponId(b);
+    const idx = list.indexOf(cur);
+    b.afkWeaponId = list[(idx + dir + list.length) % list.length];
+    persist();
+    this.hud();
+    if (this.run) this.startDuel();
+  },
+  renderWeaponSelector() {
+    if (!this.stage) return;
+    const b = S.cur, unlocked = this.unlockedWeapons(b);
+    if (!unlocked.length) {
+      if (this.wpnSelectorEl) { this.wpnSelectorEl.remove(); this.wpnSelectorEl = null; }
+      return;
+    }
+    if (!this.wpnSelectorEl) {
+      const wrap = document.createElement("div");
+      wrap.id = "afk-weapon-selector";
+      Object.assign(wrap.style, {
+        position: "absolute", right: "12px", bottom: "88px", zIndex: "28",
+        display: "flex", flexDirection: "column", alignItems: "center", gap: "3px",
+        padding: "5px 8px", background: "rgba(10,14,22,0.86)",
+        border: "1px solid #c9953a", borderRadius: "6px", pointerEvents: "auto"
+      });
+      wrap.innerHTML =
+        '<div style="display:flex;align-items:center;gap:6px">' +
+        '<button type="button" id="afk-wpn-prev" style="background:#261a0c;border:1px solid #c9953a;color:#ffd35c;font:bold 12px monospace;padding:4px 7px;border-radius:4px;cursor:pointer">◀</button>' +
+        '<div id="afk-wpn-slot" style="width:42px;height:42px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);border:1px solid rgba(201,149,58,0.45);border-radius:4px">' +
+        '<canvas id="cv-afk-wpn" width="64" height="64" style="width:38px;height:38px;image-rendering:pixelated"></canvas>' +
+        '</div>' +
+        '<button type="button" id="afk-wpn-next" style="background:#261a0c;border:1px solid #c9953a;color:#ffd35c;font:bold 12px monospace;padding:4px 7px;border-radius:4px;cursor:pointer">▶</button>' +
+        '</div>' +
+        '<div id="afk-wpn-name" style="font:bold 10px monospace;color:#ffd35c;text-align:center"></div>';
+      this.stage.appendChild(wrap);
+      this.wpnSelectorEl = wrap;
+      wrap.querySelector("#afk-wpn-prev").onclick = e => { e.stopPropagation(); this.cycleWeapon(-1); };
+      wrap.querySelector("#afk-wpn-next").onclick = e => { e.stopPropagation(); this.cycleWeapon(1); };
+    }
+    const wid = this.selectedWeaponId(b);
+    const nameEl = this.wpnSelectorEl.querySelector("#afk-wpn-name");
+    const cv = this.wpnSelectorEl.querySelector("#cv-afk-wpn");
+    const ctx = cv.getContext("2d");
+    ctx.imageSmoothingEnabled = false;
+    ctx.clearRect(0, 0, 64, 64);
+    if (wid === null) {
+      nameEl.textContent = "👊 Mains nues";
+      nameEl.style.color = "#94a3b8";
+      ctx.font = "28px serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("👊", 32, 34);
+    } else {
+      const w = DataEngine.WEAPONS[wid];
+      nameEl.textContent = w ? w.name : "Arme";
+      nameEl.style.color = "#ffd35c";
+      const skin = renderer.weaponSprite(b, wid, () => this.renderWeaponSelector());
+      if (skin) {
+        const sc = Math.min(58 / skin.width, 58 / skin.height), dw = skin.width * sc, dh = skin.height * sc;
+        ctx.drawImage(skin.sheet, skin.x, skin.y, skin.width, skin.height, (64 - dw) / 2, (64 - dh) / 2, dw, dh);
+      } else if (w) {
+        ctx.font = "28px serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(w.icon, 32, 34);
+      }
+    }
+  },
+  hud() {
+    const b = S.cur;
+    if (!b) return;
+    this.setBg(b);
+    this.renderQuickBar();
+    this.renderWeaponSelector();
 const w = this.wave || b.afkWave || 1;
 const modeTag = this.pushMode
 ? '<span style="color:#4ade80;font-size:11px">⚔️ Ascension</span>'

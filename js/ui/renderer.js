@@ -123,7 +123,8 @@ class CanvasRenderer {
     const ctx=cv.getContext("2d",{willReadFrequently:true}); ctx.drawImage(source,0,0);
     try{
       const image=ctx.getImageData(0,0,cv.width,cv.height), px=image.data;
-      const isMagenta=px[0]>200&&px[1]<60&&px[2]>200;
+      const isMagenta=px[0]>180&&px[1]<80&&px[2]>180;
+      const isBlue=px[2]>140&&px[2]>px[0]+40&&px[2]>px[1]+40;
       for(let i=0;i<px.length;i+=4){
         const r=px[i], g=px[i+1], b=px[i+2];
         if(isMagenta){
@@ -132,6 +133,13 @@ class CanvasRenderer {
             const keep=Math.max(0,Math.min(1,(75-dom)/55));
             px[i+3]=Math.round(px[i+3]*keep);
             if(keep<1){ px[i]=Math.min(r,g+25); px[i+2]=Math.min(b,g+25); }
+          }
+        } else if(isBlue){
+          const dom=b-Math.max(r,g);
+          if(b>90&&dom>28){
+            const keep=Math.max(0,Math.min(1,(100-dom)/72));
+            px[i+3]=Math.round(px[i+3]*keep);
+            if(keep<1) px[i+2]=Math.min(b,Math.round(Math.max(r,g)+dom*keep));
           }
         } else {
           const dom=g-Math.max(r,b);
@@ -147,11 +155,55 @@ class CanvasRenderer {
     this.weaponSheets[cacheKey]=cv;
     return cv;
   }
+  static WPN_DIRS=new Array("00_sword","01_dagger","02_knife","03_saw","04_axe","05_hammer","06_pickaxe","07_bone","08_boomerang","09_trident","10_pillar","11_shuriken","12_grenade","13_molotov");
+  static PANO_CFG={
+    0:{dist:68,critDist:148}, 1:{dist:58,critDist:128}, 2:{dist:60,critDist:112}, 3:{dist:66,critDist:152},
+    4:{dist:154,critDist:142}, 5:{dist:92,critDist:156}, 6:{dist:68,critDist:144}, 7:{dist:148,critDist:152},
+    8:{dist:192,critDist:205,ranged:1}, 9:{dist:146,critDist:162}, 10:{dist:74,critDist:154},
+    11:{dist:195,critDist:210,ranged:1}, 12:{dist:195,critDist:210,ranged:1}, 13:{dist:192,critDist:205,ranged:1}
+  };
+  panoInfo(sprite,wid){
+    if(!sprite||!Number.isInteger(wid)||wid<0||wid>13) return null;
+    const wDir=CanvasRenderer.WPN_DIRS[wid];
+    const hasAtk=!!(wDir&&this.loadImg("assets/characters/"+sprite+"/sheets/"+wDir+"/atk.png"));
+    const hasBase=!!(wDir&&this.loadImg("assets/characters/"+sprite+"/sheets/"+wDir+"/base.png"));
+    const legacy=this.loadImg(DataEngine.spriteBase(sprite,wid));
+    const hasStrip=!!(legacy&&legacy.naturalHeight>legacy.naturalWidth);
+    if(!hasAtk&&!hasStrip) return null;
+    return Object.assign({hasAtk,hasBase,wDir},CanvasRenderer.PANO_CFG[wid]||{dist:92,critDist:105});
+  }
   drawBrute(ctx,b,t,anim="idle",fi=null,wid=null){
-    const cols=[0,1,2,3], set=b&&CanvasRenderer.ANIM_SETS[b.animationSet];
+    const cols=new Array(0,1,2,3), set=b&&CanvasRenderer.ANIM_SETS[b.animationSet], isOff=ctx.canvas===this.off;
     const wId=Number.isInteger(wid)&&wid>=0&&wid<=13?wid:null;
+    const wDir=wId!==null?CanvasRenderer.WPN_DIRS[wId]:null;
+    const isAtk=new Array("punch","thrust","overhead","throw").includes(anim);
+    const isCrit=new Array("uppercut","pierce","meteor","salto").includes(anim);
+    const subDir=wDir?"assets/characters/"+b.sprite+"/sheets/"+wDir+"/":null;
     const wSrc=wId!==null?DataEngine.spriteBase(b.sprite,wId):null;
-    const wImg=wSrc?this.keyedSheet(wSrc):null;
+    const rawWImg=(subDir&&this.keyedSheet(subDir+"base.png"))||(wSrc?this.keyedSheet(wSrc):null);
+    const isSingleStrip=rawWImg&&rawWImg.height>rawWImg.width;
+    const wImg=isSingleStrip?null:rawWImg;
+    const panoFile=isCrit?"crit.png":isAtk?"atk.png":"";
+    const panoImg=(subDir&&panoFile&&this.keyedSheet(subDir+panoFile))||((isAtk||isCrit)&&isSingleStrip?rawWImg:null);
+    if(panoImg){
+      const rows=4, fh=Math.floor(panoImg.height/rows), fw=panoImg.width;
+      const n=fi!==null?fi:Math.floor(t*8/1000), r=Math.min(n,rows-1);
+      if(isOff&&(this.off.width!==fw||this.off.height!==fh)){ this.off.width=fw; this.off.height=fh; }
+      const ch=isOff?this.off.height:fh, cw=isOff?this.off.width:fw;
+      if(!isOff){
+        if(ctx.canvas.height!==ch) ctx.canvas.height=ch;
+        if(ctx.canvas.width!==cw) ctx.canvas.width=cw;
+        ctx.canvas.style.width="auto";
+      }
+      ctx.clearRect(0,0,cw,ch); ctx.imageSmoothingEnabled=false;
+      ctx.drawImage(panoImg,0,r*fh+2,fw,fh-4,0,0,cw,ch);
+      return;
+    }
+    if(!isOff){
+      if(ctx.canvas.width!==64) ctx.canvas.width=64;
+      if(ctx.canvas.height!==64) ctx.canvas.height=64;
+      if(ctx.canvas.style.width==="auto") ctx.canvas.style.width="";
+    }
     const WA=wImg?CanvasRenderer.WPN_ANIMS[anim]:null;
     const A=WA||(set&&set[anim])||CanvasRenderer.ANIMS[anim]||CanvasRenderer.ANIMS.idle, row=cols.map(i=>A.r*4+i);
     let img, F;
@@ -159,10 +211,10 @@ class CanvasRenderer {
     else if(A.s==="base"){ img=this.sprite(b.sprite,!!(b&&b.animationSet)); F=A.f||row; }
     else{ img=this.sheet(b.sprite,A.s); if(img) F=row; else { img=this.sprite(b.sprite); F=A.fb; } }
     const n=fi!==null?fi:Math.floor(t*A.fps/1000), k=A.loop?n%F.length:Math.min(n,F.length-1), fr=F[k];
-    const isOff=ctx.canvas===this.off;
     const fw=img?(img.naturalWidth||img.width)/4:64, fh=img?(img.naturalHeight||img.height)/4:64;
     if(isOff&&(this.off.width!==fw||this.off.height!==fh)){ this.off.width=fw; this.off.height=fh; }
-    const cw=isOff?this.off.width:(ctx.canvas.width||64), ch=isOff?this.off.height:(ctx.canvas.height||64);
+    const ch=isOff?this.off.height:(ctx.canvas.height||64), cw=ch;
+    if(!isOff&&ctx.canvas.width!==cw) ctx.canvas.width=cw;
     ctx.clearRect(0,0,cw,ch); ctx.imageSmoothingEnabled=false;
     if(img){ ctx.drawImage(img,(fr%4)*fw,((fr/4)|0)*fh,fw,fh,0,0,cw,ch); return; }
     // Placeholder 2.5D : cube de couleur, pose selon l'animation
@@ -271,7 +323,9 @@ class CanvasRenderer {
   animFrame(f,c){
     const T=f.pet?CanvasRenderer.PET:CanvasRenderer.ANIMS, set=!f.pet&&f.b&&CanvasRenderer.ANIM_SETS[f.b.animationSet];
     const wid=!f.pet&&f.wpn&&Number.isInteger(f.wpn.id)&&f.wpn.id>=0&&f.wpn.id<=13?f.wpn.id:null;
-    const hasWpnSheet=wid!==null&&!!this.loadImg(DataEngine.spriteBase(f.b.sprite,wid));
+    const wDir=wid!==null?CanvasRenderer.WPN_DIRS[wid]:null;
+    const baseWpn=(wDir&&this.loadImg("assets/characters/"+f.b.sprite+"/sheets/"+wDir+"/base.png"))||(wid!==null?this.loadImg(DataEngine.spriteBase(f.b.sprite,wid)):null);
+    const hasWpnSheet=!!baseWpn&&!(baseWpn.naturalHeight>baseWpn.naturalWidth);
     const WA=hasWpnSheet?CanvasRenderer.WPN_ANIMS[f.anim]:null;
     const A=WA||(set&&set[f.anim])||T[f.anim]||T.idle, n=Math.floor((c-f.t0)*A.fps/1000), L=A.f?A.f.length:4;
     if(!A.loop && f.anim!=="death" && n>=L) return ["idle",Math.floor(c*6/1000)];
@@ -295,8 +349,11 @@ class CanvasRenderer {
     if(fp) ctx.scale(-1,1);
     if(f.rot) ctx.rotate(f.rot);
     ctx.scale(f.sx,f.sy);
-    const R=CanvasRenderer, isPillar=wid===10, sw=isPillar?R.SPR*1.34:R.SPR, OX=isPillar?4:0, OY=isPillar?-(sw-R.PAD*1.32):-(sw-R.PAD);
-    ctx.drawImage(this.off,-sw/2+OX,OY,sw,sw);
+    const R=CanvasRenderer, ratio=this.off.width/Math.max(1,this.off.height), isPano=ratio>1.2;
+    const hasSubBase=wid===10&&f.b&&this.loadImg("assets/characters/"+f.b.sprite+"/sheets/10_pillar/base.png");
+    const isPillar=wid===10&&!isPano&&!hasSubBase, sh=isPillar?R.SPR*1.34:R.SPR, sw=sh*ratio;
+    const OX=isPano?(sh*0.33):(isPillar?4:0), OY=isPillar?-(sh-R.PAD*1.32):-(sh-R.PAD);
+    ctx.drawImage(this.off,-sh/2+OX,OY,sw,sh);
     ctx.restore();
   }
   drawArena(ctx,A,c){
